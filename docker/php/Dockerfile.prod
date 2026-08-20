@@ -1,0 +1,46 @@
+# Ảnh production, multi-stage.
+#
+# Stage `vendor` cài dependency rồi bị vứt đi; ảnh cuối KHÔNG có composer,
+# không có dev dependency, và không có toolchain biên dịch.
+
+FROM composer:2 AS vendor
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+# `--no-dev`: Pint, Larastan, Pest không có lý do gì tồn tại trên production.
+# `--no-scripts` vì mã ứng dụng chưa được copy vào ở bước này.
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader
+
+FROM php:8.4-fpm-alpine AS runtime
+
+RUN apk add --no-cache postgresql-dev icu-dev linux-headers $PHPIZE_DEPS \
+    && docker-php-ext-install pdo_pgsql intl opcache bcmath \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del $PHPIZE_DEPS
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && rm -f "$PHP_INI_DIR/php.ini-development" \
+    && printf 'expose_php = Off\n' > "$PHP_INI_DIR/conf.d/99-hanora.ini"
+
+# opcache: bắt buộc trên production. Không bật thì mỗi request biên dịch lại
+# toàn bộ mã PHP.
+RUN { \
+      echo 'opcache.enable=1'; \
+      echo 'opcache.memory_consumption=192'; \
+      echo 'opcache.max_accelerated_files=20000'; \
+      echo 'opcache.validate_timestamps=0'; \
+    } > "$PHP_INI_DIR/conf.d/opcache.ini"
+
+WORKDIR /var/www/html
+
+COPY --from=vendor /app/vendor ./vendor
+COPY . .
+
+# `validate_timestamps=0` nghĩa là opcache không kiểm tra file đổi — nên phải
+# nạp sẵn cache config/route/view lúc build, và mỗi lần deploy là một ảnh mới.
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+USER www-data
