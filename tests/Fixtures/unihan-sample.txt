@@ -1,0 +1,14 @@
+# Unihan_Readings.txt
+# Date: 2025-07-24 00:00:00 GMT [KL]
+# Unicode Version 17.0.0
+#
+U+5B78	kMandarin	xué
+U+5B78	kVietnamese	học
+U+7FD2	kVietnamese	tập
+U+6771	kVietnamese	đang đông
+U+897F	kVietnamese	tây
+U+884C	kVietnamese	hàng
+U+9280	kVietnamese	ngân
+U+8D70	kVietnamese	tẩu
+U+9577	kVietnamese	trường
+U+5927	kVietnamese	đại

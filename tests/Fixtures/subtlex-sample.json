@@ -1,0 +1,14 @@
+{
+  "metadata": {"totalCharacterCount": 100},
+  "headers": ["Word", "WCount"],
+  "data": [
+    {"Word": "好", "WCount": 900},
+    {"Word": "一", "WCount": 800},
+    {"Word": "东西", "WCount": 700},
+    {"Word": "行", "WCount": 600},
+    {"Word": "学习", "WCount": 500},
+    {"Word": "学生", "WCount": 400},
+    {"Word": "银行", "WCount": 300},
+    {"Word": "女", "WCount": 200}
+  ]
+}
