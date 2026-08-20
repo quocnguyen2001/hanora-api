@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # PostgreSQL thật, không SQLite. Lỗi đặc thù Postgres (generated column,
+      # extension unaccent ở P6) phải gãy ở đây chứ không phải lúc deploy.
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: hanora_test
+          POSTGRES_USER: hanora
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hanora -d hanora_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Env thật của runner thắng cả .env lẫn phpunit.xml (Dotenv và PHPUnit đều
+    # không ghi đè biến môi trường đã tồn tại), nên chỉ đặt ở đây thứ mà CI
+    # thật sự cần khác đi: toạ độ database và việc không có service redis.
+    #
+    # KHÔNG đặt CACHE_STORE / SESSION_DRIVER ở đây: phpunit.xml đã chọn `array`
+    # cho cả hai, và ghi đè bằng driver `file` sẽ khiến bộ đếm throttle sống
+    # xuyên suốt job → test bị 429 chỉ trên CI.
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: hanora_test
+      DB_USERNAME: hanora
+      DB_PASSWORD: secret
+      QUEUE_CONNECTION: sync
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl, bcmath
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Lint (Pint)
+        run: composer run-script lint:test
+
+      - name: Static analysis (Larastan)
+        run: composer run-script analyse
+
+      - name: Test (Pest)
+        run: php artisan test

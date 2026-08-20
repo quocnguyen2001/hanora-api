@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - app
+        - database
+        - routes
+
+    # checkModelProperties cố tình để tắt: nó đòi pseudo-type
+    # `array<model property of X, mixed>`, và cú pháp đó không parse được trên
+    # larastan 3.10 + phpdoc-parser hiện tại (phpDoc.parseError). Bật lại khi
+    # upstream sửa; level 6 đã bắt được phần lớn giá trị.
