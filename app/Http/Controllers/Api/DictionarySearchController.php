@@ -15,6 +15,10 @@ final class DictionarySearchController
      * Cache dài được vì dữ liệu từ điển hoàn toàn tĩnh sau V1 — không còn trạng
      * thái dịch thay đổi theo thời gian. `public` an toàn vì response KHÔNG
      * chứa trường nào theo user.
+     *
+     * `mode` nằm trong query string nên mỗi mode có entry cache riêng — đúng,
+     * vì `?q=xin chào&mode=vi` và `&mode=cn` là hai kết quả khác nhau thật.
+     * Đổi lại, một truy vấn tra ở cả hai mode chiếm gấp đôi chỗ cache.
      */
     private const CACHE_SECONDS = 60 * 60 * 24;
 
@@ -23,6 +27,7 @@ final class DictionarySearchController
         ['results' => $results, 'hint' => $hint] = $search->search(
             $request->searchTerm(),
             $request->page(),
+            $request->mode(),
         );
 
         $words = $search->hydrate($results->items());

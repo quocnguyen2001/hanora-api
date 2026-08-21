@@ -1,0 +1,10 @@
+# CC-CEDICT fixture RIÊNG cho nhánh nghĩa tiếng Việt.
+# KHÔNG thêm vào cedict-sample.u8: bảy test file nạp file đó, và
+# DictionaryImportTest chốt số dòng, HanVietImportTest chốt exit code của gate
+# độ phủ, ReviewTest bốc distractor ngẫu nhiên từ cùng bảng.
+貓 猫 [mao1] /cat (CL:隻|只[zhi1])/
+謝謝 谢谢 [xie4 xie5] /to thank/thanks/thank you/
+電腦 电脑 [dian4 nao3] /computer/CL:臺|台[tai2]/
+吃 吃 [chi1] /to eat/to consume/to suffer/
+新潮 新潮 [xin1 chao2] /modern; fashionable/
+你好 你好 [ni3 hao3] /hello; hi/

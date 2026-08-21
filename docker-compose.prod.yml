@@ -101,7 +101,18 @@ services:
     env_file: [.env.production.db]
     # `requirepass` BẬT kể cả khi redis không lộ ra ngoài — phòng tuyến thứ hai
     # cho trường hợp một service khác trong stack bị chiếm.
-    command: ['sh', '-c', 'redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes']
+    #
+    # `maxmemory` + `allkeys-lru` là BẮT BUỘC, không phải tinh chỉnh: cache cầu
+    # nối tìm kiếm tiếng Việt đánh key theo chuỗi người dùng gõ, và màn tìm kiếm
+    # bắn request theo từng mốc debounce 250ms — mỗi mốc là một key mới. Không có
+    # trần và chính sách loại bỏ, một tài khoản ở 60 req/phút sinh key không giới
+    # hạn cho tới khi redis từ chối ghi và mọi đường có cache bắt đầu ném lỗi.
+    command:
+      - sh
+      - -c
+      - >-
+        redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes
+        --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
     networks: [internal]

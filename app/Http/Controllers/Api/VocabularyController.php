@@ -8,6 +8,7 @@ use App\Http\Requests\VocabularyIndexRequest;
 use App\Http\Requests\VocabularyStoreRequest;
 use App\Http\Resources\UserWordResource;
 use App\Models\UserWord;
+use App\Services\Dictionary\VietnameseQueryBridge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use Illuminate\Http\Response;
 final class VocabularyController
 {
     private const PER_PAGE = 20;
+
+    public function __construct(private readonly VietnameseQueryBridge $bridge) {}
 
     public function index(VocabularyIndexRequest $request): JsonResponse
     {
@@ -143,7 +146,9 @@ final class VocabularyController
 
         $like = '%'.addcslashes($term, '%_\\').'%';
 
-        $query->whereHas('word', function ($wordQuery) use ($like, $term): void {
+        $terms = $this->bridge->resolve($term);
+
+        $query->whereHas('word', function ($wordQuery) use ($like, $term, $terms): void {
             $wordQuery
                 ->where('simplified', 'like', $like)
                 ->orWhere('traditional', 'like', $like)
@@ -152,6 +157,34 @@ final class VocabularyController
                 // dùng khi sinh cột, nếu không index sẽ không được dùng.
                 ->orWhereRaw('han_viet_plain LIKE \'%\' || f_unaccent(?) || \'%\'', [$term])
                 ->orWhere('definitions_en_text', 'ilike', $like);
+
+            if ($terms === []) {
+                return;
+            }
+
+            /*
+             * Nghĩa tiếng Việt — dùng ĐÚNG ngữ nghĩa mà màn tìm kiếm dùng.
+             *
+             * KHÔNG dùng `ilike '%cat%'` như năm điều kiện phía trên. Chúng khớp
+             * chuỗi người dùng TỰ GÕ nên false positive tự giải thích được; còn
+             * từ khóa do cầu nối sinh ra là chuỗi người dùng chưa từng thấy. Đo
+             * trên corpus thật: `definitions_en_text ILIKE '%cat%'` khớp 2.155
+             * dòng, so với 66 nếu khớp theo biên từ — gõ `con mèo` mà nhận về
+             * *education*, *category*, *delicate* thì không có cách nào giải
+             * thích cho người dùng.
+             *
+             * Hai điều kiện vì cùng lý do với nhánh rank 6 của `WordSearchService`:
+             * `search_tsv` trộn âm Hán-Việt với định nghĩa tiếng Anh, nên phải
+             * tính lại tsvector trên riêng phần định nghĩa để loại những dòng chỉ
+             * khớp nhờ âm Hán-Việt.
+             */
+            $pieces = implode(' || ', array_fill(
+                0, count($terms), "plainto_tsquery('simple', f_unaccent(?))"
+            ));
+
+            $wordQuery->orWhere(fn ($sub) => $sub
+                ->whereRaw("search_tsv @@ ({$pieces})", $terms)
+                ->whereRaw("to_tsvector('simple', f_unaccent(definitions_en_text)) @@ ({$pieces})", $terms));
         });
     }
 }
