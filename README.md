@@ -69,6 +69,22 @@ Ba nguồn, tải về `storage/app/dictionary/` (thư mục này **không** com
 | SUBTLEX-CH-WF | `subtlex-ch-wf.json` | [leonsilicon/subtlex-ch-wf](https://github.com/leonsilicon/subtlex-ch-wf) | xem repo nguồn |
 | Unihan | `Unihan_Readings.txt` | Unicode 17.0.0 (2025-07-24) | [Unicode License](https://www.unicode.org/terms_of_use.html) |
 | Bảng Hán-Việt bổ sung | `hanviet-supplement.csv` | [ph0ngp/hanviet-pinyin-wordlist](https://github.com/ph0ngp/hanviet-pinyin-wordlist) | xem repo nguồn |
+| VNEDICT | **`database/data/vnedict.txt`** — commit trong git, xem ghi chú dưới | 15/02/2019, tải 2026-08-21, SHA-256 `01a48269…19ea24` | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+
+**VNEDICT nằm ở `database/data/`, KHÔNG phải `storage/app/dictionary/` như bốn
+nguồn trên.** Ba lý do: `storage/app/` gitignore toàn bộ nên `git add` bị bỏ qua im
+lặng; production mount named volume `storage-data` đè lên `/var/www/html/storage`,
+mà volume đã tồn tại từ deploy trước nên Docker không seed lại từ image; còn
+`database/` đi thẳng cùng image và không bị volume nào che. Nguồn upstream
+(`http://www.denisowski.org/Vietnamese/vnedict.txt`) chỉ có HTTP và host không phục
+vụ được HTTPS, nên file được commit kèm SHA-256 mà `vi-lexicon:import` kiểm trước
+khi parse, cộng bản lưu readme ở `database/data/vnedict-readme.html` làm bằng chứng
+giấy phép.
+
+```bash
+php artisan vi-lexicon:import
+php artisan vi-lexicon:status  # exit code khác 0 nếu bảng rỗng hoặc dưới ngưỡng
+```
 
 ```bash
 cd storage/app/dictionary
@@ -88,9 +104,12 @@ php artisan han-viet:status    # exit code khác 0 nếu độ phủ dưới ng�
 ```
 
 **Attribution là nghĩa vụ, không phải phép lịch sự (D9).** Trang "Về hanora"
-(P20) phải ghi công CC-CEDICT (CC BY-SA) và Unihan (Unicode License). Vì không
-sinh dữ liệu phái sinh nào từ CC-CEDICT — V1 đã bỏ dịch máy — nên không phát
-sinh nghĩa vụ ShareAlike cho nội dung tự tạo.
+(P20) phải ghi công CC-CEDICT (CC BY-SA), Unihan (Unicode License), và
+**VNEDICT (CC BY 3.0)**. Vì không sinh dữ liệu phái sinh nào từ CC-CEDICT — V1 đã
+bỏ dịch máy — nên không phát sinh nghĩa vụ ShareAlike cho nội dung tự tạo.
+
+VNEDICT phải ghi công dù **không hiển thị ở đâu trong app**: nó chỉ dùng để khớp
+truy vấn. CC BY yêu cầu ghi công khi sử dụng, không phải khi hiển thị.
 
 ### Âm Hán-Việt: vì sao cần HAI nguồn
 
@@ -190,8 +209,13 @@ docker compose -f docker-compose.prod.yml exec app php artisan dictionary:import
 docker compose -f docker-compose.prod.yml exec app php artisan han-viet:import
 docker compose -f docker-compose.prod.yml exec app php artisan han-viet:status   # gate ≥70%
 docker compose -f docker-compose.prod.yml exec app php artisan examples:import
+docker compose -f docker-compose.prod.yml exec app php artisan vi-lexicon:import
+docker compose -f docker-compose.prod.yml exec app php artisan vi-lexicon:status # gate ≥50k mục
 
 # 5. Frontend
+# CHỈ deploy frontend sau khi `vi-lexicon:status` PASS: màn Tài khoản hứa với
+# người dùng là tìm được bằng nghĩa tiếng Việt, còn thiếu bảng thì tính năng đó
+# hỏng im lặng — không lỗi, không log, chỉ là không ra kết quả.
 cd ../hanora-app && npm ci && npm run build
 docker cp dist/. "$(docker compose -f ../hanora-api/docker-compose.prod.yml ps -q nginx)":/var/www/html/frontend/
 

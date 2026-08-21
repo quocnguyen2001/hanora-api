@@ -1,5 +1,18 @@
 * text=auto eol=lf
 
+# Nguồn từ điển bên thứ ba: git KHÔNG được đụng vào byte nào.
+#
+# `vi-lexicon:import` verify SHA-256 của file trước khi parse, và hằng số đó
+# tính trên bản gốc CRLF của upstream. Với `text=auto eol=lf` ở trên, git sẽ
+# chuẩn hóa 54.376 dòng CRLF thành LF lúc checkout — đo được: checksum đổi từ
+# `01a48269…` sang `1ee331b7…`, và import abort trên mọi bản clone mới cũng như
+# trong image production.
+#
+# `-text` giữ nguyên byte cả hai chiều. Đây là artifact được checksum, không phải
+# mã nguồn cần chuẩn hóa.
+database/data/vnedict.txt -text
+database/data/vnedict-readme.html -text
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
