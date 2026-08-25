@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Tìm kiếm từ điển có xếp hạng.
  *
- * Bảy nhánh, gán `rank` rồi `ORDER BY rank, frequency_rank NULLS LAST`. Thứ tự
- * này là hợp đồng với P7 — đổi nó là đổi cảm giác của cả màn tìm kiếm.
+ * Bảy nhánh, gán `rank` rồi `ORDER BY rank, precision, frequency_rank NULLS LAST`.
+ * Thứ tự này là hợp đồng với P7 — đổi nó là đổi cảm giác của cả màn tìm kiếm.
  *
  * | rank | Nhánh |
  * |---|---|
@@ -22,8 +22,11 @@ use Illuminate\Support\Facades\DB;
  * | 3 | khớp chính xác pinyin |
  * | 4 | prefix pinyin |
  * | 5 | khớp/prefix âm Hán-Việt |
- * | 6 | full-text trên `search_tsv` **và** nghĩa tiếng Việt qua `VietnameseQueryBridge` |
+ * | 6 | full-text trên `search_tsv` **và** nghĩa tiếng Việt trên `definitions_vi` |
  * | 7 | trigram trên pinyin — cứu chuỗi gõ sai |
+ *
+ * `precision` là bậc phụ BÊN TRONG một rank, không phải rank mới. Chỉ nhánh
+ * nghĩa tiếng Việt phát ra giá trị khác mặc định; xem `viMeaningBranch()`.
  */
 final class WordSearchService
 {
@@ -56,6 +59,22 @@ final class WordSearchService
 
     private const RANK_TRIGRAM = 7;
 
+    /**
+     * `precision` mặc định — bậc phụ bên trong một rank, nhỏ hơn là tốt hơn.
+     *
+     * Giá trị này là bậc XẤU NHẤT, không phải 0. Nó là thứ mọi nhánh KHÔNG
+     * phải nghĩa tiếng Việt phát ra, và full-text tiếng Anh dùng chung rank 6
+     * với nhánh nghĩa Việt — nên đặt mặc định 0 sẽ đẩy mọi kết quả tiếng Anh
+     * lên trên mọi tầng nghĩa Việt, tức lật ngược đúng thứ phase này xây.
+     *
+     * Truy vấn tiếng Anh (`student`) chỉ khớp full-text nên TOÀN BỘ kết quả đều
+     * mang giá trị này, và thứ tự của chúng không đổi một dòng nào.
+     */
+    private const PRECISION_DEFAULT = 6;
+
+    /** Dưới ngưỡng này thì mọi nghĩa đều khớp một cái gì đó. */
+    private const MIN_MEANING_LENGTH = 3;
+
     /** `hv_not_found`: truy vấn trông như tiếng Việt nhưng không khớp âm nào. */
     public const HINT_HAN_VIET_NOT_FOUND = 'hv_not_found';
 
@@ -79,7 +98,7 @@ final class WordSearchService
     public function __construct(
         private readonly QueryClassifier $classifier,
         private readonly PinyinNormalizer $pinyin,
-        private readonly VietnameseQueryBridge $bridge,
+        private readonly VietnameseQueryNormalizer $normalizer,
     ) {}
 
     /**
@@ -92,6 +111,7 @@ final class WordSearchService
 
         $results = $this->buildQuery($query, $class, $mode)
             ->orderBy('rank')
+            ->orderBy('precision')
             ->orderByRaw('frequency_rank ASC NULLS LAST')
             ->orderBy('id')
             ->paginate(self::PER_PAGE, ['*'], 'page', $page);
@@ -134,16 +154,27 @@ final class WordSearchService
 
         if ($union === null) {
             // Không nhánh nào áp dụng: trả tập rỗng thay vì trả cả từ điển.
-            $union = DB::table('dictionary_words')->selectRaw('*, 0 as rank')->whereRaw('false');
+            $union = DB::table('dictionary_words')
+                ->selectRaw('*, 0 as rank, '.self::PRECISION_DEFAULT.' as precision')
+                ->whereRaw('false');
         }
 
+        /*
+         * `ORDER BY id, rank, precision` — `precision` ở đây KHÔNG thừa.
+         *
+         * Một dòng có thể tới từ hai nhánh CÙNG rank 6: full-text tiếng Anh
+         * (precision 6) và nghĩa tiếng Việt (precision 0–5). Chỉ sắp theo
+         * `rank` thì hai dòng đó hòa, `DISTINCT ON` giữ dòng nào là tùy
+         * Postgres, và bậc nghĩa Việt biến mất một cách ngẫu nhiên.
+         */
         return DB::query()
             ->fromSub(
                 DB::query()
                     ->selectRaw('DISTINCT ON (id) *')
                     ->fromSub($union, 'branches')
                     ->orderBy('id')
-                    ->orderBy('rank'),
+                    ->orderBy('rank')
+                    ->orderBy('precision'),
                 'ranked'
             );
     }
@@ -172,7 +203,7 @@ final class WordSearchService
         $plain = $this->pinyin->stripDiacritics($query);
 
         $branches = [
-            $this->hanVietBranch($plain),
+            $this->hanVietBranch($plain, $this->accentedForm($query)),
             $this->fullTextBranch($query),
         ];
 
@@ -186,11 +217,113 @@ final class WordSearchService
     }
 
     /**
+     * Nhánh nghĩa tiếng Việt — khớp THẲNG lên `definitions_vi`, không qua cầu nối.
+     *
+     * Trả `null` khi truy vấn quá ngắn để mang tín hiệu; nhánh không được gắn
+     * vào UNION thay vì gắn một nhánh không bao giờ khớp.
+     *
+     * ## Một vector, chọn theo truy vấn — không phải cả hai
+     *
+     * Truy vấn CÓ DẤU đi `search_vi_tsv`; truy vấn không dấu đi
+     * `search_vi_plain_tsv`. Đây là kết quả đo, không phải sở thích:
+     *
+     * - Bỏ dấu CẢ HAI vế cho ra rác — `chó`→你/他/吗, `bàn`→你/我们,
+     *   `táo`→么/远/秀, vì `cho`/`ban`/`tao` có mặt khắp nơi trong định nghĩa.
+     *   Tiếng Việt đầy cặp tối thiểu chỉ khác thanh điệu; bỏ dấu phá nó nặng
+     *   hơn phá pinyin rất nhiều.
+     * - Chạy CẢ HAI vector rồi xếp bậc cũng hỏng, theo chiều ngược lại:
+     *   `may tinh` khớp `may` và `tinh` CÓ DẤU trong nghĩa của 吉凶 ("may mắn
+     *   hay xui xẻo"), nên một khớp trùng hợp ngẫu nhiên ở bậc cao đứng trước
+     *   电脑 ở bậc thấp. Đo được: 吉凶, 祸福吉凶, rồi mới tới 电脑.
+     *
+     * Mỗi vector phục vụ đúng lớp truy vấn nó tồn tại vì. `precision` 0–2 là
+     * đường có dấu, 3–5 là đường không dấu — số khác nhau để `ORDER BY` vẫn
+     * nói đúng thứ tự nếu sau này có ai nối hai đường lại.
+     *
+     * ## Ba bậc, và vì sao bậc 0 so với truy vấn GỐC
+     *
+     * | precision | Điều kiện |
+     * |---|---|
+     * | 0 / 3 | nghĩa ĐẦU đúng bằng truy vấn gốc |
+     * | 1 / 4 | nghĩa ĐẦU có chứa truy vấn (nguyên cụm, theo biên từ) |
+     * | 2 / 5 | khớp ở đâu đó trong các nghĩa |
+     *
+     * Bậc 0 so với truy vấn GỐC — trước khi bỏ loại từ — và đó là thứ giữ cho
+     * việc bỏ loại từ không phá những ngữ mà loại từ là một phần của nghĩa:
+     *
+     *   `con mèo` → bỏ `con`, tra `mèo` → 猫 bậc 1 (nghĩa đầu là "mèo…")
+     *   `quả táo` → bỏ `quả`, tra `táo`, nhưng nghĩa đầu của 苹果 ĐÚNG BẰNG
+     *               "quả táo" → bậc 0, đứng trên 清醒 ("tỉnh táo") ở bậc 1
+     *
+     * Không có bậc 0 thì `quả táo` tụt xuống thành `táo`, và `táo` là ca đa
+     * nghĩa mà plan đã chấp nhận là không sửa được.
+     *
+     * Chỉ xét nghĩa ĐẦU, không phải mọi nghĩa. Đây là lựa chọn có đo, theo cả
+     * hai hướng:
+     *
+     * - Chất lượng: `hoc sinh` khớp trọn vẹn nghĩa đầu của 学生, nhưng cũng
+     *   khớp trọn vẹn một nghĩa PHÍA SAU của 生 — mà 生 có tần suất tốt hơn nên
+     *   nó thắng. Nghĩa đầu là nghĩa chính; CVDICT xếp nó trước có lý do.
+     * - Chi phí: quét mọi nghĩa cần `jsonb_array_elements_text` trên TỪNG dòng
+     *   GIN trả về. Trên ca fan-out cao nhất (`nguoi`, 5.909 dòng) riêng nó là
+     *   +32ms, đủ để vượt ngưỡng 150ms của P6.
+     *
+     * Hai cột `definitions_vi_first*` dựng sẵn nghĩa đầu đã thường hóa, nên
+     * `CASE` chỉ còn so chuỗi. `strpos` với hai đầu chèn dấu cách là cách khớp
+     * THEO BIÊN TỪ mà không cần gọi `to_tsvector` trên từng dòng — cũng đo được
+     * là +35ms nếu gọi.
+     */
+    private function viMeaningBranch(string $query): ?Builder
+    {
+        $normalized = $this->normalizer->normalize($query);
+
+        if (mb_strlen($normalized) < self::MIN_MEANING_LENGTH) {
+            return null;
+        }
+
+        $search = $this->normalizer->withoutLeadingClassifier($normalized);
+        $accented = $this->normalizer->isAccented($normalized);
+
+        $vector = $accented ? 'search_vi_tsv' : 'search_vi_plain_tsv';
+        $first = $accented ? 'definitions_vi_first' : 'definitions_vi_first_plain';
+        $base = $accented ? 0 : 3;
+
+        // Vế bỏ dấu bọc CẢ HAI phía bằng `f_unaccent` — cùng wrapper IMMUTABLE
+        // mà cột generated dùng, nếu không planner sẽ không đụng tới index.
+        $tsquery = $accented
+            ? "plainto_tsquery('simple', ?)"
+            : "plainto_tsquery('simple', f_unaccent(?))";
+        $term = $accented ? '?' : 'f_unaccent(?)';
+
+        /*
+         * `f_unaccent(?)` trên một tham số là hằng theo dòng, nên Postgres tính
+         * nó MỘT lần cho cả câu — khác hẳn `f_unaccent(cột)`, thứ chạy trên từng
+         * dòng và là 36ms đã đo.
+         *
+         * `CASE` chỉ chạy trên tập mà GIN index đã lọc ra qua `WHERE`, cùng khuôn
+         * với `similarity()` đứng sau toán tử `%` ở nhánh trigram.
+         */
+        $precision = <<<SQL
+            CASE
+                WHEN {$first} = {$term} THEN {$base}
+                WHEN strpos(' ' || {$first} || ' ', ' ' || {$term} || ' ') > 0 THEN {$base}+1
+                ELSE {$base}+2
+            END
+        SQL;
+
+        return $this->branch(
+            self::RANK_VI_MEANING,
+            fn (Builder $q) => $q->whereRaw("{$vector} @@ {$tsquery}", [$search]),
+            $precision,
+            [$normalized, $search],
+        );
+    }
+
+    /**
      * Mode `cn` — người dùng nói rõ họ đang gõ tiếng Trung.
      *
-     * KHÔNG có nhánh Hán-Việt, KHÔNG có cầu nối nghĩa tiếng Việt, và KHÔNG gọi
-     * `bridge->resolve()` — bỏ luôn một lượt tra bảng lexicon trên đường nóng
-     * chứ không chỉ bỏ nhánh.
+     * KHÔNG có nhánh Hán-Việt và KHÔNG có nhánh nghĩa tiếng Việt: ai chọn
+     * `中文` thì đang gõ tiếng Trung, và hai nhánh đó chỉ sinh nhiễu.
      *
      * Full-text định nghĩa tiếng Anh vẫn chạy: `student` phải ra 学生 ở cả hai
      * mode.
@@ -245,7 +378,7 @@ final class WordSearchService
     private function pinyinBranches(string $query): array
     {
         $normalized = $this->pinyin->plain($query);
-        $meaningTerms = $this->bridge->resolve($query);
+        $meaning = $this->viMeaningBranch($query);
         $branches = [];
 
         /*
@@ -258,16 +391,23 @@ final class WordSearchService
          * nhận về ba từ Hán không liên quan.
          *
          * Tín hiệu phân biệt là DẤU, không phải dấu cách. Đo được: `ni hao` và
-         * `xue xi` (pinyin gõ tách) CŨNG tra được ra nghĩa tiếng Việt — `hao` là
-         * "hao mòn", `xi` là một từ thật — nên "có cách + tra được" quá yếu, dùng
-         * nó sẽ phá luôn người gõ `ni hao` để tìm 你好. Người học gõ pinyin hầu
-         * như luôn gõ không dấu; `chào` thì bàn phím tiếng Việt mới sinh ra.
+         * `xue xi` (pinyin gõ tách) CŨNG khớp nghĩa tiếng Việt — `hao` có trong
+         * "hao mòn", `xi` là một từ thật — nên "có cách + khớp được" quá yếu,
+         * dùng nó sẽ phá luôn người gõ `ni hao` để tìm 你好. Người học gõ pinyin
+         * hầu như luôn gõ không dấu; `chào` thì bàn phím tiếng Việt mới sinh ra.
+         *
+         * Vế thứ ba là một lượt `EXISTS` trên GIN index, chạy ĐÚNG MỘT LẦN cho
+         * mỗi truy vấn có dấu trên đường auto. Nó thay cho `resolve()` của cầu
+         * nối cũ: không có nó thì `xuéxí` — pinyin có dấu thanh — cũng bị hạ
+         * bậc, và 学习 rơi khỏi vị trí 1.
          *
          * Hạ bậc chứ KHÔNG bỏ nhánh: 新潮 vẫn còn trong kết quả, chỉ đứng sau.
          * Va chạm này hiếm — đo được 703/49.491 cụm tiếng Việt nhiều tiếng (1,4%)
          * có dạng gộp trùng `pinyin_plain` của một từ Hán nào đó.
          */
-        $demotePinyin = $meaningTerms !== [] && $query !== $this->pinyin->stripDiacritics($query);
+        $demotePinyin = $meaning !== null
+            && $query !== $this->pinyin->stripDiacritics($query)
+            && (clone $meaning)->exists();
 
         if ($normalized !== '') {
             $branches[] = $this->branch($demotePinyin ? 8 : 3, fn (Builder $q) => $q
@@ -282,19 +422,20 @@ final class WordSearchService
          * không dấu, đây là ca thường gặp chứ không phải ngoại lệ.
          */
         if ($this->classifier->mayBeVietnamese($query)) {
-            $branches[] = $this->hanVietBranch($this->pinyin->stripDiacritics($query));
+            $branches[] = $this->hanVietBranch(
+                $this->pinyin->stripDiacritics($query),
+                $this->accentedForm($query),
+            );
         }
 
         $branches[] = $this->fullTextBranch($query);
 
         /*
          * `mayBeVietnamese()` KHÔNG phải cổng lọc — nó trả `true` cho mọi truy
-         * vấn latin không rỗng. Cổng thật là `resolve()` trả về rỗng hay không,
-         * và nó nằm trong `viMeaningBranch()`. Đây cũng là lý do `con mèo` tới
-         * được đây: nó phân loại thành lớp pinyin, không phải lớp Việt.
+         * vấn latin không rỗng. Nhánh nghĩa Việt tự lọc bằng độ dài tối thiểu và
+         * bằng chính GIN index. Đây cũng là lý do `con mèo` tới được đây: nó
+         * phân loại thành lớp pinyin, không phải lớp Việt.
          */
-        $meaning = $this->viMeaningBranch($query, $meaningTerms);
-
         if ($meaning !== null) {
             $branches[] = $meaning;
         }
@@ -310,15 +451,54 @@ final class WordSearchService
         return $branches;
     }
 
-    private function hanVietBranch(string $plainQuery): Builder
+    /**
+     * Nhánh âm Hán-Việt (rank 5).
+     *
+     * `$accentedQuery` khác `null` khi người dùng gõ CÓ DẤU. Khi đó nhánh này
+     * phải kiểm lại trên `han_viet` còn nguyên dấu, và đây không phải tinh chỉnh
+     * — nó là chính phát hiện của phase này, áp lên một tầng khác.
+     *
+     * Đo được: `chó` khớp 23 dòng qua prefix bỏ dấu `cho%` — 撑 (`chống`),
+     * 帚 (`chổi`), 肘 (`chỏ`), 肘子 (`chỏ tử`). Không dòng nào đọc là `chó`;
+     * chúng chỉ va vào nhau SAU KHI bỏ dấu. Rank 5 đứng trên rank 6, nên cả 23
+     * dòng đó đẩy 狗 — từ có nghĩa tiếng Việt đúng bằng `chó` — ra khỏi trang.
+     *
+     * Vế bỏ dấu vẫn là vế chạy trên index và thu hẹp còn vài chục dòng; vế có
+     * dấu chỉ lọc trên tập đó nên không tốn gì. Cùng khuôn với `similarity()`
+     * đứng sau toán tử `%` ở nhánh trigram.
+     *
+     * Truy vấn KHÔNG dấu (`hoc tap`) đi đường cũ không đổi một dòng nào: người
+     * gõ không dấu vốn đã chấp nhận sự mơ hồ đó.
+     */
+    private function hanVietBranch(string $plainQuery, ?string $accentedQuery = null): Builder
     {
-        /*
-         * `f_unaccent` chứ không phải `unaccent`: phải đúng wrapper IMMUTABLE
-         * mà P4 dùng khi sinh cột, nếu không Postgres sẽ không dùng index.
-         */
-        return $this->branch(5, fn (Builder $q) => $q
-            ->whereRaw('han_viet_plain = f_unaccent(?)', [$plainQuery])
-            ->orWhereRaw('han_viet_plain LIKE f_unaccent(?) || \'%\'', [$this->escapeLike($plainQuery)]));
+        return $this->branch(5, function (Builder $q) use ($plainQuery, $accentedQuery): Builder {
+            /*
+             * `f_unaccent` chứ không phải `unaccent`: phải đúng wrapper IMMUTABLE
+             * mà P4 dùng khi sinh cột, nếu không Postgres sẽ không dùng index.
+             */
+            $q->where(fn (Builder $sub): Builder => $sub
+                ->whereRaw('han_viet_plain = f_unaccent(?)', [$plainQuery])
+                ->orWhereRaw('han_viet_plain LIKE f_unaccent(?) || \'%\'', [$this->escapeLike($plainQuery)]));
+
+            if ($accentedQuery === null) {
+                return $q;
+            }
+
+            return $q->where(fn (Builder $sub): Builder => $sub
+                ->whereRaw('lower(han_viet) = ?', [$accentedQuery])
+                ->orWhereRaw('lower(han_viet) LIKE ? || \'%\'', [$this->escapeLike($accentedQuery)]));
+        });
+    }
+
+    /**
+     * Dạng có dấu đã thường hóa của truy vấn, hoặc `null` nếu nó vốn không dấu.
+     */
+    private function accentedForm(string $query): ?string
+    {
+        $normalized = $this->normalizer->normalize($query);
+
+        return $this->normalizer->isAccented($normalized) ? $normalized : null;
     }
 
     private function fullTextBranch(string $query): Builder
@@ -328,72 +508,29 @@ final class WordSearchService
     }
 
     /**
-     * Nhánh nghĩa tiếng Việt — `null` khi không cầu nối được.
+     * `?::int`, không phải `?` trần.
      *
-     * Trả `null` thay vì một builder rỗng để câu SQL không mang theo một nhánh
-     * UNION không bao giờ khớp: phần lớn truy vấn latin không phải tiếng Việt.
+     * PDO gửi tham số xuống dạng chuỗi, nên Postgres suy ra kiểu `text` cho cột
+     * `rank` và `ORDER BY rank` sắp xếp theo THỨ TỰ CHỮ. Với rank 1–7 thì
+     * text-sort trùng numeric-sort nên không ai thấy gì; ngay khi có rank hai
+     * chữ số thì `'10' < '6'` và cả bảng xếp hạng lật ngược — đo được: mọi nhánh
+     * yếu nhất nhảy lên đầu, `con mèo` trả 从/聪/葱 thay vì 猫.
      *
-     * `plainto_tsquery` chứ KHÔNG phải `phraseto_tsquery`: bridge đã gỡ hư từ
-     * tiếng Anh khỏi từng nghĩa nên chỉ còn từ nội dung, và truy vấn cụm sẽ kéo
-     * posting list của `to` (32.506/123.646 dòng) làm GIN index bị bỏ qua.
+     * `precision` chịu đúng ràng buộc đó nên cũng phải là số, không phải chuỗi.
+     * Mặc định là hằng số ghép thẳng vào SQL — nó không tới từ người dùng.
      *
-     * @param  list<string>|null  $terms  Kết quả `resolve()` đã có sẵn, để nhánh
-     *                                    pinyin và nhánh này không tra hai lần.
-     */
-    private function viMeaningBranch(string $query, ?array $terms = null): ?Builder
-    {
-        $terms ??= $this->bridge->resolve($query);
-
-        if ($terms === []) {
-            return null;
-        }
-
-        /*
-         * `$pieces` dựng từ SỐ LƯỢNG phần tử, không phải nội dung — mọi từ khóa
-         * đi qua binding. Guard mảng rỗng nằm ngay trên, trong thân hàm, chứ
-         * không dựa vào quy ước ở call site: `implode` trên mảng rỗng cho `''`,
-         * và `search_tsv @@ ()` là lỗi cú pháp chứ không phải tập rỗng.
-         */
-        $pieces = implode(' || ', array_fill(
-            0, count($terms), "plainto_tsquery('simple', f_unaccent(?))"
-        ));
-
-        /*
-         * HAI điều kiện, không phải một.
-         *
-         * `search_tsv` là `to_tsvector('simple', f_unaccent(han_viet || defs))` —
-         * nó TRỘN âm Hán-Việt với định nghĩa tiếng Anh vào cùng một vector. Nên
-         * từ khóa tiếng Anh va vào không gian Hán-Việt đã bỏ dấu: tra `con mèo`
-         * cho ra từ khóa `cat`, và `cat` khớp 吃 vì âm Hán-Việt của nó là `cật`,
-         * bỏ dấu thành `cat`. 吃 có `frequency_rank` tốt hơn 猫 nên đứng trước —
-         * đo được: 吃, 吃饭, rồi mới tới 猫.
-         *
-         * Điều kiện một chạy trên GIN index và thu hẹp còn vài trăm dòng; điều
-         * kiện hai tính lại tsvector CHỈ trên phần định nghĩa để loại những dòng
-         * chỉ khớp nhờ âm Hán-Việt. Nó là lời gọi hàm nên không dùng index được,
-         * nhưng chỉ chạy trên tập đã lọc — cùng khuôn với `similarity()` đứng sau
-         * toán tử `%` ở nhánh trigram.
-         */
-        return $this->branch(self::RANK_VI_MEANING, fn (Builder $q) => $q
-            ->whereRaw("search_tsv @@ ({$pieces})", $terms)
-            ->whereRaw("to_tsvector('simple', f_unaccent(definitions_en_text)) @@ ({$pieces})", $terms));
-    }
-
-    /**
      * @param  callable(Builder): Builder  $where
+     * @param  string|null  $precision  Biểu thức SQL cho `precision`; `null` là bậc mặc định.
+     * @param  list<string>  $bindings  Tham số của biểu thức trên, theo đúng thứ tự.
      */
-    private function branch(int $rank, callable $where): Builder
+    private function branch(int $rank, callable $where, ?string $precision = null, array $bindings = []): Builder
     {
-        /*
-         * `?::int`, không phải `?` trần.
-         *
-         * PDO gửi tham số xuống dạng chuỗi, nên Postgres suy ra kiểu `text` cho
-         * cột `rank` và `ORDER BY rank` sắp xếp theo THỨ TỰ CHỮ. Với rank 1–7 thì
-         * text-sort trùng numeric-sort nên không ai thấy gì; ngay khi có rank hai
-         * chữ số thì `'10' < '6'` và cả bảng xếp hạng lật ngược — đo được: mọi
-         * nhánh yếu nhất nhảy lên đầu, `con mèo` trả 从/聪/葱 thay vì 猫.
-         */
-        $builder = DB::table('dictionary_words')->selectRaw('*, ?::int as rank', [$rank]);
+        $expression = $precision ?? (string) self::PRECISION_DEFAULT;
+
+        // Binding của `selectRaw` được compile TRƯỚC binding của `where`, nên
+        // thứ tự ở đây là thứ tự thật trong câu lệnh.
+        $builder = DB::table('dictionary_words')
+            ->selectRaw("*, ?::int as rank, ({$expression})::int as precision", [$rank, ...$bindings]);
 
         return $where($builder);
     }

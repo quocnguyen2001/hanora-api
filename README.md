@@ -69,21 +69,25 @@ Ba nguồn, tải về `storage/app/dictionary/` (thư mục này **không** com
 | SUBTLEX-CH-WF | `subtlex-ch-wf.json` | [leonsilicon/subtlex-ch-wf](https://github.com/leonsilicon/subtlex-ch-wf) | xem repo nguồn |
 | Unihan | `Unihan_Readings.txt` | Unicode 17.0.0 (2025-07-24) | [Unicode License](https://www.unicode.org/terms_of_use.html) |
 | Bảng Hán-Việt bổ sung | `hanviet-supplement.csv` | [ph0ngp/hanviet-pinyin-wordlist](https://github.com/ph0ngp/hanviet-pinyin-wordlist) | xem repo nguồn |
-| VNEDICT | **`database/data/vnedict.txt`** — commit trong git, xem ghi chú dưới | 15/02/2019, tải 2026-08-21, SHA-256 `01a48269…19ea24` | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| CVDICT | **`database/data/cvdict.u8`** — commit trong git, xem ghi chú dưới | `version=1.0.1` (02/12/2024), tải 2026-08-23, SHA-256 `4dde4b20…ba0948` | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
 
-**VNEDICT nằm ở `database/data/`, KHÔNG phải `storage/app/dictionary/` như bốn
-nguồn trên.** Ba lý do: `storage/app/` gitignore toàn bộ nên `git add` bị bỏ qua im
-lặng; production mount named volume `storage-data` đè lên `/var/www/html/storage`,
-mà volume đã tồn tại từ deploy trước nên Docker không seed lại từ image; còn
-`database/` đi thẳng cùng image và không bị volume nào che. Nguồn upstream
-(`http://www.denisowski.org/Vietnamese/vnedict.txt`) chỉ có HTTP và host không phục
-vụ được HTTPS, nên file được commit kèm SHA-256 mà `vi-lexicon:import` kiểm trước
-khi parse, cộng bản lưu readme ở `database/data/vnedict-readme.html` làm bằng chứng
-giấy phép.
+**CVDICT nằm ở `database/data/`, KHÔNG phải `storage/app/dictionary/` như năm
+nguồn trên.** Hai lý do: `storage/app/` gitignore toàn bộ nên `git add` bị bỏ qua
+im lặng, và production mount named volume `storage-data` đè lên
+`/var/www/html/storage` — volume đã tồn tại từ deploy trước nên Docker không seed
+lại từ image. `database/` đi thẳng cùng image và không bị volume nào che.
+
+Nội dung này **hiển thị cho người học**, không chỉ dùng để khớp truy vấn, nên file
+được commit kèm SHA-256 mà `cvdict:import` kiểm trước khi parse: một file bị thay
+là nghĩa sai dạy thẳng vào mặt người dùng, và ngưỡng độ phủ không phát hiện được
+điều đó.
+
+Chạy SAU `dictionary:import` — lệnh này chỉ gắn thêm cột vào dòng đã có, không tạo
+dòng mới:
 
 ```bash
-php artisan vi-lexicon:import
-php artisan vi-lexicon:status  # exit code khác 0 nếu bảng rỗng hoặc dưới ngưỡng
+php artisan cvdict:import
+php artisan cvdict:status  # exit code khác 0 nếu độ phủ tập ưu tiên < 95%
 ```
 
 ```bash
@@ -96,6 +100,13 @@ curl -L -o Unihan.zip https://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip &
 curl -L -o hanviet-supplement.csv https://raw.githubusercontent.com/ph0ngp/hanviet-pinyin-wordlist/master/hanviet.csv
 ```
 
+CVDICT tải riêng, vào `database/data/` chứ không vào thư mục trên:
+
+```bash
+curl -L -o database/data/cvdict.u8 https://raw.githubusercontent.com/ph0ngp/CVDICT/main/CVDICT.u8
+shasum -a 256 database/data/cvdict.u8   # phải khớp EXPECTED_SHA256 trong CvdictImport
+```
+
 Rồi ghép âm Hán-Việt và kiểm cổng chất lượng:
 
 ```bash
@@ -104,12 +115,20 @@ php artisan han-viet:status    # exit code khác 0 nếu độ phủ dưới ng�
 ```
 
 **Attribution là nghĩa vụ, không phải phép lịch sự (D9).** Trang "Về hanora"
-(P20) phải ghi công CC-CEDICT (CC BY-SA), Unihan (Unicode License), và
-**VNEDICT (CC BY 3.0)**. Vì không sinh dữ liệu phái sinh nào từ CC-CEDICT — V1 đã
-bỏ dịch máy — nên không phát sinh nghĩa vụ ShareAlike cho nội dung tự tạo.
+(P20) phải ghi công CC-CEDICT (CC BY-SA 4.0), Unihan (Unicode License), Tatoeba
+(CC BY 2.0 FR) và **CVDICT (CC BY-SA 4.0)**.
 
-VNEDICT phải ghi công dù **không hiển thị ở đâu trong app**: nó chỉ dùng để khớp
-truy vấn. CC BY yêu cầu ghi công khi sử dụng, không phải khi hiển thị.
+CVDICT còn phải nói rõ **nguồn gốc**, không chỉ tên: nó dịch bằng GPT-4o
+fine-tune, tác giả rà tay và thừa nhận còn sót lỗi. Người học cần biết mức tin cậy
+của thứ họ đang học, và đó là lý do định nghĩa tiếng Anh vẫn hiển thị song song —
+nó là cơ chế đối chiếu duy nhất họ có khi nghi ngờ một nghĩa.
+
+Nghĩa tiếng Việt hiển thị trong app, nên nghĩa vụ ShareAlike của CVDICT áp cho
+chính nội dung đó. Không sinh dữ liệu phái sinh nào khác từ CC-CEDICT.
+
+**Sửa nghĩa sai: mở issue trên repo CVDICT rồi reimport, KHÔNG sửa tay trong DB.**
+`cvdict:import` ghi đè hai cột nghĩa Việt mỗi lần chạy, nên một bản vá tay sẽ biến
+mất im lặng ở lần import sau.
 
 ### Âm Hán-Việt: vì sao cần HAI nguồn
 
@@ -209,13 +228,17 @@ docker compose -f docker-compose.prod.yml exec app php artisan dictionary:import
 docker compose -f docker-compose.prod.yml exec app php artisan han-viet:import
 docker compose -f docker-compose.prod.yml exec app php artisan han-viet:status   # gate ≥70%
 docker compose -f docker-compose.prod.yml exec app php artisan examples:import
-docker compose -f docker-compose.prod.yml exec app php artisan vi-lexicon:import
-docker compose -f docker-compose.prod.yml exec app php artisan vi-lexicon:status # gate ≥50k mục
+docker compose -f docker-compose.prod.yml exec app php artisan cvdict:import
+docker compose -f docker-compose.prod.yml exec app php artisan cvdict:status    # gate ≥95% tập ưu tiên
 
 # 5. Frontend
-# CHỈ deploy frontend sau khi `vi-lexicon:status` PASS: màn Tài khoản hứa với
-# người dùng là tìm được bằng nghĩa tiếng Việt, còn thiếu bảng thì tính năng đó
-# hỏng im lặng — không lỗi, không log, chỉ là không ra kết quả.
+# CHỈ deploy frontend sau khi `cvdict:status` PASS. Thiếu nghĩa tiếng Việt thì
+# hỏng IM LẶNG theo hai đường cùng lúc — không lỗi, không log: tìm bằng tiếng
+# Việt không ra gì, và thẻ từ không hiện nghĩa Việt mà màn Tài khoản đã hứa.
+#
+# Service worker cache response từ điển 24 giờ. Người dùng đang mở app sẽ thấy
+# thẻ từ CHƯA có nghĩa tiếng Việt cho tới khi cache hết hạn — đây là hành vi
+# mong đợi sau deploy này, không phải lỗi import.
 cd ../hanora-app && npm ci && npm run build
 docker cp dist/. "$(docker compose -f ../hanora-api/docker-compose.prod.yml ps -q nginx)":/var/www/html/frontend/
 

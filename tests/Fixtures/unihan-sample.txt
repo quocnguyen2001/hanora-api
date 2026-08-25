@@ -12,3 +12,5 @@ U+9280	kVietnamese	ngân
 U+8D70	kVietnamese	tẩu
 U+9577	kVietnamese	trường
 U+5927	kVietnamese	đại
+U+72D7	kVietnamese	cẩu
+U+6A4B	kVietnamese	kiều

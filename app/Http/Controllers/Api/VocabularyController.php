@@ -8,7 +8,7 @@ use App\Http\Requests\VocabularyIndexRequest;
 use App\Http\Requests\VocabularyStoreRequest;
 use App\Http\Resources\UserWordResource;
 use App\Models\UserWord;
-use App\Services\Dictionary\VietnameseQueryBridge;
+use App\Services\Dictionary\VietnameseQueryNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +18,10 @@ final class VocabularyController
 {
     private const PER_PAGE = 20;
 
-    public function __construct(private readonly VietnameseQueryBridge $bridge) {}
+    /** Dưới ngưỡng này thì mọi nghĩa đều khớp một cái gì đó — dùng chung với màn tìm kiếm. */
+    private const MIN_MEANING_LENGTH = 3;
+
+    public function __construct(private readonly VietnameseQueryNormalizer $normalizer) {}
 
     public function index(VocabularyIndexRequest $request): JsonResponse
     {
@@ -146,9 +149,10 @@ final class VocabularyController
 
         $like = '%'.addcslashes($term, '%_\\').'%';
 
-        $terms = $this->bridge->resolve($term);
+        $normalized = $this->normalizer->normalize($term);
+        $meaning = mb_strlen($normalized) >= self::MIN_MEANING_LENGTH ? $normalized : null;
 
-        $query->whereHas('word', function ($wordQuery) use ($like, $term, $terms): void {
+        $query->whereHas('word', function ($wordQuery) use ($like, $term, $meaning): void {
             $wordQuery
                 ->where('simplified', 'like', $like)
                 ->orWhere('traditional', 'like', $like)
@@ -158,33 +162,30 @@ final class VocabularyController
                 ->orWhereRaw('han_viet_plain LIKE \'%\' || f_unaccent(?) || \'%\'', [$term])
                 ->orWhere('definitions_en_text', 'ilike', $like);
 
-            if ($terms === []) {
+            if ($meaning === null) {
                 return;
             }
 
             /*
-             * Nghĩa tiếng Việt — dùng ĐÚNG ngữ nghĩa mà màn tìm kiếm dùng.
+             * Nghĩa tiếng Việt — MỘT điều kiện, không phải hai.
              *
-             * KHÔNG dùng `ilike '%cat%'` như năm điều kiện phía trên. Chúng khớp
-             * chuỗi người dùng TỰ GÕ nên false positive tự giải thích được; còn
-             * từ khóa do cầu nối sinh ra là chuỗi người dùng chưa từng thấy. Đo
-             * trên corpus thật: `definitions_en_text ILIKE '%cat%'` khớp 2.155
-             * dòng, so với 66 nếu khớp theo biên từ — gõ `con mèo` mà nhận về
-             * *education*, *category*, *delicate* thì không có cách nào giải
-             * thích cho người dùng.
+             * Bản cầu nối phải kiểm hai lần vì `search_tsv` trộn âm Hán-Việt với
+             * định nghĩa tiếng Anh vào cùng một vector, nên nó phải tính lại
+             * tsvector trên riêng phần định nghĩa để loại những dòng chỉ khớp
+             * nhờ âm Hán-Việt. `search_vi_tsv` dựng TỪ MỖI `definitions_vi_text`
+             * nên không có gì để loại — cả lớp lỗi đó biến mất cùng cầu nối.
              *
-             * Hai điều kiện vì cùng lý do với nhánh rank 6 của `WordSearchService`:
-             * `search_tsv` trộn âm Hán-Việt với định nghĩa tiếng Anh, nên phải
-             * tính lại tsvector trên riêng phần định nghĩa để loại những dòng chỉ
-             * khớp nhờ âm Hán-Việt.
+             * Vector chọn theo dấu, đúng như `WordSearchService::viMeaningBranch()`.
+             * Bộ lọc kho từ và màn tìm kiếm phải hiểu một chuỗi giống hệt nhau.
              */
-            $pieces = implode(' || ', array_fill(
-                0, count($terms), "plainto_tsquery('simple', f_unaccent(?))"
-            ));
+            $search = $this->normalizer->withoutLeadingClassifier($meaning);
 
-            $wordQuery->orWhere(fn ($sub) => $sub
-                ->whereRaw("search_tsv @@ ({$pieces})", $terms)
-                ->whereRaw("to_tsvector('simple', f_unaccent(definitions_en_text)) @@ ({$pieces})", $terms));
+            $wordQuery->orWhereRaw(
+                $this->normalizer->isAccented($meaning)
+                    ? "search_vi_tsv @@ plainto_tsquery('simple', ?)"
+                    : "search_vi_plain_tsv @@ plainto_tsquery('simple', f_unaccent(?))",
+                [$search]
+            );
         });
     }
 }

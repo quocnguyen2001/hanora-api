@@ -1,0 +1,37 @@
+# CVDICT fixture cho test tìm kiếm — dòng lấy NGUYÊN VĂN từ nguồn thật.
+#
+# Giữ nguyên văn là cố ý: nghĩa tự viết sẽ làm test xanh trên dữ liệu không tồn
+# tại. Ví dụ nghĩa thứ 8 của 好 thật sự CHỨA "xin chào" — đó chính là lý do 好
+# từng đứng trước 你好, và bậc `precision` phải chứng minh được nó không còn.
+#
+# Khóa khớp cedict-sample.u8 + cedict-vi-sample.u8. Fixture RIÊNG với
+# cvdict-sample.u8 vì file kia chốt tỉ lệ độ phủ của `cvdict:status`.
+# 沙发 cố ý VẮNG: ~7% mục từ điển không có trong CVDICT, và `definitions_vi:
+# null` cho chúng là hành vi HỢP LỆ mà FE phải ẩn hẳn chứ không hiện khung trống.
+# Không có dòng vắng nào thì test đó không kiểm được gì.
+#! version=test
+貓 猫 [mao1] /mèo (LT: 隻|只[zhi1])/(phương ngữ) trốn/(từ mượn) (thông tục) modem/
+謝謝 谢谢 [xie4 xie5] /cảm ơn/cảm ơn bạn/
+電腦 电脑 [dian4 nao3] /máy tính/LT:臺|台[tai2]/
+吃 吃 [chi1] /ăn; tiêu thụ/ăn ở (nhà ăn, v.v.)/tiêu diệt; phá hủy/hấp thụ/chịu (cú sốc, chấn thương, thất bại, v.v.)/
+新潮 新潮 [xin1 chao2] /hiện đại/hợp thời trang/
+你好 你好 [ni3 hao3] /xin chào/chào/
+學習 学习 [xue2 xi2] /học/tìm hiểu/
+學 学 [xue2] /học/học tập/bắt chước/khoa học/hậu tố - môn khoa học/
+學生 学生 [xue2 sheng5] /học sinh/trẻ đi học/
+習 习 [xi2] /(dạng cố định) thực hành/học/tập quán/phong tục/
+好 好 [hao3] /tốt/thích hợp; đúng/(trước động từ) dễ/(trước động từ) tốt để/(trước tính từ để nhấn mạnh) rất/(bổ ngữ động từ chỉ sự hoàn thành)/(hai người) thân thiết; có quan hệ gần gũi/(sau đại từ nhân xưng) xin chào/
+行 行 [xing2] /đi/đến/du lịch/chuyến thăm/tạm thời/tạm bợ/hiện tại/lưu hành/làm/thực hiện/có khả năng/có hiệu quả/ổn/OK!/được/hành vi/cử chỉ/người Đài Loan phát âm [xing4] cho nghĩa hành vi-cử chỉ/
+行 行 [hang2] /hàng/dòng/công ty thương mại/ngành kinh doanh/nghề/xếp hạng (nhất, hai, v.v.) trong anh chị em (theo tuổi)/(trong bảng dữ liệu) hàng/(Đài Loan) cột/
+東西 东西 [dong1 xi1] /đông và tây/
+東西 东西 [dong1 xi5] /đồ vật/thứ/người/lượng từ: 個|个[ge4], 件[jian4]/
+銀 银 [yin2] /bạc/màu bạc/liên quan đến tiền bạc hoặc tiền tệ/
+銀行 银行 [yin2 hang2] /ngân hàng/LT:家[jia1],個|个[ge4]/
+女 女 [nu:3] /nữ/phụ nữ/con gái/
+一 一 [yi1] /một/đơn/một cái (mạo từ)/ngay khi/toàn bộ; tất cả; xuyên suốt/bộ "một" trong chữ Hán (bộ Khang Hy số 1)/cũng đọc là [yao1] để rõ hơn khi đọc từng chữ số một/
+水 水 [shui3] /nước/sông/chất lỏng/đồ uống/phí hoặc thu nhập bổ sung/(quần áo) lượng từ cho số lần giặt/
+狗 狗 [gou3] /chó/LT:隻|只[zhi1],條|条[tiao2]/
+再見 再见 [zai4 jian4] /tạm biệt/gặp lại sau/
+蘋果 苹果 [ping2 guo3] /quả táo/LT:個|个[ge4],顆|颗[ke1]/
+清醒 清醒 [qing1 xing3] /tỉnh táo/tỉnh thức/
+橋 桥 [qiao2] /cầu/LT:座[zuo4]/

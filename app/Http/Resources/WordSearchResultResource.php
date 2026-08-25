@@ -35,6 +35,16 @@ final class WordSearchResultResource extends JsonResource
             // chuỗi rỗng và tuyệt đối không bịa âm.
             'han_viet' => $this->resource->han_viet,
             'definitions_en' => $this->resource->definitions_en,
+            /*
+             * Nghĩa tiếng Việt từ CVDICT. `null` là trạng thái HỢP LỆ cho ~7%
+             * mục không có trong nguồn — FE ẩn hẳn phần nghĩa Việt cho chúng,
+             * không hiện khung trống, cùng quy ước mà `han_viet: null` dùng.
+             *
+             * `definitions_en` KHÔNG bị thay thế và không bao giờ được thay
+             * thế: nghĩa tiếng Việt dịch bằng AI có người rà, còn sót lỗi, và
+             * dòng tiếng Anh là cơ chế đối chiếu duy nhất người học có.
+             */
+            'definitions_vi' => $this->resource->definitions_vi,
             'hsk_level' => $this->resource->hsk_level,
         ];
     }

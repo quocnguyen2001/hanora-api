@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\DictionaryWord;
-use App\Services\Dictionary\VietnameseQueryBridge;
 use App\Services\Dictionary\WordSearchService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,14 +21,27 @@ use Illuminate\Support\Facades\DB;
  */
 final class DictionaryBenchmark extends Command
 {
-    protected $signature = 'dictionary:benchmark
-        {--runs=25 : Số lần chạy mỗi loại truy vấn}
-        {--warm : Đo đường NÓNG (cache cầu nối đã nạp) thay vì đường lạnh}';
+    protected $signature = 'dictionary:benchmark {--runs=25 : Số lần chạy mỗi loại truy vấn}';
 
-    protected $description = 'Đo p50/p95 cho 9 loại truy vấn + ca đối kháng (R2)';
+    /*
+     * KHÔNG còn cờ `--warm`.
+     *
+     * Nó tồn tại để tắt việc xóa cache của cầu nối tra nghĩa trước mỗi vòng.
+     * Cầu nối đã bị xóa: nhánh nghĩa tiếng Việt khớp thẳng lên `definitions_vi`
+     * qua GIN index, không còn tầng cache nào của ứng dụng giữa nó với Postgres.
+     * Mọi lượt đo bây giờ vốn đã là đường lạnh — giữ lại một núm không còn điều
+     * khiển gì là mời người đọc kết luận sai về số đo.
+     */
+    protected $description = 'Đo p50/p95 cho 11 loại truy vấn + ca đối kháng (R2)';
 
     /** Ngưỡng của P6. */
     private const TARGET_P95_MS = 150.0;
+
+    /**
+     * Dưới ngưỡng này thì nhánh nghĩa tiếng Việt không có gì để khớp, và mọi
+     * con số của nó là số đo của một tính năng đang tắt.
+     */
+    private const MIN_DEFINITIONS_VI = 100_000;
 
     /**
      * Mọi ca đo có CÙNG một hình dạng `[truy vấn, mode]`.
@@ -52,20 +63,23 @@ final class DictionaryBenchmark extends Command
         'Hán-Việt có dấu' => ['học tập', null],
         'Hán-Việt không dấu' => ['hoc tap', null],
         'gõ sai (trigram)' => ['xuexy', null],
-        'nghĩa Việt' => ['con mèo', null],
+        'nghĩa Việt có dấu' => ['con mèo', null],
+        'nghĩa Việt không dấu' => ['may tinh', null],
         /*
-         * Ca đối kháng THẬT của nhánh nghĩa Việt.
+         * Ca đối kháng THẬT của nhánh nghĩa Việt: fan-out cao nhất đo được trên
+         * dữ liệu thật, và là truy vấn người dùng gõ thật chứ không phải chuỗi
+         * rác.
          *
-         * `con` resolve ra ĐỦ trần 6 từ khóa — "child, you, i, young, small,
-         * baby" — toàn lexeme tần suất cao, nên GIN trả về ~1.500 dòng và cả
-         * ~1.500 dòng đó phải đi qua recheck tsvector. Đo được p50 ~31ms, so với
-         * `may tinh` chỉ 2 từ khóa và ~6ms: bản trước lấy `may tinh` làm ca đối
-         * kháng, tức là đo ca NHANH NHẤT rồi gọi nó là chậm nhất.
+         * `người` khớp 5.881 dòng qua vector có dấu, `nguoi` khớp 5.909 dòng qua
+         * vector không dấu, và MỖI dòng đó phải chạy `CASE` ba bậc — trong đó
+         * bậc 0 mở `definitions_vi` ra bằng `jsonb_array_elements_text`. So với
+         * `may tinh` (376 dòng) và `nước` (2.024 dòng), đây mới là ca chậm nhất.
          *
-         * Chuỗi `zq` lặp 64 lần không thay được: nó resolve ra rỗng nên nhánh
-         * không hề được gắn vào.
+         * Chuỗi rác không thay được: nó không khớp gì nên `CASE` không bao giờ
+         * chạy, tức là đo ca RẺ NHẤT rồi gọi nó là đắt nhất.
          */
-        'nghĩa Việt fan-out tối đa' => ['con', null],
+        'nghĩa Việt fan-out cao (có dấu)' => ['người', null],
+        'nghĩa Việt fan-out cao (không dấu)' => ['nguoi', null],
     ];
 
     /**
@@ -83,7 +97,7 @@ final class DictionaryBenchmark extends Command
         'mode=cn: xuexi' => ['xuexi', WordSearchService::MODE_CN],
     ];
 
-    public function handle(WordSearchService $search, VietnameseQueryBridge $bridge): int
+    public function handle(WordSearchService $search): int
     {
         $total = DictionaryWord::count();
 
@@ -94,16 +108,16 @@ final class DictionaryBenchmark extends Command
         }
 
         /*
-         * Gate riêng cho lexicon cầu nối.
+         * Gate riêng cho nghĩa tiếng Việt.
          *
-         * Không có nó, benchmark chạy trên máy chưa import sẽ thấy `resolve()`
-         * trả rỗng, nhánh nghĩa Việt không được gắn, và lệnh in "ĐẠT" cho một
-         * tính năng KHÔNG hề chạy.
+         * Không có nó, benchmark chạy trên máy chưa import sẽ thấy vector rỗng,
+         * nhánh nghĩa Việt không khớp gì, và lệnh in "ĐẠT" cho một tính năng
+         * KHÔNG hề chạy — đúng loại số đo tệ hơn không đo.
          */
-        $lexicon = DB::table('vi_en_lexicon')->count();
+        $withVi = DB::table('dictionary_words')->whereNotNull('definitions_vi')->count();
 
-        if ($lexicon < ViLexiconStatus::MIN_ENTRIES) {
-            $this->error("Từ điển cầu nối chỉ có {$lexicon} mục — chạy vi-lexicon:import trước.");
+        if ($withVi < self::MIN_DEFINITIONS_VI) {
+            $this->error("Chỉ {$withVi} dòng có nghĩa tiếng Việt — chạy cvdict:import trước.");
 
             return self::FAILURE;
         }
@@ -121,7 +135,7 @@ final class DictionaryBenchmark extends Command
         $passed = true;
 
         foreach ($cases as $label => [$query, $mode]) {
-            $timings = $this->measure($search, $bridge, $query, $mode);
+            $timings = $this->measure($search, $query, $mode);
 
             $p50 = $this->percentile($timings, 0.50);
             $p95 = $this->percentile($timings, 0.95);
@@ -155,12 +169,8 @@ final class DictionaryBenchmark extends Command
     /**
      * @return list<float>
      */
-    private function measure(
-        WordSearchService $search,
-        VietnameseQueryBridge $bridge,
-        string $query,
-        ?string $mode,
-    ): array {
+    private function measure(WordSearchService $search, string $query, ?string $mode): array
+    {
         $runs = max(1, (int) $this->option('runs'));
 
         // Một lần chạy nháp để cache kế hoạch truy vấn, không tính vào số đo.
@@ -169,29 +179,6 @@ final class DictionaryBenchmark extends Command
         $timings = [];
 
         for ($i = 0; $i < $runs; $i++) {
-            /*
-             * Xóa cache cầu nối TRƯỚC mỗi vòng — đây là mặc định, không phải
-             * tùy chọn.
-             *
-             * Lượt chạy nháp phía trên nạp `Cache::remember` của
-             * `VietnameseQueryBridge`, nên nếu không xóa thì cả 25 lượt đo đều
-             * là cache hit và đường lạnh — thứ R2 cần chứng minh — không đo được
-             * bằng lệnh này. Thực tế cache hit rate còn thấp hơn nữa: màn tìm
-             * kiếm bắn request theo từng mốc debounce 250ms, mỗi mốc là một
-             * chuỗi chưa từng thấy.
-             */
-            if (! $this->option('warm')) {
-                /*
-                 * Xóa ĐÚNG key của truy vấn đang đo, không `Cache::flush()`.
-                 *
-                 * Flush là `FLUSHDB` trên cả cache store: nó xóa luôn cache
-                 * thống kê, phân tích Hán tự, số dòng của health — và chạy
-                 * `runs × số loại` lần, tức 250 lần ở mặc định. Lệnh này nằm
-                 * ngay cạnh `vi-lexicon:status` trong runbook production.
-                 */
-                $bridge->forget($query);
-            }
-
             $start = hrtime(true);
             $search->search($query, 1, $mode);
             $timings[] = (hrtime(true) - $start) / 1_000_000;

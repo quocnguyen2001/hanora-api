@@ -133,7 +133,8 @@ describe('response không chứa dữ liệu theo user — red team C2', functio
         $first = search('学习')->json('data.0');
 
         expect(array_keys($first))->toBe([
-            'id', 'simplified', 'traditional', 'pinyin', 'han_viet', 'definitions_en', 'hsk_level',
+            'id', 'simplified', 'traditional', 'pinyin', 'han_viet',
+            'definitions_en', 'definitions_vi', 'hsk_level',
         ]);
     });
 
