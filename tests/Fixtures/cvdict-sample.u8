@@ -1,0 +1,19 @@
+# Từ điển Hán Việt CVDICT - fixture test
+# Khóa khớp CỐ Ý với cedict-sample.u8: import nghĩa Việt chỉ gắn thêm cột vào
+# dòng đã có, nên fixture này vô nghĩa nếu đứng một mình.
+#
+# 猫 KHÔNG có trong cedict-sample — nó ở đây để chứng minh mục CVDICT thừa
+# không tạo ra dòng từ điển mới.
+# 好 lặp hai lần — khóa trùng phải được gộp, không phải chọn bừa một dòng.
+# 银, 学, 习, 银行, 女, 沙发, 一 cố ý VẮNG — chúng phải giữ `definitions_vi` null.
+#
+#! version=test
+#! format=ts
+學習 学习 [xue2 xi2] /học tập/nghiên cứu/
+學生 学生 [xue2 sheng5] /học sinh/trẻ đi học/
+行 行 [xing2] /đi/đi bộ/
+行 行 [hang2] /hàng/dòng/hãng buôn/
+東西 东西 [dong1 xi5] /thứ/đồ vật/
+好 好 [hao3] /tốt/
+好 好 [hao3] /hay/tốt/
+貓 猫 [mao1] /mèo/

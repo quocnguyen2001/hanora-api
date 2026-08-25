@@ -23,7 +23,7 @@ final class HealthController
         return new HealthResource([
             'status' => 'ok',
             'db' => $this->databaseStatus(),
-            'vi_lexicon' => $this->viLexiconCount(),
+            'definitions_vi' => $this->definitionsViCount(),
         ]);
     }
 
@@ -39,25 +39,27 @@ final class HealthController
     }
 
     /**
-     * Số mục từ điển cầu nối Việt-Anh.
+     * Số dòng từ điển đã có nghĩa tiếng Việt.
      *
      * Ở đây vì đó là cách duy nhất phát hiện được TỪ XA rằng deploy đã chạy
-     * migration nhưng quên `vi-lexicon:import`. Thiếu dữ liệu thì tìm kiếm bằng
-     * nghĩa tiếng Việt hỏng IM LẶNG — không lỗi, không log, kết quả rỗng trông
-     * giống hệt một truy vấn không khớp hợp lệ.
+     * migration nhưng quên `cvdict:import`. Thiếu dữ liệu thì hỏng IM LẶNG —
+     * không lỗi, không log: thẻ từ chỉ đơn giản là không có nghĩa tiếng Việt, và
+     * tìm bằng tiếng Việt trả rỗng trông giống hệt một truy vấn không khớp hợp lệ.
      *
-     * `null` khi không đọc được, để phân biệt với 0 mục thật.
+     * `null` khi không đọc được, để phân biệt với 0 dòng thật.
      *
-     * Cache 60 giây: `count(*)` không điều kiện trên bảng này là seq scan
-     * (đo được 7,1ms trên 54k dòng, không có đường index-only), còn `/api/health`
-     * là route CÔNG KHAI duy nhất. Một endpoint chẩn đoán không nên mang theo
-     * truy vấn lớn dần theo dữ liệu. 60 giây đủ nhanh cho việc nó phục vụ —
-     * phát hiện deploy quên import.
+     * Cache 60 giây: đây là điều kiện lọc trên 123k dòng, còn `/api/health` là
+     * route CÔNG KHAI duy nhất. Một endpoint chẩn đoán không nên mang theo truy
+     * vấn lớn dần theo dữ liệu.
      */
-    private function viLexiconCount(): ?int
+    private function definitionsViCount(): ?int
     {
         try {
-            return Cache::remember('health:vi_lexicon_count', 60, fn (): int => DB::table('vi_en_lexicon')->count());
+            return Cache::remember(
+                'health:definitions_vi_count',
+                60,
+                fn (): int => DB::table('dictionary_words')->whereNotNull('definitions_vi')->count()
+            );
         } catch (Throwable) {
             return null;
         }

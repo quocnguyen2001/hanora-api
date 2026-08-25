@@ -8,7 +8,7 @@ use Generator;
 use RuntimeException;
 
 /**
- * Đọc `cedict_ts.u8` thành từng bản ghi.
+ * Đọc `cedict_ts.u8` (và `cvdict.u8`, cùng định dạng) thành từng bản ghi.
  *
  * Đọc STREAMING bằng generator, không load cả file vào RAM: nguồn có ~125k
  * dòng và ~200k nghĩa, và import phải chạy được trên VPS nhỏ.
@@ -64,6 +64,81 @@ final class CedictParser
     }
 
     /**
+     * Đọc `cvdict.u8` — cùng định dạng, nghĩa bằng tiếng Việt.
+     *
+     * CVDICT sinh ra TỪ CHÍNH CC-CEDICT nên định dạng dòng giống hệt: đo được
+     * regex ở trên parse 122.596/122.597 mục. Nên đây là một method chứ không
+     * phải một parser thứ hai — một parser nữa là một regex nữa để đồng bộ.
+     *
+     * Chỉ phát khóa tự nhiên và nghĩa: pinyin có dấu, `char_count`, dạng trần
+     * đều do `dictionary:import` sở hữu, và import nghĩa Việt KHÔNG được đụng
+     * vào chúng.
+     *
+     * @return Generator<int, array{
+     *     simplified: string,
+     *     pinyin_numbered: string,
+     *     definitions_vi: list<string>,
+     *     definitions_vi_text: string
+     * }>
+     */
+    public function parseVietnamese(string $path): Generator
+    {
+        if (! is_readable($path)) {
+            throw new RuntimeException("Không đọc được file từ điển: {$path}");
+        }
+
+        $handle = fopen($path, 'rb');
+
+        if ($handle === false) {
+            throw new RuntimeException("Không mở được file từ điển: {$path}");
+        }
+
+        try {
+            while (($line = fgets($handle)) !== false) {
+                $entry = $this->parseVietnameseLine($line);
+
+                if ($entry !== null) {
+                    yield $entry;
+                }
+            }
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    /**
+     * @return array{
+     *     simplified: string,
+     *     pinyin_numbered: string,
+     *     definitions_vi: list<string>,
+     *     definitions_vi_text: string
+     * }|null null cho comment, dòng trống, dòng hỏng
+     */
+    public function parseVietnameseLine(string $line): ?array
+    {
+        $matches = $this->matchLine($line);
+
+        if ($matches === null) {
+            return null;
+        }
+
+        [, , $simplified, $pinyinNumbered, $body] = $matches;
+
+        $definitions = $this->splitDefinitions($body);
+
+        if ($definitions === []) {
+            return null;
+        }
+
+        return [
+            'simplified' => $simplified,
+            'pinyin_numbered' => $pinyinNumbered,
+            'definitions_vi' => $definitions,
+            'definitions_vi_text' => implode('; ', $definitions),
+        ];
+    }
+
+    /**
      * Tìm những khóa tự nhiên xuất hiện nhiều hơn một lần trong nguồn.
      *
      * CC-CEDICT có ~1.054 khóa như vậy: cùng chữ, cùng âm, nhưng tách thành
@@ -105,14 +180,9 @@ final class CedictParser
      */
     public function parseLine(string $line): ?array
     {
-        $line = rtrim($line, "\r\n");
+        $matches = $this->matchLine($line);
 
-        // Header của CC-CEDICT là các dòng bắt đầu bằng `#`.
-        if ($line === '' || str_starts_with($line, '#')) {
-            return null;
-        }
-
-        if (preg_match(self::LINE_PATTERN, $line, $matches) !== 1) {
+        if ($matches === null) {
             return null;
         }
 
@@ -141,6 +211,27 @@ final class CedictParser
             'char_count' => $charCount,
             'is_single_char' => $charCount === 1,
         ];
+    }
+
+    /**
+     * Tách một dòng thành `[toàn dòng, phồn thể, giản thể, pinyin số, thân]`.
+     *
+     * @return list<string>|null null cho comment, dòng trống, dòng hỏng
+     */
+    private function matchLine(string $line): ?array
+    {
+        $line = rtrim($line, "\r\n");
+
+        // Header của CC-CEDICT (và CVDICT) là các dòng bắt đầu bằng `#`.
+        if ($line === '' || str_starts_with($line, '#')) {
+            return null;
+        }
+
+        if (preg_match(self::LINE_PATTERN, $line, $matches) !== 1) {
+            return null;
+        }
+
+        return $matches;
     }
 
     /**

@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $pinyin_plain
  * @property list<string> $definitions_en
  * @property string $definitions_en_text
+ * @property list<string>|null $definitions_vi
+ * @property string|null $definitions_vi_text
  * @property string|null $han_viet
  * @property string|null $han_viet_plain
  * @property string $han_viet_status
@@ -73,6 +75,13 @@ final class DictionaryWord extends Model
     {
         return [
             'definitions_en' => 'array',
+            /*
+             * `null` là trạng thái HỢP LỆ, không phải dữ liệu thiếu: ~7% mục
+             * không khớp CVDICT và hiển thị bằng tiếng Anh như trước. Cast
+             * `array` giữ nguyên `null`, nên FE phân biệt được "không có nghĩa
+             * Việt" với "có nhưng rỗng".
+             */
+            'definitions_vi' => 'array',
             'is_priority' => 'boolean',
             'is_single_char' => 'boolean',
             'hsk_level' => 'integer',
