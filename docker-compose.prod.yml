@@ -59,9 +59,13 @@ services:
     env_file: [.env.production]
     volumes:
       - storage-data:/var/www/html/storage
-    # Sau V1 hàng đợi chỉ còn phục vụ mail đặt lại mật khẩu — MỘT worker, một
-    # hàng đợi mặc định. Không tách hàng đợi cho một loại job duy nhất.
-    command: php artisan queue:work --tries=3 --max-time=3600 --sleep=3
+    # Thứ tự hàng đợi là THỨ TỰ ƯU TIÊN, không phải danh sách.
+    #
+    # `default` giữ mail đặt lại mật khẩu — người dùng đang đứng chờ nó.
+    # `enrichment` là pre-warm nội dung AI: hàng nghìn job, mỗi job vài giây, và
+    # không ai chờ. Gộp chung một hàng đợi thì một đợt `dictionary:enrich --hsk`
+    # đẩy mail đặt lại mật khẩu xuống sau 4.987 job.
+    command: php artisan queue:work --queue=default,enrichment --tries=3 --max-time=3600 --sleep=3
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_started }

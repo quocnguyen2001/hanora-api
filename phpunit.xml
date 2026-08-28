@@ -47,6 +47,20 @@
             Bật có chủ đích, không bật do quên.
         -->
         <env name="GEMINI_API_KEY" value=""/>
+
+        <!--
+            Van giảm áp RPM tắt trong test.
+
+            `Redis::throttle` giữ trạng thái TRONG REDIS, và Redis không bị dọn
+            giữa các test như `CACHE_STORE=array`. Với trần 10/phút mặc định,
+            test thứ mười một trong cùng một phút bị chặn 5 giây rồi `release()`
+            — nó hỏng vì test TRƯỚC nó, ở file khác, và triệu chứng trông không
+            liên quan gì tới nguyên nhân.
+
+            Test không bao giờ gọi mạng thật (`Http::fake`), nên giữ nhịp cho
+            chúng là thuần lãng phí cộng một nguồn phụ thuộc giữa các test.
+        -->
+        <env name="GEMINI_RPM" value="100000"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

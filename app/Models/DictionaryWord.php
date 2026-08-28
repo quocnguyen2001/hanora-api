@@ -8,6 +8,7 @@ use Database\Factories\DictionaryWordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Một mục từ điển CC-CEDICT đã chuẩn hóa.
@@ -88,5 +89,16 @@ final class DictionaryWord extends Model
             'frequency_rank' => 'integer',
             'char_count' => 'integer',
         ];
+    }
+
+    /**
+     * Nội dung làm giàu do AI sinh. `null` là trạng thái HỢP LỆ — phần lớn từ
+     * chưa được sinh, và màn chi tiết phải render bình thường khi thiếu.
+     *
+     * @return HasOne<DictionaryWordEnrichment, $this>
+     */
+    public function enrichment(): HasOne
+    {
+        return $this->hasOne(DictionaryWordEnrichment::class, 'word_id');
     }
 }

@@ -211,11 +211,35 @@ Ba tính chất bắt buộc, mỗi cái có test khóa lại:
 `tests/Unit/SearchWeaknessTest.php` — **đó là số đo, không phải ví dụ**. Đổi luật
 thì đo lại, đừng sửa kỳ vọng cho khớp luật mới.
 
-### Làm giàu mục từ — mới xong phần kết nối
+### Làm giàu mục từ — đang chạy
 
-Nghĩa theo từ loại, ví dụ song ngữ, bộ thủ và số nét, từ ghép liên quan. Hiện mới
-có `GeminiClient` và `dictionary:enrich-spike`; phần cache và endpoint nằm ở
-`plans/260828-1424-lop-lam-giau-tu-dien-bang-gemini/`.
+`GET /api/dictionary/words/{word}/enrichment` trả nghĩa theo từ loại, ví dụ song
+ngữ zh–vi, bộ thủ và số nét, từ ghép liên quan, thành ngữ. Sinh **một lần cho mỗi
+từ** rồi cache vĩnh viễn; lần tra thứ hai không phát sinh request nào ra Gemini.
+
+Gọi **async sau khi màn chi tiết đã render** phần dữ liệu cứng:
+
+| Trạng thái | Mã | Ý nghĩa |
+|---|---|---|
+| đã có nội dung | `200` | `data` đầy đủ, `Cache-Control: public, max-age=86400` |
+| đang sinh | `202` | `data: null`, `Retry-After: 3`, `no-store` |
+| không dùng được | `200` | `data: null`, `meta.status: "unavailable"` — **không bao giờ 5xx** |
+
+Payload mang `source: "ai"` và tên model; FE phải hiện nhãn đó.
+
+```bash
+docker compose exec app php artisan dictionary:enrich --hsk        # nạp sẵn tập HSK
+docker compose exec app php artisan dictionary:enrich --hsk --limit=50   # chạy thử trước
+docker compose exec app php artisan dictionary:enrich --stale --force    # sinh lại khi prompt đổi
+docker compose exec app php artisan queue:work --queue=enrichment
+```
+
+Đo thật: **4–5 giây mỗi từ**, ~$0,0011. Tập HSK 4.987 từ ≈ **$5,70**; cả 123.646
+từ ≈ **$141**. Chạy `--limit=50` và kiểm tay trước khi chạy toàn bộ — đốt 4.987
+lượt gọi để phát hiện prompt sai ở lượt thứ ba là cách học đắt nhất.
+
+Job xếp trên queue **`enrichment`**, tách khỏi `default`: một đợt pre-warm không
+được đẩy mail đặt lại mật khẩu xuống sau 4.987 job.
 
 ### Biến môi trường
 
