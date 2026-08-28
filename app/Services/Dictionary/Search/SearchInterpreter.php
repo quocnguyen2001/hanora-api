@@ -26,15 +26,12 @@ final class SearchInterpreter
         private readonly InterpretPrompt $prompts,
     ) {}
 
-    /**
-     * @return list<int>|null
-     */
-    public function interpret(string $query, string $mode): ?array
+    public function interpret(string $query, string $mode): Interpretation
     {
         $normalized = self::normalize($query);
 
         if ($normalized === '') {
-            return [];
+            return Interpretation::of([]);
         }
 
         /*
@@ -45,7 +42,7 @@ final class SearchInterpreter
          * tính năng thậm chí không bật.
          */
         if (! is_string(config('services.gemini.key')) || config('services.gemini.key') === '') {
-            return [];
+            return Interpretation::of([]);
         }
 
         $cached = SearchQueryInterpretation::query()
@@ -67,7 +64,10 @@ final class SearchInterpreter
                 ->whereKey($cached->id)
                 ->update(['hit_count' => DB::raw('hit_count + 1')]);
 
-            return array_map(intval(...), $cached->word_ids);
+            return Interpretation::of(
+                array_map(intval(...), $cached->word_ids),
+                $this->translation($cached->translation),
+            );
         }
 
         ['prompt' => $prompt, 'schema' => $schema] = $this->prompts->for($normalized, $mode);
@@ -87,10 +87,11 @@ final class SearchInterpreter
          * đó là một câu trả lời, không phải một lỗi.
          */
         if (! $result->successful) {
-            return null;
+            return Interpretation::failed();
         }
 
         $ids = $this->resolve($result->payload['words'] ?? []);
+        $translation = $this->translation($result->payload['translation'] ?? null);
 
         /*
          * `upsert`, KHÔNG phải `create`.
@@ -106,16 +107,17 @@ final class SearchInterpreter
                 'query_normalized' => $normalized,
                 'mode' => $mode,
                 'word_ids' => json_encode($ids),
+                'translation' => $translation === null ? null : json_encode($translation),
                 'model' => (string) config('services.gemini.model'),
                 'prompt_version' => InterpretPrompt::VERSION,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]],
             ['query_normalized', 'mode'],
-            ['word_ids', 'model', 'prompt_version', 'updated_at'],
+            ['word_ids', 'translation', 'model', 'prompt_version', 'updated_at'],
         );
 
-        return $ids;
+        return Interpretation::of($ids, $translation);
     }
 
     /**
@@ -173,6 +175,33 @@ final class SearchInterpreter
         }
 
         return $ids;
+    }
+
+    /**
+     * Chuẩn hóa và kiểm câu dịch.
+     *
+     * Không tra ngược corpus được — một câu không bao giờ là mục từ điển, và đó
+     * chính là lý do trường này tồn tại. Thứ kiểm được là hình dạng: `zh` phải
+     * thực sự chứa chữ Hán. Model trả một câu tiếng Việt vào ô `zh` là ca hỏng
+     * duy nhất bắt được mà không cần thêm một lời gọi nữa.
+     *
+     * @return array{zh: string, pinyin: string, vi: string}|null
+     */
+    private function translation(mixed $raw): ?array
+    {
+        if (! is_array($raw)) {
+            return null;
+        }
+
+        $zh = is_string($raw['zh'] ?? null) ? trim($raw['zh']) : '';
+        $pinyin = is_string($raw['pinyin'] ?? null) ? trim($raw['pinyin']) : '';
+        $vi = is_string($raw['vi'] ?? null) ? trim($raw['vi']) : '';
+
+        if ($zh === '' || $pinyin === '' || preg_match('/\p{Han}/u', $zh) !== 1) {
+            return null;
+        }
+
+        return ['zh' => $zh, 'pinyin' => $pinyin, 'vi' => $vi];
     }
 
     private static function normalize(string $query): string

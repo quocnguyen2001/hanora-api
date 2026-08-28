@@ -24,14 +24,20 @@ beforeEach(function (): void {
     $this->user = User::factory()->create();
 });
 
-function aiReturns(array $words): void
+function aiReturns(array $words, ?array $translation = null): void
 {
+    $payload = ['words' => $words];
+
+    if ($translation !== null) {
+        $payload['translation'] = $translation;
+    }
+
     Http::fake(['*' => Http::response([
         'usage' => ['total_input_tokens' => 40, 'total_output_tokens' => 20],
         'steps' => [
             ['type' => 'thought', 'signature' => 'x'],
             ['type' => 'model_output', 'content' => [
-                ['type' => 'text', 'text' => json_encode(['words' => $words])],
+                ['type' => 'text', 'text' => json_encode($payload)],
             ]],
         ],
     ])]);
@@ -207,5 +213,63 @@ describe('không cấu hình key thì lớp AI tắt êm', function (): void {
 
         searchApi('học')->assertOk()
             ->assertHeader('Cache-Control', 'max-age=86400, public');
+    });
+});
+
+describe('câu dịch trong response', function (): void {
+    it('trả câu dịch NGOÀI data cho truy vấn dạng câu', function (): void {
+        aiReturns(['学习'], [
+            'zh' => '你还记得我吗？',
+            'pinyin' => 'nǐ hái jìde wǒ ma?',
+            'vi' => 'bạn có nhớ tôi không?',
+        ]);
+
+        $response = searchApi('bạn có nhớ tôi không?')->assertOk();
+
+        expect($response->json('translation.zh'))->toBe('你还记得我吗？')
+            ->and($response->json('translation.pinyin'))->toBe('nǐ hái jìde wǒ ma?')
+            // Nhãn nguồn bắt buộc: đây là câu do máy dịch, không phải dữ liệu từ điển.
+            ->and($response->json('translation.source'))->toBe('ai');
+    });
+
+    it('KHÔNG nhét câu dịch vào data', function (): void {
+        /*
+         * `data[]` là mục từ điển có `id` thật, lưu được vào sổ từ vựng. Một câu
+         * dịch không có id — nhét vào cùng mảng là làm nút lưu hỏng ở đúng phần
+         * tử đầu tiên người dùng nhìn thấy.
+         */
+        aiReturns(['学习'], ['zh' => '我想学习', 'pinyin' => 'wǒ xiǎng xuéxí', 'vi' => 'x']);
+
+        $data = searchApi('tôi muốn đi học')->assertOk()->json('data');
+
+        expect(collect($data)->pluck('simplified'))->not->toContain('我想学习')
+            ->and(collect($data)->pluck('id')->filter(fn ($id) => $id === null))->toBeEmpty();
+    });
+
+    it('translation là null cho truy vấn dạng từ', function (): void {
+        aiReturns(['学生']);
+
+        expect(searchApi('học trò là gì')->assertOk()->json('translation'))->toBeNull();
+    });
+
+    it('translation là null khi không đụng tới AI', function (): void {
+        Http::fake();
+
+        expect(searchApi('学习', null)->assertOk()->json('translation'))->toBeNull();
+    });
+
+    it('dập hint hv_not_found khi AI đã trả lời được', function (): void {
+        // Hint đó khuyên "thử chuyển sang 中文". Hiện nó cạnh một danh sách kết
+        // quả đúng là đổ lỗi cho người dùng về việc hệ thống vừa làm xong.
+        aiReturns(['学习']);
+
+        expect(searchApi('bạn có nhớ tôi không?')->assertOk()->json('meta.hint'))->toBeNull();
+    });
+
+    it('giữ hint khi AI không tham gia', function (): void {
+        Http::fake();
+        config(['services.gemini.key' => '']);
+
+        searchApi('không khớp gì cả')->assertOk()->assertJsonPath('meta.source', 'sql');
     });
 });

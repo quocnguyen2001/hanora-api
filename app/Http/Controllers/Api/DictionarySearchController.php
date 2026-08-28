@@ -51,6 +51,7 @@ final class DictionarySearchController
         $top = $results->items()[0] ?? null;
         $aiFailed = false;
         $source = 'sql';
+        $translation = null;
 
         /*
          * Chỉ trang 1. Xếp hạng của AI là khái niệm của trang đầu — nó trả tối
@@ -58,12 +59,13 @@ final class DictionarySearchController
          * trang là trả tiền cho cùng một câu trả lời nhiều lần.
          */
         if ($page === 1 && SearchWeakness::isWeak($top->rank ?? null, $top->precision ?? null, $results->total())) {
-            $aiIds = $interpreter->interpret($request->searchTerm(), $request->mode() ?? 'auto');
+            $interpretation = $interpreter->interpret($request->searchTerm(), $request->mode() ?? 'auto');
 
-            if ($aiIds === null) {
+            if ($interpretation->failed) {
                 $aiFailed = true;
-            } elseif ($aiIds !== []) {
-                $words = $merger->merge($aiIds, $words);
+            } elseif (! $interpretation->isEmpty()) {
+                $words = $merger->merge($interpretation->ids, $words);
+                $translation = $interpretation->translation;
                 $source = 'ai';
             }
         }
@@ -80,10 +82,28 @@ final class DictionarySearchController
                  * SQL. `max` không bao giờ nói sai về thứ đang hiển thị.
                  */
                 'total' => max($results->total(), count($words)),
-                'hint' => $hint,
+                /*
+                 * Dập `hv_not_found` khi AI đã trả lời được.
+                 *
+                 * Hint đó khuyên người dùng "thử chuyển sang 中文" vì không khớp
+                 * âm Hán-Việt nào. Hiện nó cạnh một danh sách kết quả đúng là
+                 * đổ lỗi cho người dùng về một việc hệ thống vừa làm xong.
+                 */
+                'hint' => $source === 'ai' ? null : $hint,
                 // FE và test dùng để biết đường nào đã chạy.
                 'source' => $source,
             ],
+            /*
+             * Câu dịch nằm NGOÀI `data`, không phải phần tử đầu của nó.
+             *
+             * `data[]` là mục từ điển có `id` thật: lưu được vào sổ từ vựng, mở
+             * được màn chi tiết. Một câu dịch không có id và không bao giờ là
+             * mục từ điển — nhét nó vào cùng mảng là buộc FE đoán xem phần tử
+             * nào bấm được, và làm nút lưu hỏng ở phần tử đầu tiên.
+             *
+             * `null` là trạng thái thường gặp nhất: chỉ truy vấn dạng CÂU mới có.
+             */
+            'translation' => $translation === null ? null : $translation + ['source' => 'ai'],
         ])->header(
             'Cache-Control',
             /*

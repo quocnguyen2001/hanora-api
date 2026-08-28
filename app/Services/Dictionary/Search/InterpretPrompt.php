@@ -13,8 +13,15 @@ namespace App\Services\Dictionary\Search;
  */
 final class InterpretPrompt
 {
-    /** Tăng khi prompt đổi tới mức cache cũ không còn dùng được. */
-    public const VERSION = 1;
+    /**
+     * Tăng khi prompt đổi tới mức cache cũ không còn dùng được.
+     *
+     * v2: xin thêm `translation`. Bản v1 chỉ trả danh sách từ, nên
+     * `bạn có nhớ tôi không?` cho ra 你 / 记得 / 我 / 想念 — các mảnh của câu
+     * thay vì câu trả lời. Bản ghi v1 vẫn dùng được cho truy vấn dạng TỪ; chạy
+     * lại chúng chỉ để có `translation` là trả tiền cho một trường luôn null.
+     */
+    public const VERSION = 2;
 
     /**
      * Xin 10 chứ không phải 8: sau khi tra ngược corpus sẽ rụng bớt (đo trên
@@ -41,16 +48,25 @@ final class InterpretPrompt
 
         {$intent}
 
-        Trả về tối đa {$max} từ tiếng Trung mà người này nhiều khả năng đang muốn tra,
-        xếp theo độ liên quan giảm dần.
+        Trả về HAI thứ.
 
-        RÀNG BUỘC:
+        `words`: tối đa {$max} từ tiếng Trung người này nhiều khả năng muốn tra, xếp
+        theo độ liên quan giảm dần.
+
         1. Chỉ trả chữ GIẢN THỂ. Không phồn thể, không pinyin, không giải thích.
         2. Mỗi phần tử là MỘT từ hoặc MỘT thành ngữ tra được trong từ điển.
            Không trả cụm ngữ pháp kiểu "不但……而且……", không trả cả câu.
         3. Nếu truy vấn là một câu, hãy tách ra những từ khoá đáng tra nhất trong câu đó.
         4. Chỉ trả từ CÓ THẬT và phổ thông. Không chắc thì bỏ, đừng đoán.
         5. Nếu truy vấn không có nghĩa gì trong tiếng Việt lẫn tiếng Trung, trả mảng rỗng.
+
+        `translation`: bản dịch tiếng Trung của TOÀN BỘ truy vấn, kèm pinyin.
+
+        6. CHỈ điền khi truy vấn là một CÂU hoặc MỆNH ĐỀ hoàn chỉnh — có chủ ngữ,
+           động từ, hoặc là một câu hỏi. Bỏ TRỐNG khi truy vấn chỉ là một từ hay
+           một cụm danh từ như "học sinh", "bác sĩ", "xin chào".
+        7. Dịch tự nhiên như người Trung Quốc nói, không dịch từng chữ.
+        8. `pinyin` có dấu thanh, viết theo từng chữ cách nhau.
         PROMPT;
 
         return [
@@ -62,7 +78,17 @@ final class InterpretPrompt
                         'type' => 'array',
                         'items' => ['type' => 'string'],
                     ],
+                    'translation' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'zh' => ['type' => 'string'],
+                            'pinyin' => ['type' => 'string'],
+                            'vi' => ['type' => 'string'],
+                        ],
+                    ],
                 ],
+                // `translation` KHÔNG required: phần lớn truy vấn là một từ, và
+                // ép model điền sẽ khiến nó bịa một "câu" cho `bác sĩ`.
                 'required' => ['words'],
             ],
         ];

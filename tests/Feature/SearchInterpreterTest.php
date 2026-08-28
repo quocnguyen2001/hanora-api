@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\DictionaryWord;
 use App\Models\SearchQueryInterpretation;
+use App\Services\Dictionary\Search\Interpretation;
 use App\Services\Dictionary\Search\SearchInterpreter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Artisan;
@@ -23,36 +24,48 @@ beforeEach(function (): void {
 });
 
 /** Hình dạng response thật của Interactions API — bước `thought` đứng trước. */
-function interpretResponse(array $words): array
+function interpretResponse(array $words, ?array $translation = null): array
 {
+    $payload = ['words' => $words];
+
+    if ($translation !== null) {
+        $payload['translation'] = $translation;
+    }
+
     return [
         'usage' => ['total_input_tokens' => 40, 'total_output_tokens' => 20],
         'steps' => [
             ['type' => 'thought', 'signature' => 'x'],
             ['type' => 'model_output', 'content' => [
-                ['type' => 'text', 'text' => json_encode(['words' => $words])],
+                ['type' => 'text', 'text' => json_encode($payload)],
             ]],
         ],
     ];
 }
 
-function interpret(string $query, string $mode = 'vi'): ?array
+function interpret(string $query, string $mode = 'vi'): Interpretation
 {
     return app(SearchInterpreter::class)->interpret($query, $mode);
+}
+
+/** @return list<int> */
+function interpretIds(string $query, string $mode = 'vi'): array
+{
+    return interpret($query, $mode)->ids;
 }
 
 it('diễn giải truy vấn rồi trả id mục từ trong corpus', function (): void {
     $expected = DictionaryWord::where('simplified', '学习')->value('id');
     Http::fake(['*' => Http::response(interpretResponse(['学习']))]);
 
-    expect(interpret('tôi muốn học'))->toBe([$expected]);
+    expect(interpretIds('tôi muốn học'))->toBe([$expected]);
 });
 
 it('không gọi mạng lần thứ hai cho cùng một truy vấn', function (): void {
     Http::fake(['*' => Http::response(interpretResponse(['学习']))]);
 
-    $first = interpret('tôi muốn học');
-    $second = interpret('tôi muốn học');
+    $first = interpretIds('tôi muốn học');
+    $second = interpretIds('tôi muốn học');
 
     expect($second)->toBe($first);
     Http::assertSentCount(1);
@@ -89,7 +102,7 @@ it('loại chữ Hán do AI bịa, giữ nguyên thứ tự của phần còn l�
     ]))]);
 
     // Thứ tự AI được giữ: 学生 trước 学习, dù id trong bảng ngược lại.
-    expect(interpret('học sinh và học tập'))->toBe([$real['学生'], $real['学习']]);
+    expect(interpretIds('học sinh và học tập'))->toBe([$real['学生'], $real['学习']]);
 });
 
 it('cache cả kết quả rỗng do AI chủ động trả về', function (): void {
@@ -97,8 +110,8 @@ it('cache cả kết quả rỗng do AI chủ động trả về', function (): 
     // là 3,5 giây và một khoản tiền.
     Http::fake(['*' => Http::response(interpretResponse([]))]);
 
-    expect(interpret('asdfghjkl'))->toBe([])
-        ->and(interpret('asdfghjkl'))->toBe([]);
+    expect(interpretIds('asdfghjkl'))->toBe([])
+        ->and(interpretIds('asdfghjkl'))->toBe([]);
 
     Http::assertSentCount(1);
     expect(SearchQueryInterpretation::where('query_normalized', 'asdfghjkl')->exists())->toBeTrue();
@@ -109,15 +122,15 @@ it('KHÔNG cache khi lời gọi hỏng', function (): void {
     // này không có kết quả, mãi mãi" là cách hỏng tệ nhất lớp này có thể tạo ra.
     Http::fake(fn () => throw new ConnectionException('timeout'));
 
-    // `null`, KHÔNG phải `[]`. Controller dùng khác biệt này để đặt `no-store`.
-    expect(interpret('anh yêu em'))->toBeNull();
+    // `failed`, KHÔNG phải rỗng. Controller dùng khác biệt này để đặt `no-store`.
+    expect(interpret('anh yêu em')->failed)->toBeTrue();
     expect(SearchQueryInterpretation::count())->toBe(0);
 });
 
 it('trả rỗng cho truy vấn trắng, không gọi mạng', function (): void {
     Http::fake();
 
-    expect(interpret('   '))->toBe([]);
+    expect(interpretIds('   '))->toBe([]);
     Http::assertNothingSent();
 });
 
@@ -173,4 +186,86 @@ it('ghi đè thay vì đâm vào unique index khi hai lượt cùng ghi', functi
 
     expect($rows)->toHaveCount(1)
         ->and($rows->first()->word_ids)->toBe([1, 2]);
+});
+
+describe('câu dịch cho truy vấn dạng câu', function (): void {
+    it('giữ câu dịch dù nó KHÔNG có trong corpus', function (): void {
+        /*
+         * Hồi quy cho lỗi người dùng báo: `bạn có nhớ tôi không?` trả về
+         * 你 / 记得 / 我 / 想念 — các mảnh của câu thay vì câu trả lời.
+         *
+         * AI thực ra ĐÃ trả về `你还记得我吗`, nhưng luật tra ngược corpus vứt nó
+         * đi. Luật đó đúng cho từ ghép và sai cho câu: một câu KHÔNG BAO GIỜ là
+         * mục từ điển, nên chống bịa vô tình giết đúng câu trả lời hữu ích nhất.
+         */
+        Http::fake(['*' => Http::response(interpretResponse(['记得', '想念'], [
+            'zh' => '你还记得我吗？',
+            'pinyin' => 'nǐ hái jìde wǒ ma?',
+            'vi' => 'bạn có nhớ tôi không?',
+        ]))]);
+
+        $result = interpret('bạn có nhớ tôi không?');
+
+        expect($result->translation)->not->toBeNull()
+            ->and($result->translation['zh'])->toBe('你还记得我吗？')
+            ->and($result->translation['pinyin'])->toBe('nǐ hái jìde wǒ ma?');
+    });
+
+    it('cache câu dịch cùng danh sách từ', function (): void {
+        Http::fake(['*' => Http::response(interpretResponse(['学习'], [
+            'zh' => '我想学习', 'pinyin' => 'wǒ xiǎng xuéxí', 'vi' => 'tôi muốn học',
+        ]))]);
+
+        interpret('tôi muốn học');
+        $second = interpret('tôi muốn học');
+
+        Http::assertSentCount(1);
+        expect($second->translation['zh'])->toBe('我想学习');
+    });
+
+    it('không có câu dịch khi truy vấn chỉ là một từ', function (): void {
+        Http::fake(['*' => Http::response(interpretResponse(['学生']))]);
+
+        expect(interpret('học sinh')->translation)->toBeNull();
+    });
+
+    describe('loại câu dịch lệch hình dạng', function (): void {
+        it('khi zh không chứa chữ Hán nào', function (): void {
+            // Model trả một câu tiếng Việt vào ô `zh` là ca hỏng duy nhất bắt
+            // được mà không cần thêm một lời gọi nữa — câu thì không tra ngược
+            // corpus được.
+            Http::fake(['*' => Http::response(interpretResponse(['学习'], [
+                'zh' => 'toi muon hoc', 'pinyin' => 'x', 'vi' => 'y',
+            ]))]);
+
+            expect(interpret('tôi muốn học')->translation)->toBeNull();
+        });
+
+        it('khi thiếu pinyin', function (): void {
+            Http::fake(['*' => Http::response(interpretResponse(['学习'], [
+                'zh' => '我想学习', 'pinyin' => '', 'vi' => 'y',
+            ]))]);
+
+            expect(interpret('tôi muốn học')->translation)->toBeNull();
+        });
+
+        it('khi translation mang kiểu sai hoàn toàn', function (): void {
+            Http::fake(['*' => Http::response(interpretResponse(['学习'], []))]);
+
+            expect(interpret('tôi muốn học')->translation)->toBeNull();
+        });
+    });
+
+    it('coi là có kết quả dù chỉ có câu dịch, không có từ nào lọt', function (): void {
+        // Mọi từ AI đề xuất đều bịa, nhưng câu dịch vẫn dùng được. Trả rỗng ở
+        // đây là quay về đúng hành vi mà lỗi này sinh ra.
+        Http::fake(['*' => Http::response(interpretResponse(['词不存在'], [
+            'zh' => '你还记得我吗？', 'pinyin' => 'nǐ hái jìde wǒ ma?', 'vi' => 'x',
+        ]))]);
+
+        $result = interpret('bạn có nhớ tôi không?');
+
+        expect($result->ids)->toBe([])
+            ->and($result->isEmpty())->toBeFalse();
+    });
 });
