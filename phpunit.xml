@@ -33,6 +33,20 @@
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+
+        <!--
+            Lớp AI TẮT mặc định trong test.
+
+            Không có dòng này, `config('services.gemini.key')` rơi về `.env` của
+            máy đang chạy và một test tìm kiếm bình thường sẽ gọi API thật: chậm
+            (đo được 3,55s cho một test vốn 40ms), tốn tiền, phụ thuộc mạng, và
+            cho kết quả khác nhau giữa hai lần chạy.
+
+            Test nào cần lớp AI thì tự bật bằng
+            `config(['services.gemini.key' => 'test-key'])` kèm `Http::fake()`.
+            Bật có chủ đích, không bật do quên.
+        -->
+        <env name="GEMINI_API_KEY" value=""/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
