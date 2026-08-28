@@ -207,10 +207,12 @@ final class WordSearchService
             $this->fullTextBranch($query),
         ];
 
-        $meaning = $this->viMeaningBranch($query);
+        foreach ([false, true] as $useAiGlosses) {
+            $meaning = $this->viMeaningBranch($query, $useAiGlosses);
 
-        if ($meaning !== null) {
-            $branches[] = $meaning;
+            if ($meaning !== null) {
+                $branches[] = $meaning;
+            }
         }
 
         return $branches;
@@ -273,7 +275,7 @@ final class WordSearchService
      * THEO BIÊN TỪ mà không cần gọi `to_tsvector` trên từng dòng — cũng đo được
      * là +35ms nếu gọi.
      */
-    private function viMeaningBranch(string $query): ?Builder
+    private function viMeaningBranch(string $query, bool $useAiGlosses = false): ?Builder
     {
         $normalized = $this->normalizer->normalize($query);
 
@@ -284,8 +286,27 @@ final class WordSearchService
         $search = $this->normalizer->withoutLeadingClassifier($normalized);
         $accented = $this->normalizer->isAccented($normalized);
 
-        $vector = $accented ? 'search_vi_tsv' : 'search_vi_plain_tsv';
-        $first = $accented ? 'definitions_vi_first' : 'definitions_vi_first_plain';
+        /*
+         * Hai bộ cột CÙNG hình dạng, chạy CÙNG rank và CÙNG thang bậc:
+         *
+         *   CVDICT  search_vi_tsv         definitions_vi_first
+         *   AI      search_vi_ai_tsv      definitions_vi_ai_first
+         *
+         * Nhánh AI là nhánh THÊM, không thay nhánh cũ. `DISTINCT ON (id)` giữ
+         * `precision` nhỏ hơn, nên một từ khớp cả hai lấy bậc tốt hơn, và từ
+         * chưa được dọn (cột AI còn NULL) không mất gì — `@@` trên NULL trả
+         * NULL nên nó chỉ vắng mặt ở nhánh AI.
+         *
+         * Vì sao cần: nghĩa CVDICT xếp không theo mức phổ biến, và mọi bậc
+         * `precision` đều tính trên nghĩa ĐẦU. Đo được `的` có nghĩa đầu là
+         * "xe taxi", `吗` là "dùng trong 嗎啡" — tức bậc 0 và 1 đang được trao
+         * cho nghĩa sai ở đúng nhóm từ phổ biến nhất.
+         */
+        $suffix = $useAiGlosses ? '_ai' : '';
+        $vector = $accented ? "search_vi{$suffix}_tsv" : "search_vi{$suffix}_plain_tsv";
+        $first = $accented
+            ? "definitions_vi{$suffix}_first"
+            : "definitions_vi{$suffix}_first_plain";
         $base = $accented ? 0 : 3;
 
         // Vế bỏ dấu bọc CẢ HAI phía bằng `f_unaccent` — cùng wrapper IMMUTABLE

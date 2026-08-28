@@ -198,6 +198,12 @@ rồi cache vĩnh viễn theo truy vấn đã chuẩn hóa. Đo trên DB thật 
 | `tôi muốn ăn cơm` | (rỗng) | 我 想 要 吃 饭 吃饭 |
 | `xin chào` | 你好 ✅ | 你好 ✅ — **không gọi AI, 9ms** |
 
+Truy vấn dạng **CÂU** còn nhận thêm bản dịch, nằm ở trường `translation` NGOÀI
+`data`: `bạn có nhớ tôi không?` → `你还记得我吗？`. Nó nằm ngoài `data` vì một câu
+không có `id`, không lưu được vào sổ từ vựng và không phải mục từ điển — nhét vào
+cùng mảng là làm nút lưu hỏng ở đúng phần tử đầu tiên. `translation` là `null`
+cho mọi truy vấn dạng từ.
+
 Ba tính chất bắt buộc, mỗi cái có test khóa lại:
 
 1. **Không bao giờ 5xx vì Gemini.** API chết thì `/search` trả nguyên kết quả SQL.
@@ -241,6 +247,36 @@ lượt gọi để phát hiện prompt sai ở lượt thứ ba là cách học
 Job xếp trên queue **`enrichment`**, tách khỏi `default`: một đợt pre-warm không
 được đẩy mail đặt lại mật khẩu xuống sau 4.987 job.
 
+### Dọn nghĩa tiếng Việt — chạy thủ công
+
+`definitions_vi` của CVDICT có nhiễu đo được trên 115.040 mục: 14.113 dòng lẫn
+chữ Hán, 4.092 lẫn mã pinyin, 31.467 có ngoặc chú thích trong nghĩa đầu. Nhưng
+THỨ TỰ nghĩa mới là phần hại nhất — mọi bậc `precision` của nhánh nghĩa Việt đều
+tính trên nghĩa ĐẦU:
+
+```
+的  → "xe taxi; xe cab (viết tắt của 的士[di1 shi4])"
+你  → "bạn (ngôi thứ hai thông dụng, khác với kính trọng 您[nin2])"
+吗  → "dùng trong 嗎啡|吗啡[ma3 fei1]"
+```
+
+`dictionary:optimize-glosses` dọn và sắp lại bằng AI, ghi vào cột `*_vi_ai*`.
+**`definitions_vi` của CVDICT KHÔNG bị đụng tới** — nó vẫn là thứ hiển thị, cột
+AI chỉ dùng để KHỚP. Hỏng thì xoá cột AI là quay về đúng hành vi cũ.
+
+```bash
+docker compose exec app php artisan dictionary:optimize-glosses --all --pretend  # đếm và ước giá
+docker compose exec app php artisan dictionary:optimize-glosses --frequency=2000 # chạy thử nhóm phổ biến
+docker compose exec app php artisan dictionary:optimize-glosses --all            # 115.040 mục
+docker compose exec app php artisan queue:work --queue=glosses
+```
+
+Gọi theo lô 20 từ: 5.752 lời gọi thay vì 115.040. Ước **~$10** cho toàn bộ từ
+điển. Chạy lại được — mục đã dọn ở phiên bản prompt hiện hành bị bỏ qua.
+
+Sau khi chạy, `search("của")` khớp 的 ở `rank 6 precision 0`; trước đó không thể,
+vì nghĩa đầu của 的 là "xe taxi".
+
 ### Biến môi trường
 
 | Biến | Mặc định | Ghi chú |
@@ -250,6 +286,9 @@ Job xếp trên queue **`enrichment`**, tách khỏi `default`: một đợt pre
 | `GEMINI_RPM` | `10` | Van giảm áp; nguồn sự thật là mã 429 trả về |
 | `GEMINI_TIMEOUT` | `30` | Cho việc sinh nội dung nền |
 | `GEMINI_SEARCH_TIMEOUT` | `6` | Cho đường request; đo được 3,2–4,5s |
+
+Ba hàng đợi, theo thứ tự ưu tiên: `default` (mail, có người đang chờ) →
+`enrichment` → `glosses`.
 
 > **Nội dung do AI sinh khác bản chất với năm nguồn trong bảng trên.** Nó không có
 > license, không có người rà, và có thể sai. FE phải hiển thị nhãn nguồn —
