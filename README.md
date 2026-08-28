@@ -247,6 +247,27 @@ lượt gọi để phát hiện prompt sai ở lượt thứ ba là cách học
 Job xếp trên queue **`enrichment`**, tách khỏi `default`: một đợt pre-warm không
 được đẩy mail đặt lại mật khẩu xuống sau 4.987 job.
 
+### Chi tiết câu — `GET /api/dictionary/sentences?zh=…`
+
+Bấm vào thẻ dịch ở màn tìm kiếm là mở trang này. Trả pinyin, bản dịch tự nhiên,
+**nghĩa đen**, **tách từ** và ghi chú ngữ pháp.
+
+Khoá cache là chính chuỗi Hán đã chuẩn hoá, KHÔNG phải một id sinh ra rồi trả về:
+câu không phải mục từ điển nên không có id, và khoá theo văn bản cho phép FE điều
+hướng ngay khi bấm thay vì gọi API lấy id trước rồi mới chuyển trang.
+
+Mỗi token mang `word_id` tra ngược từ corpus, nên bấm vào một từ trong câu là mở
+được trang chi tiết từ đó. `null` là trạng thái hợp lệ và thường gặp — dấu câu,
+tên riêng, cụm không có trong CC-CEDICT đều rơi vào đó.
+
+**Tách từ bị bỏ hẳn nếu nối các token lại không ra đúng câu gốc** (xét trên chữ,
+bỏ qua dấu câu). Ca này nguy hiểm nhất: model làm rơi một chữ thì người học đọc
+một câu khác với câu trên màn hình mà không cách nào thấy bằng mắt. Mất khối tách
+từ, giữ pinyin và bản dịch.
+
+Đồng bộ chứ không 202 như `/enrichment`: đây là nội dung CHÍNH của trang người
+dùng vừa mở. Đo thật: **3,8–5,2 giây** lần đầu, **36ms** khi trúng cache.
+
 ### Dọn nghĩa tiếng Việt — chạy thủ công
 
 `definitions_vi` của CVDICT có nhiễu đo được trên 115.040 mục: 14.113 dòng lẫn
@@ -285,7 +306,8 @@ vì nghĩa đầu của 的 là "xe taxi".
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | `2.5-flash-lite` trả 404 cho tài khoản mới |
 | `GEMINI_RPM` | `10` | Van giảm áp; nguồn sự thật là mã 429 trả về |
 | `GEMINI_TIMEOUT` | `30` | Cho việc sinh nội dung nền |
-| `GEMINI_SEARCH_TIMEOUT` | `6` | Cho đường request; đo được 3,2–4,5s |
+| `GEMINI_SEARCH_TIMEOUT` | `6` | Diễn giải truy vấn; đo được 3,2–4,5s |
+| `GEMINI_SENTENCE_TIMEOUT` | `15` | Phân tích câu; đầu ra dài hơn hẳn |
 
 Ba hàng đợi, theo thứ tự ưu tiên: `default` (mail, có người đang chờ) →
 `enrichment` → `glosses`.

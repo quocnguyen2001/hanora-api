@@ -70,6 +70,15 @@ return [
          * số đo đó, không phải một con số tròn cho đẹp.
          */
         'search_timeout' => (int) env('GEMINI_SEARCH_TIMEOUT', 6),
+
+        /*
+         * Phân tích câu: dài hơn diễn giải truy vấn vì đầu ra nhiều hơn hẳn
+         * (tách từ + nghĩa đen + ghi chú ngữ pháp). Vẫn nằm trên đường request
+         * vì đó là nội dung CHÍNH của trang, nhưng người dùng đã chủ động bấm
+         * vào nên họ đang chờ có chủ đích — khác với `/search` gõ tới đâu chạy
+         * tới đó.
+         */
+        'sentence_timeout' => (int) env('GEMINI_SENTENCE_TIMEOUT', 15),
     ],
 
     'slack' => [

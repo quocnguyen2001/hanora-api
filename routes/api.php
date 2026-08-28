@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DictionaryEnrichmentController;
 use App\Http\Controllers\Api\DictionarySearchController;
+use App\Http\Controllers\Api\DictionarySentenceController;
 use App\Http\Controllers\Api\DictionaryWordController;
 use App\Http\Controllers\Api\HandwritingController;
 use App\Http\Controllers\Api\HealthController;
@@ -53,6 +54,15 @@ Route::middleware('auth:sanctum')->group(function (): void {
     // D8: từ điển cũng nằm sau auth. Không có chế độ khách.
     Route::prefix('dictionary')->name('api.dictionary.')->group(function (): void {
         Route::get('/search', DictionarySearchController::class)->name('search');
+
+        /*
+         * Chi tiết một CÂU. Khoá là chuỗi Hán trong query string, không phải id
+         * trên path: câu không phải mục từ điển nên không có id để đặt vào path.
+         *
+         * Nằm sau `auth:sanctum` như mọi endpoint từ điển khác, và ở đây điều đó
+         * quan trọng hơn: mỗi câu mới tiêu một lời gọi Gemini.
+         */
+        Route::get('/sentences', DictionarySentenceController::class)->name('sentence');
         Route::get('/words/{word}', DictionaryWordController::class)->name('word');
 
         /*
