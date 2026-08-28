@@ -41,6 +41,7 @@ docker compose exec app composer lint      # Pint, sửa tại chỗ
 docker compose exec app composer lint:test # Pint, chỉ kiểm tra
 docker compose exec app composer analyse   # Larastan level 6
 docker compose exec app php artisan migrate
+docker compose exec app php artisan dictionary:search-stats  # cache AI: tỉ lệ trúng, chi phí
 ```
 
 ### Test chạy trên database riêng
@@ -178,6 +179,61 @@ rơi vào 8.000–10.000. Đo trên nguồn thật:
 2.0 trùng nặng với top-5000 SUBTLEX. Ngưỡng nằm ở
 `DictionaryEnricher::FREQUENCY_THRESHOLD`; đổi nguồn dữ liệu thì phải đo lại —
 lệnh import tự cảnh báo nếu kết quả rơi ra ngoài dải.
+
+## Lớp AI (Gemini)
+
+Từ điển vẫn là **CC-CEDICT + CVDICT + Unihan + HSK + SUBTLEX**. AI không thay
+nguồn nào; nó chỉ làm hai việc mà dữ liệu tĩnh không làm được.
+
+### Diễn giải truy vấn — đang chạy
+
+`/api/dictionary/search` gọi Gemini **chỉ khi SQL không có bằng chứng mạnh**,
+rồi cache vĩnh viễn theo truy vấn đã chuẩn hóa. Đo trên DB thật 2026-08-28:
+
+| Truy vấn | Trước | Sau |
+|---|---|---|
+| `yêu` | 要 要求 约 邀请 | 爱 喜欢 热爱 爱情 |
+| `bác sĩ` | 博士 (tiến sĩ) | 医生 大夫 医师 |
+| `anh yêu em` | 博爱 基情 贤妻 | 爱 喜欢 |
+| `tôi muốn ăn cơm` | (rỗng) | 我 想 要 吃 饭 吃饭 |
+| `xin chào` | 你好 ✅ | 你好 ✅ — **không gọi AI, 9ms** |
+
+Ba tính chất bắt buộc, mỗi cái có test khóa lại:
+
+1. **Không bao giờ 5xx vì Gemini.** API chết thì `/search` trả nguyên kết quả SQL.
+2. **Truy vấn mạnh không chạm AI.** Khớp chữ Hán, pinyin, hoặc gloss tiếng Việt
+   chính xác đều trả trong vài mili-giây như trước.
+3. **Chữ Hán do AI trả về phải tồn tại trong `dictionary_words`.** Chữ bịa bị loại
+   trước khi tới người dùng — đo được 8–11% đề xuất của AI rơi vào nhóm này.
+
+Độ trễ: lời gọi thật **3,2–4,5 giây**, trúng cache **~1ms**. Luật quyết định nằm
+ở `SearchWeakness`, và bộ truy vấn vàng dùng để hiệu chỉnh nó nằm trong
+`tests/Unit/SearchWeaknessTest.php` — **đó là số đo, không phải ví dụ**. Đổi luật
+thì đo lại, đừng sửa kỳ vọng cho khớp luật mới.
+
+### Làm giàu mục từ — mới xong phần kết nối
+
+Nghĩa theo từ loại, ví dụ song ngữ, bộ thủ và số nét, từ ghép liên quan. Hiện mới
+có `GeminiClient` và `dictionary:enrich-spike`; phần cache và endpoint nằm ở
+`plans/260828-1424-lop-lam-giau-tu-dien-bang-gemini/`.
+
+### Biến môi trường
+
+| Biến | Mặc định | Ghi chú |
+|---|---|---|
+| `GEMINI_API_KEY` | *(rỗng)* | Thiếu key thì cả hai lớp AI tắt êm, không lỗi |
+| `GEMINI_MODEL` | `gemini-3.1-flash-lite` | `2.5-flash-lite` trả 404 cho tài khoản mới |
+| `GEMINI_RPM` | `10` | Van giảm áp; nguồn sự thật là mã 429 trả về |
+| `GEMINI_TIMEOUT` | `30` | Cho việc sinh nội dung nền |
+| `GEMINI_SEARCH_TIMEOUT` | `6` | Cho đường request; đo được 3,2–4,5s |
+
+> **Nội dung do AI sinh khác bản chất với năm nguồn trong bảng trên.** Nó không có
+> license, không có người rà, và có thể sai. FE phải hiển thị nhãn nguồn —
+> response mang sẵn `meta.source` và, ở lớp làm giàu, `source: "ai"` kèm tên model.
+
+> **`GEMINI_API_KEY` chỉ sống trong `.env`.** Không commit, không đưa vào
+> `.env.example`, không log. Key nào đã từng bị dán ra ngoài trình quản lý bí mật
+> thì phải rotate ở Google AI Studio trước khi deploy.
 
 ## Deploy (P20)
 
