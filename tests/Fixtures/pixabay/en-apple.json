@@ -1,0 +1,55 @@
+{
+  "totalHits": 500,
+  "hits": [
+    {
+      "id": 1702316,
+      "tags": "apple, red, fruit, red chief, red apple, fresh apple, ripe, ripe apple, fresh, fresh fruit, harvest, produce, organic, healthy, food, close up, apple, apple, apple, apple, apple",
+      "previewURL": "https://cdn.pixabay.com/photo/2016/09/29/08/33/apple-1702316_150.jpg",
+      "webformatWidth": 640,
+      "webformatHeight": 495,
+      "pageURL": "https://pixabay.com/photos/apple-red-fruit-red-chief-1702316/",
+      "user": "NoName_13",
+      "user_id": 2364555
+    },
+    {
+      "id": 2788616,
+      "tags": "apple, red, red apple, apple plantation, yummy, fruit, vitamins, fresh, nature, healthy, ripe, pome fruit family, apple trees, orchards, trees, fruit trees, fall, harvest, harvested, apple, apple, apple, apple, apple",
+      "previewURL": "https://cdn.pixabay.com/photo/2017/09/26/13/31/apple-2788616_150.jpg",
+      "webformatWidth": 640,
+      "webformatHeight": 384,
+      "pageURL": "https://pixabay.com/photos/apple-red-red-apple-2788616/",
+      "user": "NoName_13",
+      "user_id": 2364555
+    },
+    {
+      "id": 256268,
+      "tags": "apple, red, delicious, fruit, vitamins, apple, apple, apple, apple, apple",
+      "previewURL": "https://cdn.pixabay.com/photo/2014/02/01/17/30/apple-256268_150.jpg",
+      "webformatWidth": 640,
+      "webformatHeight": 423,
+      "pageURL": "https://pixabay.com/photos/apple-red-delicious-fruit-vitamins-256268/",
+      "user": "jarmoluk",
+      "user_id": 143740
+    },
+    {
+      "id": 2391,
+      "tags": "apple, diet, female, food, fresh, fruit, girl, hand, healthy, holding, palm, red, ripe, woman, red apple, ripe apple, fresh apple, apple, apple, apple, apple, apple, diet",
+      "previewURL": "https://cdn.pixabay.com/photo/2010/12/13/10/09/apple-2391_150.jpg",
+      "webformatWidth": 640,
+      "webformatHeight": 426,
+      "pageURL": "https://pixabay.com/photos/apple-diet-female-food-fresh-2391/",
+      "user": "PublicDomainPictures",
+      "user_id": 14
+    },
+    {
+      "id": 9911963,
+      "tags": "food, lime, apple, healthy, vitamins, fresh, fruits",
+      "previewURL": "https://cdn.pixabay.com/photo/2025/10/23/11/35/food-9911963_150.jpg",
+      "webformatWidth": 427,
+      "webformatHeight": 640,
+      "pageURL": "https://pixabay.com/photos/food-lime-apple-healthy-vitamins-9911963/",
+      "user": "Pataleex",
+      "user_id": 34059543
+    }
+  ]
+}

@@ -81,6 +81,32 @@ return [
         'sentence_timeout' => (int) env('GEMINI_SENTENCE_TIMEOUT', 15),
     ],
 
+    /*
+     * Pixabay — ảnh minh hoạ trên màn chi tiết từ.
+     *
+     * `timeout`: 8 giây. Lời gọi này nằm trong HÀNG ĐỢI chứ không trên đường
+     * request, nên rộng rãi hơn `search_timeout: 6` của Gemini được.
+     *
+     * `rpm`: trần thật của Pixabay là 100 request/60 giây, tính theo API KEY
+     * chứ không theo IP. Đặt 60 để chừa biên: mỗi từ tốn HAI request (một nhánh
+     * tiếng Trung, một nhánh tiếng Anh để đối chiếu), tức ~30 từ mỗi phút. Con
+     * số ở đây chỉ là van giảm áp; nguồn sự thật vẫn là mã 429 trả về.
+     *
+     * Ba ngưỡng cổng chặn đo trên 16 từ thật ngày 2026-08-29 — bảng số liệu nằm
+     * trong `plans/260829-0635-anh-minh-hoa-pixabay/plan.md`. Để ở config để
+     * chỉnh được mà không phải sửa code, NHƯNG đổi chúng thì phải tăng
+     * `IllustrationSelector::GATE_VERSION`, nếu không những bản ghi `none` sinh
+     * bởi ngưỡng cũ sẽ nằm lại vĩnh viễn và không ai quét lại.
+     */
+    'pixabay' => [
+        'key' => env('PIXABAY_API_KEY'),
+        'timeout' => (int) env('PIXABAY_TIMEOUT', 8),
+        'rpm' => (int) env('PIXABAY_RPM', 60),
+        'min_total_hits' => (int) env('PIXABAY_MIN_TOTAL_HITS', 200),
+        'min_tag_matches' => (int) env('PIXABAY_MIN_TAG_MATCHES', 3),
+        'sample_size' => (int) env('PIXABAY_SAMPLE_SIZE', 5),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

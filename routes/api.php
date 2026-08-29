@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DictionaryEnrichmentController;
+use App\Http\Controllers\Api\DictionaryIllustrationController;
 use App\Http\Controllers\Api\DictionarySearchController;
 use App\Http\Controllers\Api\DictionarySentenceController;
 use App\Http\Controllers\Api\DictionaryWordController;
@@ -73,6 +74,16 @@ Route::middleware('auth:sanctum')->group(function (): void {
          */
         Route::get('/words/{word}/enrichment', DictionaryEnrichmentController::class)
             ->name('word.enrichment');
+
+        /*
+         * Ảnh minh hoạ, cũng gọi ASYNC sau khi màn chi tiết đã render.
+         *
+         * Nằm sau `auth:sanctum` như mọi endpoint từ điển khác — nó xếp job vào
+         * hàng đợi và tiêu trần 100 request/phút của Pixabay, nên để công khai
+         * là mời người lạ đốt hạn mức.
+         */
+        Route::get('/words/{word}/illustration', DictionaryIllustrationController::class)
+            ->name('word.illustration');
     });
 
     Route::prefix('vocabulary')->name('api.vocabulary.')->group(function (): void {

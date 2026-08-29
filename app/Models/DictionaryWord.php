@@ -101,4 +101,18 @@ final class DictionaryWord extends Model
     {
         return $this->hasOne(DictionaryWordEnrichment::class, 'word_id');
     }
+
+    /**
+     * Ảnh minh hoạ, resolve từ Pixabay một lần rồi cache vĩnh viễn.
+     *
+     * Vắng mặt là trạng thái hợp lệ và phổ biến: cổng chặn cố tình từ chối hư
+     * từ và từ trừu tượng, nên FE luôn phải dựng được màn chi tiết mà không có
+     * quan hệ này.
+     *
+     * @return HasOne<DictionaryWordIllustration, $this>
+     */
+    public function illustration(): HasOne
+    {
+        return $this->hasOne(DictionaryWordIllustration::class, 'word_id');
+    }
 }
