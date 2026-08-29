@@ -6,6 +6,7 @@ namespace App\Services\Stats;
 
 use App\Models\User;
 use App\Models\UserWord;
+use App\Services\Review\ReviewScore;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,10 @@ final class StatsSummaryService
 {
     public const RANGES = ['week', 'month', 'year', 'all'];
 
-    public function __construct(private readonly string $timezone = 'Asia/Ho_Chi_Minh') {}
+    public function __construct(
+        private readonly ReviewScore $score,
+        private readonly string $timezone = 'Asia/Ho_Chi_Minh',
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -112,6 +116,11 @@ final class StatsSummaryService
      *
      * Đếm cả lượt làm lại sẽ khiến người càng chăm sửa lỗi càng bị báo tỉ lệ nhớ
      * thấp — đúng ngược với hành vi ta muốn khuyến khích.
+     *
+     * Phép chia nằm ở `ReviewScore`, không viết lại ở đây: điểm một phiên ôn
+     * dùng đúng công thức này thu hẹp vào một phiên. Hai bản sao của cùng một
+     * công thức sẽ trôi khỏi nhau, và lúc đó người dùng thấy điểm phiên 90 cạnh
+     * tỉ lệ nhớ 87 mà không cách nào giải thích được.
      */
     private function memoryRate(User $user, ?CarbonImmutable $from): int
     {
@@ -123,7 +132,7 @@ final class StatsSummaryService
 
         $correct = $this->logQuery($user, $from)->where('is_correct', true)->count();
 
-        return (int) round($correct / $total * 100);
+        return $this->score->score($total, $correct);
     }
 
     /**

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\ReviewSessionRequest;
 use App\Http\Requests\SubmitAnswerRequest;
 use App\Models\ReviewLog;
+use App\Models\ReviewSession;
 use App\Models\UserWord;
 use App\Services\Review\AnswerGrader;
 use App\Services\Review\ReviewSessionBuilder;
@@ -20,7 +21,14 @@ final class ReviewController
 {
     public function session(ReviewSessionRequest $request, ReviewSessionBuilder $builder): JsonResponse
     {
-        $session = $builder->build($request->user(), $request->mode(), $request->limitValue());
+        // `SOURCE_DUE` cố định: endpoint này bị thay bằng `POST /reviews/sessions`
+        // ngay ở bước sau, nơi nguồn phiên trở thành tham số thật.
+        $session = $builder->build(
+            $request->user(),
+            $request->mode(),
+            ReviewSession::SOURCE_DUE,
+            $request->limitValue(),
+        );
 
         // Phiên ôn là dữ liệu theo user và thay đổi mỗi lần gọi.
         return response()->json(['data' => $session])

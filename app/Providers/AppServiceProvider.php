@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\User;
+use App\Services\Review\ReviewScore;
 use App\Services\Review\SrsScheduler;
 use App\Services\Stats\StatsSummaryService;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -28,9 +30,15 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // Cùng lý do: gộp ngày phải theo múi giờ VN, và service giữ tính thuần.
+        //
+        // `ReviewScore` resolve qua container chứ không `new` tại chỗ: đó là
+        // cùng công thức mà điểm phiên ôn dùng, và chỉ được phép có một bản.
         $this->app->bind(
             StatsSummaryService::class,
-            fn (): StatsSummaryService => new StatsSummaryService((string) config('app.timezone')),
+            fn (Application $app): StatsSummaryService => new StatsSummaryService(
+                $app->make(ReviewScore::class),
+                (string) config('app.timezone'),
+            ),
         );
     }
 

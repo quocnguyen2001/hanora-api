@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Review;
 
 use App\Models\DictionaryWord;
+use App\Models\ReviewSession;
 use App\Models\User;
 use App\Models\UserWord;
 use Illuminate\Support\Collection;
@@ -22,18 +23,52 @@ final class ReviewSessionBuilder
     /** Một câu hỏi trắc nghiệm gồm 1 đáp án đúng + 3 distractor. */
     private const DISTRACTOR_COUNT = 3;
 
+    /** Nguồn không có từ nào để ôn. */
+    public const EMPTY_NO_WORDS = 'no_words';
+
+    /** Có từ, nhưng không dựng được câu trắc nghiệm nào từ chúng. */
+    public const EMPTY_NOT_ENOUGH_OPTIONS = 'not_enough_options';
+
+    public function __construct(private readonly WeakWordQuery $weakWords) {}
+
     /**
-     * @return array{mode: string, items: list<array<string, mixed>>}
+     * @return array{mode: string, items: list<array<string, mixed>>, empty_reason: string|null}
      */
-    public function build(User $user, string $mode, int $limit): array
+    public function build(User $user, string $mode, string $source, int $limit): array
     {
-        $dueWords = $this->dueWords($user, $limit);
+        $words = $source === ReviewSession::SOURCE_WEAK
+            ? $this->weakWords->forUser($user, $limit)
+            : $this->dueWords($user, $limit);
 
         $items = $mode === AnswerGrader::MODE_MCQ
-            ? $this->mcqItems($user, $dueWords)
-            : $this->typingItems($dueWords);
+            ? $this->mcqItems($user, $words)
+            : $this->typingItems($words);
 
-        return ['mode' => $mode, 'items' => $items];
+        return [
+            'mode' => $mode,
+            'items' => $items,
+            'empty_reason' => $this->emptyReason($words, $items),
+        ];
+    }
+
+    /**
+     * Vì sao phiên rỗng — hai lý do khác nhau cần hai câu trả lời khác nhau.
+     *
+     * `mcqItems()` loại bỏ mục không đủ 3 distractor khác âm, nên một người có
+     * đầy từ hay sai vẫn có thể nhận `items` rỗng ở mode trắc nghiệm. Gộp hai
+     * trường hợp làm một sẽ khiến app báo "Chưa có từ nào bạn từng sai" trong
+     * khi trang Thống kê đang hiện đúng những từ đó — một câu sai sự thật.
+     *
+     * @param  Collection<int, UserWord>  $words
+     * @param  list<array<string, mixed>>  $items
+     */
+    private function emptyReason(Collection $words, array $items): ?string
+    {
+        if ($items !== []) {
+            return null;
+        }
+
+        return $words->isEmpty() ? self::EMPTY_NO_WORDS : self::EMPTY_NOT_ENOUGH_OPTIONS;
     }
 
     /**
