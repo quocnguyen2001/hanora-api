@@ -23,10 +23,22 @@ final class SubmitAnswerRequest extends FormRequest
              * tại và trả 404 (red team H1).
              */
             'user_word_id' => ['required', 'integer', 'min:1'],
+
+            // Cùng lý do không dùng `exists:` như trên: luật đó nói bản ghi tồn
+            // tại, không nói nó thuộc về ai.
+            'review_session_id' => ['required', 'integer', 'min:1'],
             'mode' => ['required', Rule::in([AnswerGrader::MODE_MCQ, AnswerGrader::MODE_TYPING])],
             'answer_word_id' => ['required_if:mode,'.AnswerGrader::MODE_MCQ, 'integer', 'min:1'],
             'answer' => ['required_if:mode,'.AnswerGrader::MODE_TYPING, 'string', 'max:64'],
-            'is_retry' => ['nullable', 'boolean'],
+
+            /*
+             * KHÔNG có `is_retry`.
+             *
+             * Cờ đó chi phối cả hình phạt SRS lẫn mẫu số của điểm. Nhận nó từ
+             * client nghĩa là client tự chấm điểm mình: gửi `true` cho mọi câu
+             * sai và `false` cho mọi câu đúng là ra 100 điểm. Server suy nó từ
+             * `review_logs` của chính phiên — `ReviewSessionManager::isRetry()`.
+             */
         ];
     }
 
@@ -37,15 +49,11 @@ final class SubmitAnswerRequest extends FormRequest
     {
         return [
             'user_word_id.required' => 'Thiếu từ đang ôn.',
+            'review_session_id.required' => 'Thiếu phiên ôn tập.',
             'mode.in' => 'Chế độ ôn tập không hợp lệ.',
             'answer_word_id.required_if' => 'Chưa chọn đáp án.',
             'answer.required_if' => 'Chưa nhập câu trả lời.',
             'answer.max' => 'Câu trả lời không được dài quá 64 ký tự.',
         ];
-    }
-
-    public function isRetry(): bool
-    {
-        return (bool) ($this->validated('is_retry') ?? false);
     }
 }

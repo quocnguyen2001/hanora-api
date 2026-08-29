@@ -49,6 +49,30 @@ it('siết throttle chặt hơn mặc định trên các endpoint auth công kha
     }
 });
 
+it('dùng limiter CÓ TÊN cho các endpoint ôn tập ghi dữ liệu', function (): void {
+    /*
+     * Cùng cái bẫy như nhóm auth, chỉ khác là hai endpoint này nằm sau `auth`
+     * nên bài test route công khai ở trên không chạm tới chúng.
+     *
+     * Đổi `throttle:review-sessions` thành `throttle:20,1` cho "gọn" sẽ khiến
+     * mỗi request bị đếm hai lần với `throttle:60,1` của nhóm `api`, và trần
+     * thực tế chỉ còn một nửa con số khai báo. Không có test này thì thay đổi
+     * đó không làm đỏ gì cả.
+     */
+    $expected = [
+        'api/reviews/sessions' => 'throttle:review-sessions',
+        'api/reviews/answers' => 'throttle:review-answers',
+    ];
+
+    foreach ($expected as $uri => $middleware) {
+        $route = collect(Route::getRoutes())
+            ->first(fn ($r) => $r->uri() === $uri && in_array('POST', $r->methods(), true));
+
+        expect($route)->not->toBeNull("thiếu route {$uri}")
+            ->and($route->gatherMiddleware())->toContain($middleware);
+    }
+});
+
 it('đặt mọi route API trong nhóm `api`', function (): void {
     // Nhóm `api` là nơi `throttleApi('60,1')` được gắn (bootstrap/app.php).
     // Một route `api/*` nằm ngoài nhóm này là một endpoint không có trần request.

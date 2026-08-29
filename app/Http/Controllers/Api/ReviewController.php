@@ -6,39 +6,66 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\ReviewSessionRequest;
 use App\Http\Requests\SubmitAnswerRequest;
+use App\Http\Resources\ReviewAnswerResource;
+use App\Http\Resources\ReviewSessionResource;
 use App\Models\ReviewLog;
 use App\Models\ReviewSession;
 use App\Models\UserWord;
 use App\Services\Review\AnswerGrader;
-use App\Services\Review\ReviewSessionBuilder;
+use App\Services\Review\ReviewSessionManager;
 use App\Services\Review\SrsScheduler;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 final class ReviewController
 {
-    public function session(ReviewSessionRequest $request, ReviewSessionBuilder $builder): JsonResponse
+    /**
+     * Mở một phiên ôn.
+     *
+     * `POST` chứ không `GET`: endpoint này GHI một dòng vào DB. Để `GET` là mời
+     * prefetch của trình duyệt và service worker tạo phiên ma.
+     */
+    public function start(ReviewSessionRequest $request, ReviewSessionManager $manager): JsonResponse
     {
-        // `SOURCE_DUE` cố định: endpoint này bị thay bằng `POST /reviews/sessions`
-        // ngay ở bước sau, nơi nguồn phiên trở thành tham số thật.
-        $session = $builder->build(
+        $result = $manager->start(
             $request->user(),
             $request->mode(),
-            ReviewSession::SOURCE_DUE,
+            $request->source(),
             $request->limitValue(),
         );
 
-        // Phiên ôn là dữ liệu theo user và thay đổi mỗi lần gọi.
-        return response()->json(['data' => $session])
-            ->header('Cache-Control', 'private, no-store');
+        /*
+         * Không có thẻ nào: 200 với `session: null`, và KHÔNG bản ghi nào được
+         * tạo.
+         *
+         * `empty_reason` phân biệt "không có từ nào" với "có từ nhưng không
+         * dựng được câu trắc nghiệm từ chúng". Gộp hai trường hợp sẽ khiến app
+         * báo "Chưa có từ nào bạn từng sai" trong khi trang Thống kê đang hiện
+         * đúng những từ đó.
+         */
+        if ($result['session'] === null) {
+            return $this->privateJson([
+                'session' => null,
+                'items' => [],
+                'empty_reason' => $result['empty_reason'],
+            ]);
+        }
+
+        return $this->privateJson([
+            'session' => (new ReviewSessionResource($result['session']))->resolve(),
+            'items' => $result['items'],
+            'empty_reason' => null,
+        ], Response::HTTP_CREATED);
     }
 
     public function answer(
         SubmitAnswerRequest $request,
         AnswerGrader $grader,
         SrsScheduler $scheduler,
+        ReviewSessionManager $manager,
     ): JsonResponse {
         /*
          * KIỂM QUYỀN SỞ HỮU (red team H1).
@@ -58,45 +85,83 @@ final class ReviewController
             abort(Response::HTTP_NOT_FOUND);
         }
 
+        // Cùng quy ước cho phiên: phiên của người khác là 404, không phải 403.
+        $session = ReviewSession::query()
+            ->where('user_id', $request->user()->id)
+            ->find($request->validated('review_session_id'));
+
+        if (! $session instanceof ReviewSession) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+
+        /*
+         * Phiên đã chốt: 409, KHÔNG phải 404.
+         *
+         * Phiên có thật và thuộc về họ — nói dối ở đây khiến app không phân biệt
+         * được "phiên đã kết thúc" với "lỗi", và người dùng mất câu trả lời mà
+         * không hiểu vì sao.
+         */
+        if (! $session->isOpen()) {
+            abort(Response::HTTP_CONFLICT, 'Phiên ôn này đã kết thúc.');
+        }
+
         $mode = (string) $request->validated('mode');
-        $isRetry = $request->isRetry();
         $answeredAt = CarbonImmutable::now();
+
+        // SERVER suy, không nhận từ client — xem `ReviewSessionManager::isRetry()`.
+        $isRetry = $manager->isRetry($session, $userWord);
 
         $isCorrect = $mode === AnswerGrader::MODE_MCQ
             ? $grader->gradeMcq((int) $request->validated('answer_word_id'), $userWord->word_id)
             : $grader->gradeTyping((string) $request->validated('answer'), $userWord->word);
 
         $result = DB::transaction(function () use (
-            $userWord, $mode, $isCorrect, $isRetry, $answeredAt, $scheduler, $request
+            $userWord, $session, $mode, $isCorrect, $isRetry, $answeredAt, $scheduler, $manager, $request
         ): array {
             $intervalBefore = $userWord->interval_days;
+            $updates = [];
 
             /*
-             * Lượt LÀM LẠI được ghi log nhưng KHÔNG chạy scheduler (H3).
+             * LỊCH và BỘ ĐẾM là HAI quyết định, không phải một.
              *
-             * Nếu chạy: sai rồi sửa ngay sẽ cho ra cùng lịch như đúng ngay từ
-             * đầu — `repetitions` đã về 0 nên lần đúng kế tiếp áp luật "lần 1" —
-             * tức hình phạt SRS bị xóa sạch. Người dùng học được cách bấm bừa
-             * rồi sửa.
+             * Trước đây cả hai nằm chung trong `if (! $isRetry)`. Khi thêm chế
+             * độ ôn từ hay sai, luật "đúng trong phiên weak thì không kéo dài
+             * lịch" mà áp lên cả khối sẽ đóng băng luôn `review_count` và
+             * `correct_count` — và vì số lần sai được suy ra bằng hiệu hai cột
+             * đó, từ đã thuộc lòng sẽ không bao giờ rời khỏi danh sách hay sai.
              */
-            if (! $isRetry) {
+            if ($manager->shouldSchedule($session, $isCorrect, $isRetry)) {
                 $scheduled = $scheduler->schedule($userWord, $isCorrect, $answeredAt);
 
-                $userWord->update([
+                $updates += [
                     'interval_days' => $scheduled['interval_days'],
                     'ease_factor' => $scheduled['ease_factor'],
                     'repetitions' => $scheduled['repetitions'],
                     'status' => $scheduled['status'],
                     'next_review_at' => $scheduled['next_review_at'],
+                ];
+            }
+
+            if ($manager->shouldCount($isRetry)) {
+                $updates += [
                     'last_reviewed_at' => $answeredAt,
                     'review_count' => $userWord->review_count + 1,
                     'correct_count' => $userWord->correct_count + ($isCorrect ? 1 : 0),
-                ]);
+                ];
             }
+
+            if ($updates !== []) {
+                $userWord->update($updates);
+            }
+
+            // CÙNG transaction với việc ghi log: bộ đếm phiên và log không được
+            // phép rời nhau.
+            $manager->recordAnswer($session, $isCorrect, $isRetry);
 
             ReviewLog::create([
                 'user_id' => $userWord->user_id,
                 'user_word_id' => $userWord->id,
+                'review_session_id' => $session->id,
                 'mode' => $mode,
                 'is_correct' => $isCorrect,
                 'is_retry' => $isRetry,
@@ -119,10 +184,56 @@ final class ReviewController
                 'next_review_at' => $userWord->next_review_at?->toIso8601String(),
                 'status' => $userWord->status,
                 'is_retry' => $isRetry,
+                // Tiến độ mới nhất, để app không phải gọi thêm chỉ để vẽ thanh
+                // tiến độ.
+                'session' => (new ReviewSessionResource($session->fresh()))->resolve(),
             ];
         });
 
-        return response()->json(['data' => $result])
+        return $this->privateJson($result);
+    }
+
+    /**
+     * Chốt phiên. Idempotent — gọi lại trả nguyên kết quả cũ.
+     *
+     * Trả CÙNG hình dạng với `GET /reviews/sessions/{id}`: màn tổng kết và màn
+     * chi tiết phiên đọc cùng một payload, nên không thể hiện hai con số "từ
+     * sai" khác nhau cho cùng một phiên.
+     */
+    public function finish(Request $request, int $id, ReviewSessionManager $manager): JsonResponse
+    {
+        $session = ReviewSession::query()
+            ->where('user_id', $request->user()->id)
+            ->find($id);
+
+        if (! $session instanceof ReviewSession) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+
+        $manager->finish($session);
+
+        $answers = ReviewLog::query()
+            ->with('userWord.word')
+            ->where('review_session_id', $session->id)
+            ->orderBy('answered_at')
+            ->orderBy('id')
+            ->get();
+
+        return $this->privateJson([
+            'session' => (new ReviewSessionResource($session->fresh()))->resolve(),
+            'answers' => ReviewAnswerResource::collection($answers)->resolve(),
+        ]);
+    }
+
+    /**
+     * Dữ liệu theo user: KHÔNG bao giờ được service worker hay proxy cache —
+     * đó chính là đường rò dữ liệu giữa hai tài khoản trên cùng một thiết bị.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function privateJson(array $data, int $status = Response::HTTP_OK): JsonResponse
+    {
+        return response()->json(['data' => $data], $status)
             ->header('Cache-Control', 'private, no-store');
     }
 }

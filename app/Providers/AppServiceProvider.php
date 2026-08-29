@@ -84,6 +84,16 @@ class AppServiceProvider extends ServiceProvider
         );
 
         /*
+         * Mở phiên ôn: cũng khóa theo USER, và chặt hơn `review-answers` vì mỗi
+         * request tạo một bản ghi. 20/phút rộng hơn nhiều lần thao tác thật —
+         * đổi chế độ liên tục cũng không chạm trần.
+         */
+        RateLimiter::for(
+            'review-sessions',
+            fn (Request $request) => Limit::perMinute(20)->by((string) $request->user()?->id),
+        );
+
+        /*
          * Nhận dạng chữ viết tay: mỗi lần ngừng vẽ là một request ra dịch vụ
          * bên thứ ba. 60/phút đủ cho người vẽ liên tục, và chặn được việc biến
          * endpoint này thành proxy miễn phí cho người khác.

@@ -108,7 +108,19 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->name('api.handwriting.recognize');
 
     Route::prefix('reviews')->name('api.reviews.')->group(function (): void {
-        Route::get('/session', [ReviewController::class, 'session'])->name('session');
+        /*
+         * POST, không GET: mở phiên GHI một dòng vào `review_sessions`. Một
+         * `GET` ghi dữ liệu là lời mời cho prefetch của trình duyệt và service
+         * worker tạo phiên ma.
+         */
+        Route::post('/sessions', [ReviewController::class, 'start'])
+            ->middleware('throttle:review-sessions')
+            ->name('sessions.store');
+
+        Route::post('/sessions/{id}/finish', [ReviewController::class, 'finish'])
+            ->whereNumber('id')
+            ->name('sessions.finish');
+
         // Limiter CÓ TÊN, không phải throttle inline: throttle inline dùng
         // chung khóa cache với `throttle:60,1` của nhóm api và bị đếm hai lần.
         Route::post('/answers', [ReviewController::class, 'answer'])
