@@ -32,6 +32,17 @@ final class SubmitAnswerRequest extends FormRequest
             'answer' => ['required_if:mode,'.AnswerGrader::MODE_TYPING, 'string', 'max:64'],
 
             /*
+             * Thời gian trả lời thẻ này, do client đo. CHỈ để hiển thị — không
+             * đụng điểm, xếp loại hay lịch SRS, nên client tự khai được mà
+             * không ảnh hưởng gì ngoài chính họ.
+             *
+             * Trần 1 giờ: quá mốc đó thì người dùng đã bỏ tab chứ không còn
+             * đang nghĩ, và một số nguyên không chặn là thứ không nên ghi thẳng
+             * vào cột.
+             */
+            'duration_ms' => ['nullable', 'integer', 'min:0', 'max:3600000'],
+
+            /*
              * KHÔNG có `is_retry`.
              *
              * Cờ đó chi phối cả hình phạt SRS lẫn mẫu số của điểm. Nhận nó từ
@@ -54,6 +65,7 @@ final class SubmitAnswerRequest extends FormRequest
             'answer_word_id.required_if' => 'Chưa chọn đáp án.',
             'answer.required_if' => 'Chưa nhập câu trả lời.',
             'answer.max' => 'Câu trả lời không được dài quá 64 ký tự.',
+            'duration_ms.max' => 'Thời gian trả lời không hợp lệ.',
         ];
     }
 }

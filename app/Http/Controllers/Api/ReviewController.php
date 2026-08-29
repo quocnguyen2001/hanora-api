@@ -185,6 +185,7 @@ final class ReviewController
                 'answer_raw' => $mode === AnswerGrader::MODE_TYPING
                     ? (string) $request->validated('answer')
                     : (string) $request->validated('answer_word_id'),
+                'duration_ms' => $request->validated('duration_ms'),
                 'interval_before' => $intervalBefore,
                 'interval_after' => $userWord->interval_days,
                 'answered_at' => $answeredAt,

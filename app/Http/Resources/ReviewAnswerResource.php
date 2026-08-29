@@ -38,6 +38,7 @@ final class ReviewAnswerResource extends JsonResource
             'is_correct' => $this->resource->is_correct,
             'is_retry' => $this->resource->is_retry,
             'answer_raw' => $this->resource->answer_raw,
+            'duration_ms' => $this->resource->duration_ms,
             'answered_at' => $this->resource->answered_at->toIso8601String(),
             'word' => [
                 'id' => $word->id,

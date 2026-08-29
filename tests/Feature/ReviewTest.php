@@ -263,6 +263,58 @@ describe('chấm bài mode gõ', function (): void {
         ])->assertStatus(422)->assertJsonValidationErrors('answer');
     });
 
+    it('lưu và trả lại thời gian trả lời từng thẻ', function (): void {
+        $sessionId = openSessionId();
+
+        submitAnswer([
+            'user_word_id' => $this->userWord->id,
+            'review_session_id' => $sessionId,
+            'mode' => AnswerGrader::MODE_TYPING,
+            'answer' => '学习',
+            'duration_ms' => 12_400,
+        ])->assertOk();
+
+        expect(ReviewLog::sole()->duration_ms)->toBe(12_400)
+            ->and(finishSession($sessionId)->json('data.answers.0.duration_ms'))->toBe(12_400);
+    });
+
+    it('chấp nhận lượt nộp KHÔNG kèm thời gian', function (): void {
+        // Thiếu số đo là chuyện bình thường (client cũ, tab bị treo), không phải
+        // lỗi — trường này chỉ để hiển thị.
+        submitAnswer([
+            'user_word_id' => $this->userWord->id,
+            'review_session_id' => openSessionId(),
+            'mode' => AnswerGrader::MODE_TYPING,
+            'answer' => '学习',
+        ])->assertOk();
+
+        expect(ReviewLog::sole()->duration_ms)->toBeNull();
+    });
+
+    it('từ chối thời gian vượt trần một giờ', function (): void {
+        submitAnswer([
+            'user_word_id' => $this->userWord->id,
+            'review_session_id' => openSessionId(),
+            'mode' => AnswerGrader::MODE_TYPING,
+            'answer' => '学习',
+            'duration_ms' => 3_600_001,
+        ])->assertStatus(422)->assertJsonValidationErrors('duration_ms');
+    });
+
+    it('thời gian KHÔNG ảnh hưởng tới điểm', function (): void {
+        /*
+         * Client tự khai được số này, nên nó phải nằm ngoài mọi thứ quyết định
+         * kết quả. Trả lời trong 1ms và trong 30 giây cho ra cùng một điểm.
+         */
+        $fast = openSessionId();
+        submitAnswer([
+            'user_word_id' => $this->userWord->id, 'review_session_id' => $fast,
+            'mode' => AnswerGrader::MODE_TYPING, 'answer' => '学习', 'duration_ms' => 1,
+        ])->assertOk();
+
+        expect(finishSession($fast)->json('data.session.score'))->toBe(100);
+    });
+
     it('bắt buộc có review_session_id', function (): void {
         // Nullable ở DB là để chứa log CŨ, không phải để cho phép lượt nộp mới
         // thiếu phiên.

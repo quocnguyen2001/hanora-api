@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property bool $is_correct
  * @property bool $is_retry
  * @property string|null $answer_raw
+ * @property int|null $duration_ms
  * @property int $interval_before
  * @property int $interval_after
  * @property Carbon $answered_at
