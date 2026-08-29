@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DictionaryWordController;
 use App\Http\Controllers\Api\HandwritingController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\ReviewHistoryController;
 use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\VocabularyController;
 use Illuminate\Support\Facades\Route;
@@ -126,5 +127,23 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/answers', [ReviewController::class, 'answer'])
             ->middleware('throttle:review-answers')
             ->name('answers');
+
+        /*
+         * Phần CHỈ ĐỌC. Đặt `/sessions` (index) và `/weak-words` TRƯỚC
+         * `/sessions/{id}` theo đúng thói quen đã dùng cho `vocabulary/ids`:
+         * không thì `weak-words` bị bắt như một id.
+         */
+        Route::get('/sessions', [ReviewHistoryController::class, 'sessions'])
+            ->name('sessions.index');
+
+        Route::get('/weak-words', [ReviewHistoryController::class, 'weakWords'])
+            ->name('weak-words');
+
+        Route::get('/words/{word}/history', [ReviewHistoryController::class, 'wordHistory'])
+            ->name('words.history');
+
+        Route::get('/sessions/{id}', [ReviewHistoryController::class, 'session'])
+            ->whereNumber('id')
+            ->name('sessions.show');
     });
 });
