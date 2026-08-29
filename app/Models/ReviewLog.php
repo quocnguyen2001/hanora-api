@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $user_id
  * @property int $user_word_id
+ * @property int|null $review_session_id
  * @property string $mode
  * @property bool $is_correct
  * @property bool $is_retry
@@ -49,5 +50,19 @@ final class ReviewLog extends Model
     public function userWord(): BelongsTo
     {
         return $this->belongsTo(UserWord::class);
+    }
+
+    /**
+     * Phiên chứa lượt trả lời này.
+     *
+     * `null` với log sinh ra trước khi bảng `review_sessions` tồn tại — lịch sử
+     * phiên vì vậy bắt đầu từ ngày triển khai, còn thống kê tổng vẫn tính trên
+     * mọi log nên không có khoảng trống ở màn Thống kê.
+     *
+     * @return BelongsTo<ReviewSession, $this>
+     */
+    public function reviewSession(): BelongsTo
+    {
+        return $this->belongsTo(ReviewSession::class);
     }
 }
