@@ -45,11 +45,19 @@ final class ReviewLog extends Model
     }
 
     /**
+     * `withTrashed()` là BẮT BUỘC, không phải phòng xa.
+     *
+     * `user_words` dùng soft delete CHÍNH LÀ để log ở đây sống sót (xem
+     * migration). Nhưng global scope của soft delete áp cả lên quan hệ
+     * `belongsTo`, nên thiếu `withTrashed()` thì quan hệ trả `null` cho đúng
+     * những log mà cơ chế kia được dựng ra để bảo vệ — và màn lịch sử ôn nổ 500
+     * vĩnh viễn sau khi người dùng bỏ một từ khỏi kho.
+     *
      * @return BelongsTo<UserWord, $this>
      */
     public function userWord(): BelongsTo
     {
-        return $this->belongsTo(UserWord::class);
+        return $this->belongsTo(UserWord::class)->withTrashed();
     }
 
     /**

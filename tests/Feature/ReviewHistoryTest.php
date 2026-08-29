@@ -364,6 +364,12 @@ describe('GET /reviews/words/{word}/history', function (): void {
             ->and($recent[0]['answered_at'])->toBeGreaterThan($recent[9]['answered_at']);
     });
 
+    it('trả 404 chứ không 500 với id không phải số', function (): void {
+        // Không có `whereNumber` thì route model binding chạy
+        // `where id = 'abc'` trên cột bigint và Postgres ném lỗi cú pháp.
+        getJsonAs('/api/reviews/words/abc/history')->assertNotFound();
+    });
+
     it('trả 404 khi user chưa lưu từ này', function (): void {
         $unsaved = DictionaryWord::where('simplified', '银行')->value('id');
 

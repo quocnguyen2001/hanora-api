@@ -66,15 +66,36 @@ describe('mở phiên', function (): void {
     });
 
     it('chốt phiên bỏ dở CÓ lượt trả lời thay vì xoá', function (): void {
-        $abandoned = ReviewSession::factory()->open()->create([
-            'user_id' => $this->user->id,
-            'answered_count' => 3,
-            'correct_count' => 2,
-        ]);
+        // Dựng bằng LOG, không bằng bộ đếm: quyết định xoá hay chốt đọc trên
+        // `review_logs`, nên một phiên chỉ có bộ đếm mà không có log là trạng
+        // thái đường ghi thật không bao giờ sinh ra.
+        $abandoned = ReviewSession::factory()->open()->create(['user_id' => $this->user->id]);
+
+        logAnswer($abandoned, $this->userWord, isCorrect: true);
 
         $this->manager->start($this->user, AnswerGrader::MODE_TYPING, ReviewSession::SOURCE_DUE, 10);
 
-        expect($abandoned->fresh()->finished_at)->not->toBeNull();
+        $fresh = $abandoned->fresh();
+
+        expect($fresh)->not->toBeNull()
+            ->and($fresh->finished_at)->not->toBeNull()
+            ->and($fresh->answered_count)->toBe(1);
+    });
+
+    it('KHÔNG xoá phiên có log dù bộ đếm nói là rỗng', function (): void {
+        /*
+         * Bộ đếm là số liệu hiển thị; quyết định xoá một hàng mà FK bảo vệ thì
+         * phải đọc log. Tin bộ đếm nghĩa là một lượt nộp đang bay — log đã ghi,
+         * bộ đếm chưa kịp — bị hiểu thành "phiên rỗng", và câu trả lời của
+         * người dùng biến mất cùng phiên.
+         */
+        $session = ReviewSession::factory()->empty()->create(['user_id' => $this->user->id]);
+
+        logAnswer($session, $this->userWord, isCorrect: true);
+
+        $this->manager->start($this->user, AnswerGrader::MODE_TYPING, ReviewSession::SOURCE_DUE, 10);
+
+        expect(ReviewSession::find($session->id))->not->toBeNull();
     });
 
     it('không đụng phiên đang mở của người khác', function (): void {

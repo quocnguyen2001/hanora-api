@@ -140,6 +140,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
             ->name('weak-words');
 
         Route::get('/words/{word}/history', [ReviewHistoryController::class, 'wordHistory'])
+            // Thiếu ràng buộc này thì `/words/abc/history` cho route model
+            // binding chạy `where id = 'abc'` trên cột bigint → 500, không 404.
+            ->whereNumber('word')
             ->name('words.history');
 
         Route::get('/sessions/{id}', [ReviewHistoryController::class, 'session'])

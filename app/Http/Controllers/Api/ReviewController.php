@@ -94,30 +94,47 @@ final class ReviewController
             abort(Response::HTTP_NOT_FOUND);
         }
 
-        /*
-         * Phiên đã chốt: 409, KHÔNG phải 404.
-         *
-         * Phiên có thật và thuộc về họ — nói dối ở đây khiến app không phân biệt
-         * được "phiên đã kết thúc" với "lỗi", và người dùng mất câu trả lời mà
-         * không hiểu vì sao.
-         */
-        if (! $session->isOpen()) {
-            abort(Response::HTTP_CONFLICT, 'Phiên ôn này đã kết thúc.');
-        }
-
         $mode = (string) $request->validated('mode');
         $answeredAt = CarbonImmutable::now();
-
-        // SERVER suy, không nhận từ client — xem `ReviewSessionManager::isRetry()`.
-        $isRetry = $manager->isRetry($session, $userWord);
 
         $isCorrect = $mode === AnswerGrader::MODE_MCQ
             ? $grader->gradeMcq((int) $request->validated('answer_word_id'), $userWord->word_id)
             : $grader->gradeTyping((string) $request->validated('answer'), $userWord->word);
 
         $result = DB::transaction(function () use (
-            $userWord, $session, $mode, $isCorrect, $isRetry, $answeredAt, $scheduler, $manager, $request
+            $userWord, $session, $mode, $isCorrect, $answeredAt, $scheduler, $manager, $request
         ): array {
+            /*
+             * KHOÁ DÒNG PHIÊN, rồi mới kiểm trạng thái và suy `is_retry`.
+             *
+             * Kiểm `isOpen()` ngoài transaction để lại một cửa sổ TOCTOU: lượt
+             * nộp qua cửa → `finish()` chốt điểm trên N log → lượt nộp commit
+             * log thứ N+1. `finish()` idempotent nên không bao giờ tính lại, và
+             * phiên mang vĩnh viễn một điểm không khớp log của chính nó.
+             *
+             * Cùng khoá này cũng khiến `isRetry()` đáng tin: hai lượt nộp ĐỒNG
+             * THỜI cho cùng một từ đều thấy 0 log và đều tự nhận là lượt đầu,
+             * làm scheduler chạy hai lần và bộ đếm nhảy hai bậc.
+             */
+            $session = ReviewSession::query()
+                ->whereKey($session->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            /*
+             * Phiên đã chốt: 409, KHÔNG phải 404.
+             *
+             * Phiên có thật và thuộc về họ — nói dối ở đây khiến app không phân
+             * biệt được "phiên đã kết thúc" với "lỗi", và người dùng mất câu trả
+             * lời mà không hiểu vì sao.
+             */
+            if (! $session->isOpen()) {
+                abort(Response::HTTP_CONFLICT, 'Phiên ôn này đã kết thúc.');
+            }
+
+            // SERVER suy, không nhận từ client — xem `ReviewSessionManager::isRetry()`.
+            $isRetry = $manager->isRetry($session, $userWord);
+
             $intervalBefore = $userWord->interval_days;
             $updates = [];
 
@@ -210,7 +227,19 @@ final class ReviewController
             abort(Response::HTTP_NOT_FOUND);
         }
 
-        $manager->finish($session);
+        /*
+         * Cùng khoá như `answer()`: không có nó, hai `finish()` đồng thời cùng
+         * qua cửa `isOpen()` và cùng UPDATE, nên tính idempotent chỉ đúng khi
+         * các lời gọi tuần tự.
+         */
+        DB::transaction(function () use ($session, $manager): void {
+            $locked = ReviewSession::query()
+                ->whereKey($session->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $manager->finish($locked);
+        });
 
         $answers = ReviewLog::query()
             ->with('userWord.word')

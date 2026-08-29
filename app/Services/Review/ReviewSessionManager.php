@@ -77,6 +77,14 @@ final class ReviewSessionManager
                 // Số thẻ THỰC SỰ phát ra, không phải `$limit`: mode trắc nghiệm
                 // bỏ những mục không dựng đủ 4 lựa chọn.
                 'planned_count' => count($built['items']),
+                /*
+                 * Đặt TƯỜNG MINH, không dựa vào default của cột: `create()`
+                 * không đọc lại giá trị default từ DB, nên model vừa tạo sẽ có
+                 * `null` và resource trả `null` ra cho app — thanh tiến độ hiện
+                 * " / 10" cho tới lượt trả lời đầu tiên.
+                 */
+                'answered_count' => 0,
+                'correct_count' => 0,
                 'started_at' => CarbonImmutable::now(),
             ]);
 
@@ -97,13 +105,15 @@ final class ReviewSessionManager
 
         foreach ($open as $session) {
             /*
-             * Phiên chưa trả lời câu nào thì XOÁ, không chốt điểm 0 cho nó.
+             * Phiên chưa có LƯỢT NÀO thì XOÁ, không chốt điểm 0 cho nó.
              *
-             * Không có log nào trỏ vào nó nên FK `restrictOnDelete` không cản;
-             * nếu nó cản thì `answered_count` đã nói dối và ta muốn biết ngay
-             * thay vì âm thầm ghi một phiên rác vào lịch sử.
+             * Điều kiện đọc trên `review_logs`, KHÔNG trên `answered_count`:
+             * bộ đếm là số liệu hiển thị, còn ở đây ta quyết định xoá một hàng
+             * mà FK `restrictOnDelete` bảo vệ. Tin bộ đếm nghĩa là một lượt nộp
+             * đang bay (log đã ghi, bộ đếm chưa kịp) sẽ bị hiểu thành "phiên
+             * rỗng" và câu trả lời của người dùng biến mất cùng phiên.
              */
-            if ($session->answered_count === 0) {
+            if (! $session->logs()->exists()) {
                 $session->delete();
 
                 continue;

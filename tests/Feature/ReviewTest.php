@@ -189,6 +189,20 @@ describe('payload trắc nghiệm', function (): void {
         expect($response->json('data.session.planned_count'))
             ->toBe(count($response->json('data.items')));
     });
+
+    it('trả bộ đếm là SỐ 0, không phải null', function (): void {
+        /*
+         * `create()` không đọc lại default của cột từ DB, nên bỏ qua hai trường
+         * này sẽ cho model vừa tạo mang `null`. App khai kiểu `number` và dùng
+         * thẳng cho thanh tiến độ — kết quả là " / 10" cùng `aria-valuenow`
+         * rỗng, cho tới lượt trả lời đầu tiên.
+         */
+        startSession()->assertCreated()
+            ->assertJsonPath('data.session.answered_count', 0)
+            ->assertJsonPath('data.session.correct_count', 0)
+            ->assertJsonPath('data.session.score', null)
+            ->assertJsonPath('data.session.grade', null);
+    });
 });
 
 describe('chấm bài trắc nghiệm', function (): void {
@@ -686,6 +700,36 @@ describe('bộ đếm phiên khớp log', function (): void {
 });
 
 describe('log sống sót khi xóa từ khỏi kho — red team H5', function (): void {
+    it('vẫn ĐỌC được lịch sử phiên sau khi xoá từ khỏi kho', function (): void {
+        /*
+         * `user_words` dùng soft delete chính là để log sống sót. Nhưng global
+         * scope của soft delete áp cả lên quan hệ `belongsTo`, nên nếu quan hệ
+         * thiếu `withTrashed()` thì nó trả `null` cho đúng những log mà cơ chế
+         * kia được dựng ra để bảo vệ — và màn lịch sử nổ 500 vĩnh viễn.
+         *
+         * Test cũ chỉ đếm log; nó không bao giờ ĐỌC LẠI phiên sau khi xoá, nên
+         * đường đọc không được kiểm ở đúng trạng thái mà repo cố tình tạo ra.
+         */
+        $sessionId = openSessionId();
+
+        submitAnswer([
+            'user_word_id' => $this->userWord->id,
+            'review_session_id' => $sessionId,
+            'mode' => AnswerGrader::MODE_TYPING,
+            'answer' => '学习',
+        ])->assertOk();
+
+        finishSession($sessionId)->assertOk();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->deleteJson("/api/vocabulary/{$this->userWord->id}")->assertNoContent();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->getJson("/api/reviews/sessions/{$sessionId}")
+            ->assertOk()
+            ->assertJsonPath('data.answers.0.word.simplified', '学习');
+    });
+
     it('giữ nguyên review_logs sau khi soft-delete user_word', function (): void {
         submitAnswer([
             'user_word_id' => $this->userWord->id,
