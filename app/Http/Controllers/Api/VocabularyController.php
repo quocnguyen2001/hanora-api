@@ -9,6 +9,7 @@ use App\Http\Requests\VocabularyStoreRequest;
 use App\Http\Resources\UserWordResource;
 use App\Models\UserWord;
 use App\Services\Dictionary\VietnameseQueryNormalizer;
+use App\Services\Streak\StreakService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,7 +77,7 @@ final class VocabularyController
             ->header('Cache-Control', 'private, no-store');
     }
 
-    public function store(VocabularyStoreRequest $request): JsonResponse
+    public function store(VocabularyStoreRequest $request, StreakService $streak): JsonResponse
     {
         $userId = $request->user()->id;
         $wordId = (int) $request->validated('word_id');
@@ -109,10 +110,33 @@ final class VocabularyController
             'status' => UserWord::STATUS_NEW,
         ]);
 
-        return response()->json(
-            ['data' => new UserWordResource($userWord->load('word'))],
-            Response::HTTP_CREATED
-        )->header('Cache-Control', 'private, no-store');
+        /*
+         * CHỈ nhánh tạo mới, không nhánh khôi phục ở trên: lưu lại một từ đã xoá
+         * không phải là học thêm một từ mới.
+         *
+         * Trả trạng thái chuỗi ngay trong response thay vì để app hỏi lại. Màn
+         * học chủ đề cố ý không invalidate gì sau mỗi thẻ (ngân sách 60
+         * request/phút theo user), nên đây là đường DUY NHẤT chip trên header
+         * nhích được khi người dùng lưu từ thứ 5 giữa phiên.
+         */
+        /*
+         * Chuỗi là việc PHỤ của endpoint này. Từ đã được lưu và commit ở dòng
+         * trên; để một lỗi ở đây (chờ khoá, Redis chết) biến thành 500 nghĩa là
+         * người dùng thấy "lưu thất bại" cho một từ đã nằm trong kho, rồi thử
+         * lại thì rơi vào nhánh khôi phục và chuỗi vĩnh viễn không nhích.
+         */
+        try {
+            $streakState = $streak->registerActivity($request->user());
+        } catch (\Throwable $e) {
+            report($e);
+
+            $streakState = null;
+        }
+
+        return response()->json([
+            'data' => new UserWordResource($userWord->load('word')),
+            'streak' => $streakState,
+        ], Response::HTTP_CREATED)->header('Cache-Control', 'private, no-store');
     }
 
     public function destroy(Request $request, int $id): Response

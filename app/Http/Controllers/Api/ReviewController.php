@@ -249,10 +249,27 @@ final class ReviewController
             ->orderBy('id')
             ->get();
 
-        return $this->privateJson([
-            'session' => (new ReviewSessionResource($session->fresh()))->resolve(),
-            'answers' => ReviewAnswerResource::collection($answers)->resolve(),
-        ]);
+        /*
+         * `streak` là trường CẤP ENVELOPE, không nằm trong `data` — giống
+         * `POST /vocabulary`, và giống `translation` của `/dictionary/search`.
+         *
+         * Bản đầu đặt nó trong `data` và điều đó phá một hợp đồng có test khoá
+         * lại: đọc lại một phiên (`GET /reviews/sessions/{id}`) phải cho ra CÙNG
+         * hình dạng với lúc vừa chốt. Chuỗi là trạng thái của NGƯỜI DÙNG tại
+         * thời điểm ghi, không phải một phần của phiên ôn, nên nó không thuộc về
+         * `data` ngay từ đầu.
+         *
+         * `advanced` là nguồn sự thật DUY NHẤT cho lời chúc mừng ở màn tổng kết.
+         * Client không suy được: `SessionSummary` chỉ mount SAU khi mutation này
+         * xong, nên nó không bao giờ quan sát được giá trị "trước".
+         */
+        return response()->json([
+            'data' => [
+                'session' => (new ReviewSessionResource($session->fresh()))->resolve(),
+                'answers' => ReviewAnswerResource::collection($answers)->resolve(),
+            ],
+            'streak' => $manager->lastStreak(),
+        ])->header('Cache-Control', 'private, no-store');
     }
 
     /**

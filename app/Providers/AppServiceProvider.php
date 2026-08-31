@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Review\ReviewScore;
 use App\Services\Review\SrsScheduler;
 use App\Services\Stats\StatsSummaryService;
+use App\Services\Streak\StreakService;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
@@ -33,6 +34,12 @@ class AppServiceProvider extends ServiceProvider
         //
         // `ReviewScore` resolve qua container chứ không `new` tại chỗ: đó là
         // cùng công thức mà điểm phiên ôn dùng, và chỉ được phép có một bản.
+        // Cùng lý do: luật chuỗi gộp ngày theo giờ VN, service giữ tính thuần.
+        $this->app->bind(
+            StreakService::class,
+            fn (): StreakService => new StreakService((string) config('app.timezone')),
+        );
+
         $this->app->bind(
             StatsSummaryService::class,
             fn (Application $app): StatsSummaryService => new StatsSummaryService(
@@ -118,6 +125,21 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for(
             'topic-create',
             fn (Request $request) => Limit::perHour(5)->by((string) $request->user()?->id),
+        );
+
+        /*
+         * Lưu từ vào kho. Chưa từng có limiter riêng, và nay endpoint này còn là
+         * đường GHI vào bảng `users` (chuỗi ngày) — mỗi request tạo một dòng và
+         * có thể cập nhật ba cột.
+         *
+         * 30/phút, KHÔNG phải 60: nhóm `api` đã áp `throttle:60,1` cũng khoá
+         * theo user id, nên một limiter 60/phút ở đây không bao giờ chạm trước
+         * và chỉ là trang trí. 30 vẫn gấp ba một phiên học chủ đề đầy đủ (10
+         * lần lưu) mà thật sự chặn được vòng lặp bỏ chạy.
+         */
+        RateLimiter::for(
+            'vocabulary-store',
+            fn (Request $request) => Limit::perMinute(30)->by((string) $request->user()?->id),
         );
 
         RateLimiter::for(

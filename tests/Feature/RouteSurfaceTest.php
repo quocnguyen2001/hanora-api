@@ -67,6 +67,9 @@ it('dùng limiter CÓ TÊN cho các endpoint ôn tập ghi dữ liệu', functio
         'api/topics/skips' => 'throttle:topic-skips',
         // Bề mặt duy nhất người dùng cuối kích hoạt được chi tiêu Gemini.
         'api/topics' => 'throttle:topic-create',
+        // Lưu từ nay còn là đường GHI vào bảng `users` (chuỗi ngày), nên nó
+        // cũng cần trần riêng chặt hơn trần nhóm.
+        'api/vocabulary' => 'throttle:vocabulary-store',
     ];
 
     foreach ($expected as $uri => $middleware) {

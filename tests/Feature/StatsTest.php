@@ -50,7 +50,7 @@ describe('hợp đồng response', function (): void {
     it('trả đủ trường cho màn P17', function (): void {
         expect(array_keys(summary()))->toBe([
             'range', 'words_learned', 'words_learned_delta_pct', 'reviews_count',
-            'streak_days', 'memory_rate', 'series', 'distribution',
+            'memory_rate', 'series', 'distribution',
         ]);
     });
 
@@ -99,56 +99,18 @@ describe('loại lượt làm lại — red team H3', function (): void {
     });
 });
 
-describe('streak', function (): void {
-    it('đếm số ngày liên tiếp tính đến hôm nay', function (): void {
+describe('streak_days đã rời khỏi payload này', function (): void {
+    it('không còn trả streak_days', function (): void {
+        // Chuỗi ngày có luật riêng, chặt hơn luật cũ ở đây, và sống ở
+        // `StreakService`. Giữ lại một bản sao đọc từ service đó cũng không cứu
+        // được: controller bọc TOÀN BỘ payload này trong `Cache::remember` 60
+        // giây, nên hai đường đọc sẽ lệch nhau tới một phút.
+        //
+        // Luật chuỗi được phủ ở `StreakTest`, không ở đây.
         $userWord = makeUserWord($this->user);
-        $today = CarbonImmutable::now('Asia/Ho_Chi_Minh');
+        logReview($this->user, $userWord, true, 'now');
 
-        foreach ([0, 1, 2] as $daysAgo) {
-            logReview($this->user, $userWord, true, $today->subDays($daysAgo)->format('Y-m-d H:i:s'));
-        }
-
-        expect(summary()['streak_days'])->toBe(3);
-    });
-
-    it('đứt chuỗi khi có ngày trống ở giữa', function (): void {
-        $userWord = makeUserWord($this->user);
-        $today = CarbonImmutable::now('Asia/Ho_Chi_Minh');
-
-        logReview($this->user, $userWord, true, $today->format('Y-m-d H:i:s'));
-        logReview($this->user, $userWord, true, $today->subDays(3)->format('Y-m-d H:i:s'));
-
-        expect(summary()['streak_days'])->toBe(1);
-    });
-
-    it('giữ chuỗi khi hôm nay chưa ôn nhưng hôm qua có', function (): void {
-        // Chưa ôn hôm nay không phải là đã đứt chuỗi — ngày vẫn còn chạy.
-        $userWord = makeUserWord($this->user);
-        $today = CarbonImmutable::now('Asia/Ho_Chi_Minh');
-
-        logReview($this->user, $userWord, true, $today->subDay()->format('Y-m-d H:i:s'));
-        logReview($this->user, $userWord, true, $today->subDays(2)->format('Y-m-d H:i:s'));
-
-        expect(summary()['streak_days'])->toBe(2);
-    });
-
-    it('về 0 khi lượt ôn gần nhất đã quá xa', function (): void {
-        $userWord = makeUserWord($this->user);
-
-        logReview($this->user, $userWord, true, CarbonImmutable::now('Asia/Ho_Chi_Minh')->subDays(5)->format('Y-m-d H:i:s'));
-
-        expect(summary()['streak_days'])->toBe(0);
-    });
-
-    it('tính ngày theo giờ VIỆT NAM, không phải UTC', function (): void {
-        // Ôn lúc 6h sáng giờ VN = 23h hôm trước theo UTC. Gộp theo UTC sẽ đẩy
-        // lượt này sang ngày hôm trước và làm streak reset lúc 7h sáng mỗi ngày.
-        $userWord = makeUserWord($this->user);
-        $today = CarbonImmutable::now('Asia/Ho_Chi_Minh');
-
-        logReview($this->user, $userWord, true, $today->setTime(6, 0)->format('Y-m-d H:i:s'));
-
-        expect(summary()['streak_days'])->toBe(1);
+        expect(summary())->not->toHaveKey('streak_days');
     });
 });
 
@@ -168,14 +130,17 @@ describe('cô lập theo user', function (): void {
 describe('giữ lịch sử của từ đã xóa — red team H5', function (): void {
     it('vẫn tính log của user_word đã soft-delete', function (): void {
         // Người dùng đã thực sự ôn những từ đó. Xóa một từ khỏi kho không được
-        // phép viết lại lịch sử và làm bay chuỗi 60 ngày.
+        // phép viết lại lịch sử.
+        //
+        // Nửa CHUỖI của bài này không biến mất cùng `streak_days` — nó chuyển
+        // sang `StreakTest` ('xoá từ khỏi kho không làm bay chuỗi'), và ở đó vẫn
+        // khẳng định chuỗi = 1 chứ không hạ kỳ vọng xuống 0.
         $userWord = makeUserWord($this->user);
         logReview($this->user, $userWord, true, 'now');
 
         $userWord->delete();
 
-        expect(summary()['reviews_count'])->toBe(1)
-            ->and(summary()['streak_days'])->toBe(1);
+        expect(summary()['reviews_count'])->toBe(1);
     });
 });
 

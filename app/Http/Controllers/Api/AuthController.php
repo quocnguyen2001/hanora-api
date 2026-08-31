@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\Streak\StreakService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -75,10 +76,26 @@ final class AuthController
         return response()->noContent();
     }
 
-    public function me(): JsonResponse
+    /**
+     * Người dùng hiện tại, kèm chuỗi ngày.
+     *
+     * `streak` ở đây tồn tại vì MỘT lý do: response này được service worker
+     * cache (`NetworkFirst`, bucket dữ liệu cá nhân), nên nó là đường duy nhất
+     * chip lửa trên header có số khi máy đang ngoại tuyến. `GET /streak` cố ý
+     * `no-store` nên không cache được.
+     *
+     * Chỉ hai số nguyên — KHÔNG thêm lịch 30 ngày vào đây. Bucket đó sống 7
+     * ngày, và một cái lịch cũ một tuần thì tệ hơn không có lịch.
+     */
+    public function me(StreakService $streak): JsonResponse
     {
+        $user = auth()->user();
+
         return response()->json([
-            'data' => ['user' => new UserResource(auth()->user())],
+            'data' => [
+                'user' => new UserResource($user),
+                'streak' => $streak->brief($user),
+            ],
         ]);
     }
 

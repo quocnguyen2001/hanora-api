@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ReviewHistoryController;
 use App\Http\Controllers\Api\StatsController;
+use App\Http\Controllers\Api\StreakController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\TopicSkipController;
 use App\Http\Controllers\Api\VocabularyController;
@@ -105,7 +106,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/', [VocabularyController::class, 'index'])->name('index');
         // Đặt TRƯỚC `/{id}` — nếu không `ids` sẽ bị bắt như một id.
         Route::get('/ids', [VocabularyController::class, 'ids'])->name('ids');
-        Route::post('/', [VocabularyController::class, 'store'])->name('store');
+        Route::post('/', [VocabularyController::class, 'store'])
+            ->middleware('throttle:vocabulary-store')->name('store');
         Route::delete('/{id}', [VocabularyController::class, 'destroy'])
             ->whereNumber('id')->name('destroy');
     });
@@ -146,6 +148,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
     });
 
     Route::get('/stats/summary', StatsController::class)->name('api.stats.summary');
+
+    /*
+     * Chuỗi ngày. `?calendar=1` mới tính lịch 30 ngày — chip trên header gọi
+     * endpoint này ở mọi màn và chỉ cần hai số nguyên.
+     */
+    Route::get('/streak', StreakController::class)->name('api.streak');
 
     /*
      * Proxy nhận dạng chữ viết tay (P19).

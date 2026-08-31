@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserWord;
 use App\Services\Review\AnswerGrader;
 use App\Services\Review\ReviewSessionBuilder;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Testing\TestResponse;
 
@@ -862,5 +863,76 @@ describe('log sống sót khi xóa từ khỏi kho — red team H5', function ()
         // P16 tính streak và tỉ lệ nhớ trên MỌI log — người dùng đã thực sự ôn
         // những từ này, kể cả từ sau đó họ bỏ khỏi kho.
         expect(ReviewLog::count())->toBe(1);
+    });
+});
+
+describe('chuỗi ngày đi qua đường ôn tập', function (): void {
+    /*
+     * Ba bài dưới đây đi qua ĐÚNG các endpoint mà app gọi, không gọi thẳng
+     * `StreakService`. Không có chúng thì xoá hẳn dòng hook trong
+     * `ReviewSessionManager::finish()` — hoặc dời nó về controller, đúng cái sai
+     * mà D4 sinh ra để ngăn — vẫn để suite xanh.
+     */
+    it('chốt phiên có lượt trả lời thì trả streak và chuỗi tăng', function (): void {
+        $id = openSessionId();
+        submitAnswer(['user_word_id' => $this->userWord->id, 'review_session_id' => $id, 'mode' => AnswerGrader::MODE_TYPING, 'answer' => $this->word->simplified])
+            ->assertOk();
+
+        $response = finishSession($id)->assertOk();
+
+        expect($response->json('streak.advanced'))->toBeTrue()
+            ->and($response->json('streak.current'))->toBe(1)
+            ->and($this->user->fresh()->current_streak)->toBe(1);
+    });
+
+    it('chốt phiên KHÔNG có lượt nào thì chuỗi đứng yên', function (): void {
+        $id = openSessionId();
+
+        $response = finishSession($id)->assertOk();
+
+        expect($response->json('streak.advanced'))->toBeFalse()
+            ->and($this->user->fresh()->current_streak)->toBe(0);
+    });
+
+    it('chốt lại phiên đã chốt vẫn trả streak, không trả null', function (): void {
+        // Client di động retry khi mất response. Trả `null` ở đây khiến app ghi
+        // một giá trị rỗng vào cache và chip trên header tụt về 0.
+        $id = openSessionId();
+        submitAnswer(['user_word_id' => $this->userWord->id, 'review_session_id' => $id, 'mode' => AnswerGrader::MODE_TYPING, 'answer' => $this->word->simplified]);
+        finishSession($id);
+
+        $again = finishSession($id)->assertOk();
+
+        expect($again->json('streak'))->not->toBeNull()
+            ->and($again->json('streak.current'))->toBe(1)
+            ->and($again->json('streak.advanced'))->toBeFalse();
+    });
+
+    it('phiên bỏ dở hôm qua được chốt qua finishStale vẫn tính cho HÔM QUA', function (): void {
+        /*
+         * Đường `finishStale()` — lý do tồn tại của D4, và là đường mà hook ở
+         * controller sẽ bỏ sót. Người dùng ôn tối qua rồi đóng tab; hôm nay mở
+         * `/review` thì `start()` chốt phiên cũ với `finished_at` = lượt trả lời
+         * cuối, tức ngày hôm qua.
+         */
+        $yesterday = CarbonImmutable::now('Asia/Ho_Chi_Minh')->subDay();
+
+        $id = openSessionId();
+        submitAnswer(['user_word_id' => $this->userWord->id, 'review_session_id' => $id, 'mode' => AnswerGrader::MODE_TYPING, 'answer' => $this->word->simplified]);
+
+        // Đẩy phiên và lượt trả lời về hôm qua, rồi mở lại như chưa chốt.
+        ReviewSession::whereKey($id)->update([
+            'started_at' => $yesterday, 'finished_at' => null, 'score' => null, 'grade' => null,
+        ]);
+        ReviewLog::where('review_session_id', $id)->update(['answered_at' => $yesterday]);
+
+        // Không khẳng định 201: từ duy nhất vừa ôn xong nên phiên mới có thể rỗng.
+        // Điều cần kiểm là `finishStale()` đã chạy — nó nằm trước bước dựng phiên.
+        startSession()->assertSuccessful();
+
+        $user = $this->user->fresh();
+
+        expect($user->current_streak)->toBe(1)
+            ->and($user->last_goal_met_on->toDateString())->toBe($yesterday->toDateString());
     });
 });

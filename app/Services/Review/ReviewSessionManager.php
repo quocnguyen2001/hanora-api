@@ -8,6 +8,7 @@ use App\Models\ReviewLog;
 use App\Models\ReviewSession;
 use App\Models\User;
 use App\Models\UserWord;
+use App\Services\Streak\StreakService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +23,32 @@ final class ReviewSessionManager
     public function __construct(
         private readonly ReviewSessionBuilder $builder,
         private readonly ReviewScore $score,
+        private readonly StreakService $streak,
     ) {}
+
+    /**
+     * Trạng thái chuỗi do lần `finish()` gần nhất tạo ra, hoặc `null`.
+     *
+     * Tồn tại vì `finish()` là ĐIỂM HOOK DUY NHẤT cho chuỗi (xem comment trong
+     * hàm đó), nhưng `ReviewController` cần cờ `advanced` để màn tổng kết biết
+     * có chúc mừng hay không. Cho controller tự gọi `registerActivity()` lần nữa
+     * sẽ luôn trả `advanced: false` — hàm đó idempotent, lần gọi thứ hai trong
+     * cùng ngày là no-op.
+     *
+     * An toàn vì manager được resolve MỘT lần cho mỗi request và không chạy song
+     * song trong cùng một request.
+     *
+     * @var array{current: int, met_today: bool, advanced: bool}|null
+     */
+    private ?array $lastStreak = null;
+
+    /**
+     * @return array{current: int, met_today: bool, advanced: bool}|null
+     */
+    public function lastStreak(): ?array
+    {
+        return $this->lastStreak;
+    }
 
     /**
      * Mở một phiên mới.
@@ -217,6 +243,14 @@ final class ReviewSessionManager
     public function finish(ReviewSession $session, ?CarbonImmutable $finishedAt = null): ReviewSession
     {
         if (! $session->isOpen()) {
+            /*
+             * Phiên đã chốt: không ghi gì thêm, nhưng VẪN phải trả trạng thái
+             * chuỗi. `finish` là idempotent và client di động retry khi mất
+             * response — trả `null` ở đây khiến lần retry đó đẩy một giá trị
+             * rỗng vào cache của app và làm chip trên header tụt về 0.
+             */
+            $this->lastStreak = $this->streak->snapshotDelta($session->user);
+
             return $session;
         }
 
@@ -238,13 +272,40 @@ final class ReviewSessionManager
 
         $score = $this->score->score($answered, $correct);
 
+        $finishedAt ??= CarbonImmutable::now();
+
         $session->update([
             'answered_count' => $answered,
             'correct_count' => $correct,
             'score' => $score,
             'grade' => $this->score->grade($score, $answered),
-            'finished_at' => $finishedAt ?? CarbonImmutable::now(),
+            'finished_at' => $finishedAt,
         ]);
+
+        /*
+         * ĐIỂM HOOK DUY NHẤT của chuỗi cho phía ôn tập — đặt ở đây, không ở
+         * controller.
+         *
+         * `finish()` có HAI caller: `ReviewController::finish` (người dùng bấm
+         * kết thúc) và `finishStale()` (phiên bỏ dở, chốt lúc mở phiên sau).
+         * Caller thứ hai chốt với `finished_at` = lượt trả lời CUỐI, tức một
+         * ngày trong quá khứ. Hook ở controller bỏ sót đúng những người đóng tab
+         * giữa phiên — và chuỗi 40 ngày của họ sẽ về 1 vào hôm sau.
+         *
+         * Truyền `$finishedAt` chứ không để `registerActivity()` tự lấy hôm nay:
+         * ngày của phiên là ngày người dùng thật sự học.
+         *
+         * ĐI NGƯỢC plan một cách có chủ đích: plan nói gọi SAU khi transaction
+         * bao quanh commit. Không làm được mà vẫn giữ một điểm hook duy nhất —
+         * `finishStale()` chạy bên trong transaction của `start()`, nên "sau
+         * commit" ở đó nghĩa là hook thứ hai, đúng cái D4 sinh ra để ngăn.
+         *
+         * An toàn vì không có vòng khoá: đường này luôn lấy `review_sessions`
+         * trước rồi mới tới `users` (`update()` ở trên chạy trước), còn đường
+         * lưu từ chỉ lấy `users`. Giá phải trả là khoá dòng `users` bị giữ tới
+         * hết transaction của `start()` — đo trước khi tối ưu.
+         */
+        $this->lastStreak = $this->streak->registerActivity($session->user, $finishedAt);
 
         return $session;
     }

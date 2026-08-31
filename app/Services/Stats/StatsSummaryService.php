@@ -17,12 +17,23 @@ use Illuminate\Support\Facades\DB;
  * ## Hai quy tắc chi phối mọi truy vấn ở đây
  *
  * **1. Mọi phép gộp theo ngày chạy bằng SQL với `AT TIME ZONE`, không gộp trong
- * PHP.** Trộn hai cách là cách chắc chắn để streak reset lúc 7h sáng mỗi ngày:
+ * PHP.** Trộn hai cách là cách chắc chắn để số liệu nhảy lúc 7h sáng mỗi ngày:
  * người ôn lúc 6h sáng giờ VN rơi vào ngày UTC hôm trước.
  *
  * **2. Thống kê tính trên MỌI `review_logs`**, kể cả log của `user_words` đã
  * soft-delete (P11). Người dùng đã thực sự ôn những từ đó; xóa một từ khỏi kho
- * không được phép viết lại lịch sử và làm bay chuỗi 60 ngày (red team H5).
+ * không được phép viết lại lịch sử (red team H5).
+ *
+ * ## `streak_days` KHÔNG còn ở đây
+ *
+ * Nó từng là một khoá trong payload này, tính bằng `streakDays()` với luật lỏng
+ * hơn: một lượt trả lời bất kỳ là đủ ăn một ngày. Nay chuỗi có luật riêng, chặt
+ * hơn, và sống ở `StreakService`.
+ *
+ * Không giữ lại một bản sao đọc từ service đó, vì controller bọc TOÀN BỘ payload
+ * này trong `Cache::remember` 60 giây × 4 range: người dùng thêm từ thứ 5 sẽ
+ * thấy chip trên header nói 12 cạnh màn Thống kê nói 11 trong tối đa một phút.
+ * Một nguồn, không cache, không lệch — app đọc `GET /streak`.
  */
 final class StatsSummaryService
 {
@@ -47,7 +58,6 @@ final class StatsSummaryService
             'words_learned' => $this->wordsLearned($user),
             'words_learned_delta_pct' => $this->wordsLearnedDeltaPct($user, $from, $previousFrom),
             'reviews_count' => $this->reviewsCount($user, $from),
-            'streak_days' => $this->streakDays($user, $now),
             'memory_rate' => $this->memoryRate($user, $from),
             'series' => $this->series($user, $from, $now),
             'distribution' => $this->distribution($user),
@@ -133,51 +143,6 @@ final class StatsSummaryService
         $correct = $this->logQuery($user, $from)->where('is_correct', true)->count();
 
         return $this->score->score($total, $correct);
-    }
-
-    /**
-     * Số ngày liên tiếp tính đến hôm nay có ít nhất một lượt ôn.
-     *
-     * Gộp ngày bằng SQL với `AT TIME ZONE` — xem ghi chú đầu class.
-     */
-    private function streakDays(User $user, CarbonImmutable $now): int
-    {
-        $days = DB::table('review_logs')
-            ->where('user_id', $user->id)
-            ->selectRaw('DISTINCT (answered_at AT TIME ZONE ?)::date AS day', [$this->timezone])
-            ->orderByDesc('day')
-            ->pluck('day')
-            ->map(fn (string $day): string => CarbonImmutable::parse($day)->format('Y-m-d'))
-            ->all();
-
-        if ($days === []) {
-            return 0;
-        }
-
-        $today = $now->format('Y-m-d');
-        $yesterday = $now->subDay()->format('Y-m-d');
-
-        // Chuỗi còn sống nếu hôm nay HOẶC hôm qua có ôn: chưa ôn hôm nay không
-        // phải là đã đứt chuỗi, ngày vẫn còn chạy.
-        if ($days[0] !== $today && $days[0] !== $yesterday) {
-            return 0;
-        }
-
-        $streak = 1;
-        $cursor = CarbonImmutable::parse($days[0]);
-
-        foreach (array_slice($days, 1) as $day) {
-            $expected = $cursor->subDay();
-
-            if ($day !== $expected->format('Y-m-d')) {
-                break;
-            }
-
-            $streak++;
-            $cursor = $expected;
-        }
-
-        return $streak;
     }
 
     /**
