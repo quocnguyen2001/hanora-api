@@ -34,40 +34,26 @@ final class SearchInterpreter
             return Interpretation::of([]);
         }
 
+        $hit = $this->readCache($normalized, $mode);
+
+        if ($hit !== null) {
+            return $hit;
+        }
+
         /*
          * Không cấu hình key = lớp AI TẮT, và đó là một trạng thái đã biết chứ
          * không phải sự cố. Phân biệt hai thứ này quan trọng ở tầng trên: nhánh
          * "hỏng" đặt `no-store`, nên gộp chúng lại sẽ khiến một cài đặt chạy
          * không key mất sạch cache HTTP của `/search` — trả giá cache cho một
          * tính năng thậm chí không bật.
+         *
+         * Kiểm SAU khi đọc cache, không phải trước: đọc một dòng đã trả tiền rồi
+         * thì không cần key. Để nó ở đầu hàm sẽ khiến `interpret()` và `cached()`
+         * trả lời KHÁC NHAU cho cùng một dòng cache khi thiếu key — một bất đối
+         * xứng không ai đoán được từ tên hàm.
          */
         if (! is_string(config('services.gemini.key')) || config('services.gemini.key') === '') {
             return Interpretation::of([]);
-        }
-
-        $cached = SearchQueryInterpretation::query()
-            ->where('query_normalized', $normalized)
-            ->where('mode', $mode)
-            ->first();
-
-        if ($cached !== null) {
-            /*
-             * Tăng bằng UPDATE nguyên tử, không phải đọc-cộng-ghi: hai request
-             * cùng lúc cho một truy vấn hot sẽ mất một lượt đếm, và con số này
-             * là thứ duy nhất trả lời được "cache trúng bao nhiêu phần trăm".
-             *
-             * Hệ quả cần biết: nhánh trúng cache VẪN GHI. `/search` vì thế không
-             * phục vụ được từ read replica. Chấp nhận ở quy mô hiện tại; nếu sau
-             * này cần replica thì dồn phép đếm sang một hàng đợi, đừng bỏ nó đi.
-             */
-            SearchQueryInterpretation::query()
-                ->whereKey($cached->id)
-                ->update(['hit_count' => DB::raw('hit_count + 1')]);
-
-            return Interpretation::of(
-                array_map(intval(...), $cached->word_ids),
-                $this->translation($cached->translation),
-            );
         }
 
         ['prompt' => $prompt, 'schema' => $schema] = $this->prompts->for($normalized, $mode);
@@ -118,6 +104,70 @@ final class SearchInterpreter
         );
 
         return Interpretation::of($ids, $translation);
+    }
+
+    /**
+     * Diễn giải ĐÃ CÓ cho truy vấn này, nếu từng hỏi. KHÔNG bao giờ gọi Gemini.
+     *
+     * Đây là lối vào của đường tra THƯỜNG — nhánh mà `SearchWeakness` thấy SQL đủ
+     * mạnh nên không đáng tiêu tiền hỏi AI. Nhưng "không đáng hỏi lại" khác hẳn
+     * "không đáng đọc": nếu ai đó đã bấm nút báo kết quả sai cho đúng truy vấn
+     * này, câu trả lời tốt hơn đã nằm sẵn trong bảng và đã trả tiền rồi. Không
+     * đọc nó nghĩa là bắt từng người dùng bấm lại đúng cái nút đó, mãi mãi.
+     *
+     * Rỗng = chưa ai từng hỏi truy vấn này. Caller không cần phân biệt nó với
+     * "AI bảo không có gì": cả hai đều dẫn tới việc dùng nguyên kết quả SQL.
+     */
+    public function cached(string $query, string $mode): Interpretation
+    {
+        $normalized = self::normalize($query);
+
+        if ($normalized === '') {
+            return Interpretation::of([]);
+        }
+
+        return $this->readCache($normalized, $mode) ?? Interpretation::of([]);
+    }
+
+    /**
+     * MỘT chỗ đọc cache cho cả hai lối vào.
+     *
+     * Tách đôi thì một trong hai đường sẽ quên tăng `hit_count`, và tỉ lệ trúng
+     * cache — con số duy nhất trả lời được lớp này có đáng tiền hay không — báo
+     * sai mà không ai nhận ra.
+     *
+     * `null` = không có dòng nào, phân biệt với dòng có `word_ids` RỖNG (một câu
+     * trả lời thật: "AI bảo không có gì").
+     */
+    private function readCache(string $normalized, string $mode): ?Interpretation
+    {
+        $cached = SearchQueryInterpretation::query()
+            ->where('query_normalized', $normalized)
+            ->where('mode', $mode)
+            ->first();
+
+        if ($cached === null) {
+            return null;
+        }
+
+        /*
+         * Tăng bằng UPDATE nguyên tử, không phải đọc-cộng-ghi: hai request cùng
+         * lúc cho một truy vấn hot sẽ mất một lượt đếm, và con số này là thứ duy
+         * nhất trả lời được "cache trúng bao nhiêu phần trăm".
+         *
+         * Hệ quả cần biết: nhánh trúng cache VẪN GHI. `/search` vì thế không phục
+         * vụ được từ read replica — và từ khi đường tra THƯỜNG cũng đọc cache,
+         * đường ghi đó rộng hơn trước. Chấp nhận ở quy mô hiện tại; nếu sau này
+         * cần replica thì dồn phép đếm sang một hàng đợi, đừng bỏ nó đi.
+         */
+        SearchQueryInterpretation::query()
+            ->whereKey($cached->id)
+            ->update(['hit_count' => DB::raw('hit_count + 1')]);
+
+        return Interpretation::of(
+            array_map(intval(...), $cached->word_ids),
+            $this->translation($cached->translation),
+        );
     }
 
     /**

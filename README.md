@@ -236,10 +236,25 @@ gọi lớp diễn giải. Đây là đường vòng THỦ CÔNG, không phải 
 - Cache diễn giải dùng chung với đường tự động, nên bấm lại một truy vấn đã hỏi
   là lượt trúng cache, không tốn lời gọi nào.
 
-Lưu ý đã biết: cache diễn giải KHÔNG được đường tra thường đọc. Sau khi ai đó
-refine `bác sĩ`, lần tra sau vẫn trả kết quả SQL. Sửa được bằng một `SELECT` —
-nhưng nó khiến một lượt bấm của một người đổi kết quả của mọi người, nên đó là
-một quyết định sản phẩm riêng.
+#### Đường tra thường cũng ĐỌC cache đó
+
+`SearchWeakness` quyết định có TIÊU TIỀN hay không; nó không quyết định có được
+ĐỌC hay không. Sau khi ai đó refine `bác sĩ`, dòng diễn giải nằm sẵn trong bảng
+và đã trả tiền rồi — nên mọi lần tra `bác sĩ` sau đó dùng luôn dòng đó và trả
+`source: 'ai'`, bằng một `SELECT` trên unique index, không lời gọi Gemini nào.
+
+Hệ quả cố ý: **một lượt bấm của một người đổi kết quả của mọi người** cho đúng
+truy vấn đó. Thứ khiến nó chịu được là nội dung KHÔNG do người dùng soạn — Gemini
+trả chữ Hán, và `SearchInterpreter::resolve()` loại mọi chữ không có trong
+`dictionary_words`. Không có đường bơm chữ tuỳ ý vào kết quả của người khác.
+
+Hai điều đi kèm, đừng bỏ quên khi sửa lớp này:
+
+- Trúng cache kéo theo `UPDATE hit_count`, nên `/search` vẫn là đường GHI và
+  không phục vụ được từ read replica — nay còn rộng hơn trước.
+- Kiểm `GEMINI_API_KEY` nằm SAU bước đọc cache: đọc một dòng đã trả tiền thì
+  không cần key. Đặt lại lên đầu sẽ khiến `interpret()` và `cached()` trả lời
+  khác nhau cho cùng một dòng.
 
 ### Làm giàu mục từ — đang chạy
 

@@ -73,11 +73,22 @@ final class DictionarySearchController
          * đa 10 từ, không có gì để đóng góp cho trang 3, và trả tiền cho mỗi
          * trang là trả tiền cho cùng một câu trả lời nhiều lần.
          *
-         * Điều đó đúng cả với `refine`: bấm nút ở trang 3 vẫn không có gì để AI
-         * đóng góp, nên `$page === 1` đứng ngoài chứ không nằm trong ngoặc.
+         * Điều đó đúng cả với `refine` lẫn với việc đọc cache: cả hai đều không
+         * có gì để đóng góp cho trang 3.
          */
-        if ($page === 1 && ($forced || SearchWeakness::isWeak($top->rank ?? null, $top->precision ?? null, $results->total()))) {
-            $interpretation = $interpreter->interpret($request->searchTerm(), $request->mode() ?? 'auto');
+        if ($page === 1) {
+            /*
+             * HỎI AI khi người dùng ép hoặc SQL yếu. Ngoài ra chỉ ĐỌC thứ đã hỏi
+             * rồi — `cached()` không bao giờ gọi Gemini.
+             *
+             * `SearchWeakness` vì thế vẫn là thứ DUY NHẤT quyết định có tiêu tiền
+             * hay không; nó chỉ thôi quyết định việc có được đọc hay không. Đó là
+             * hai câu hỏi khác nhau, và gộp chúng lại chính là lý do một truy vấn
+             * đã được sửa đúng vẫn trả về kết quả sai ở lần tra kế tiếp.
+             */
+            $interpretation = $forced || SearchWeakness::isWeak($top->rank ?? null, $top->precision ?? null, $results->total())
+                ? $interpreter->interpret($request->searchTerm(), $request->mode() ?? 'auto')
+                : $interpreter->cached($request->searchTerm(), $request->mode() ?? 'auto');
 
             if ($interpretation->failed) {
                 $aiFailed = true;
