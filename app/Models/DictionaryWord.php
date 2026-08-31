@@ -60,13 +60,20 @@ final class DictionaryWord extends Model
      * Câu ví dụ, tốt nhất trước. P13 điền; rỗng là trạng thái hợp lệ và FE ẩn
      * hẳn section đó (D6).
      *
+     * `orderBy('id')` cuối cùng KHÔNG thừa. Hai câu bằng điểm và bằng độ dài là
+     * chuyện thường, và không có khoá phá hoà thì Postgres được tự do trả thứ
+     * tự khác nhau giữa hai truy vấn. Ở đó `limit(3)` của word detail và của
+     * endpoint dịch có thể cắt ra HAI BỘ CÂU KHÁC NHAU — người dùng nhận bản
+     * dịch cho câu màn hình không hiện.
+     *
      * @return HasMany<DictionaryExample, $this>
      */
     public function examples(): HasMany
     {
         return $this->hasMany(DictionaryExample::class, 'word_id')
             ->orderByDesc('quality_score')
-            ->orderBy('char_length');
+            ->orderBy('char_length')
+            ->orderBy('id');
     }
 
     /**

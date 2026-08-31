@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DictionaryEnrichmentController;
+use App\Http\Controllers\Api\DictionaryExampleTranslationController;
 use App\Http\Controllers\Api\DictionaryIllustrationController;
 use App\Http\Controllers\Api\DictionarySearchController;
 use App\Http\Controllers\Api\DictionarySentenceController;
@@ -85,6 +86,17 @@ Route::middleware('auth:sanctum')->group(function (): void {
          */
         Route::get('/words/{word}/illustration', DictionaryIllustrationController::class)
             ->name('word.illustration');
+
+        /*
+         * Nghĩa tiếng Việt của câu ví dụ, cũng gọi ASYNC sau khi màn chi tiết
+         * đã render.
+         *
+         * Nằm sau `auth:sanctum` như mọi endpoint từ điển khác — nó xếp job vào
+         * hàng đợi và tiêu quota Gemini, nên để công khai là mời người lạ đốt
+         * tiền.
+         */
+        Route::get('/words/{word}/example-translations', DictionaryExampleTranslationController::class)
+            ->name('word.example-translations');
     });
 
     Route::prefix('vocabulary')->name('api.vocabulary.')->group(function (): void {

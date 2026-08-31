@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\DictionaryWordResource;
+use App\Models\DictionaryExample;
 use App\Models\DictionaryWord;
 use App\Services\Dictionary\CharacterBreakdownService;
 use Illuminate\Http\JsonResponse;
@@ -15,9 +16,9 @@ final class DictionaryWordController
 
     public function __invoke(DictionaryWord $word, CharacterBreakdownService $breakdown): JsonResponse
     {
-        // Tối đa 3 câu — đủ để thấy ngữ cảnh, không biến màn chi tiết thành một
-        // bức tường chữ.
-        $word->load(['examples' => fn ($query) => $query->limit(3)]);
+        // Hằng số dùng chung với endpoint dịch câu ví dụ: hai con số lệch nhau
+        // nghĩa là FE nhận bản dịch cho câu nó không hiện.
+        $word->load(['examples' => fn ($query) => $query->limit(DictionaryExample::MAX_PER_WORD)]);
 
         $resource = new DictionaryWordResource($word, $breakdown->forWord($word));
 

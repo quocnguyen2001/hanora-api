@@ -268,6 +268,33 @@ từ, giữ pinyin và bản dịch.
 Đồng bộ chứ không 202 như `/enrichment`: đây là nội dung CHÍNH của trang người
 dùng vừa mở. Đo thật: **3,8–5,2 giây** lần đầu, **36ms** khi trúng cache.
 
+### Nghĩa tiếng Việt cho câu ví dụ — `GET /api/dictionary/words/{word}/example-translations`
+
+Câu ví dụ Tatoeba chỉ có bản dịch **tiếng Anh**. Endpoint này dịch tối đa 3 câu
+của một từ sang tiếng Việt trong **một** lời gọi Gemini, lưu vĩnh viễn vào
+`dictionary_examples.translation_vi`.
+
+Lười và async như `/enrichment`, không đồng bộ như `/sentences`: nó nổ ra ở **mọi
+lần mở trang chi tiết** — thao tác điều hướng thường xuyên nhất của app — nên giữ
+một worker PHP-FPM cho mỗi lượt mở từ chưa dịch là đặt rủi ro sai chỗ.
+
+| Trạng thái | Mã | Ý nghĩa |
+|---|---|---|
+| đã dịch xong | `200` | `data` đủ câu, `Cache-Control: public, max-age=86400` |
+| đang dịch | `202` | `Retry-After: 3`, `no-store` |
+| cạn lượt / thiếu key | `200` | `meta.status: "unavailable"` — **không bao giờ 5xx** |
+
+`data` **luôn là mảng**, kể cả ở hai nhánh sau: một từ có thể dịch xong 2 câu rồi
+cạn lượt ở câu thứ ba, và vứt cả lô khi đó là vứt đi bản dịch đã trả tiền để có.
+
+Job `TranslateWordExamples` là `ShouldBeUnique` theo `word_id` — đo thật: 5 request
+đồng thời cho một từ chưa dịch tạo đúng **1** job. Chạy trên queue `default`, mất
+**~4 giây** mỗi từ.
+
+Bản dịch do máy sinh và không có người rà, nên dòng tiếng Anh Tatoeba **ở lại**
+trên giao diện làm chốt đối chiếu — cùng lý do `definitions_vi` không thay thế
+`definitions_en`.
+
 ### Dọn nghĩa tiếng Việt — chạy thủ công
 
 `definitions_vi` của CVDICT có nhiễu đo được trên 115.040 mục: 14.113 dòng lẫn
