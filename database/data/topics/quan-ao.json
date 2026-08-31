@@ -1,0 +1,281 @@
+{
+    "slug": "quan-ao",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:54:13+07:00",
+    "words": [
+        {
+            "zh": "穿",
+            "pinyin": "chuan1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "mặc"
+        },
+        {
+            "zh": "衣服",
+            "pinyin": "yi1 fu5",
+            "rank": 2,
+            "batch": 1,
+            "vi": "quần áo"
+        },
+        {
+            "zh": "换",
+            "pinyin": "huan4",
+            "rank": 3,
+            "batch": 1,
+            "vi": "trao đổi"
+        },
+        {
+            "zh": "戴",
+            "pinyin": "dai4",
+            "rank": 4,
+            "batch": 1,
+            "vi": "đeo"
+        },
+        {
+            "zh": "裤子",
+            "pinyin": "ku4 zi5",
+            "rank": 5,
+            "batch": 1,
+            "vi": "quần tây"
+        },
+        {
+            "zh": "颜色",
+            "pinyin": "yan2 se4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "màu sắc"
+        },
+        {
+            "zh": "帽子",
+            "pinyin": "mao4 zi5",
+            "rank": 7,
+            "batch": 1,
+            "vi": "mũ"
+        },
+        {
+            "zh": "鞋子",
+            "pinyin": "xie2 zi5",
+            "rank": 8,
+            "batch": 1,
+            "vi": "giày"
+        },
+        {
+            "zh": "裙子",
+            "pinyin": "qun2 zi5",
+            "rank": 9,
+            "batch": 1,
+            "vi": "váy"
+        },
+        {
+            "zh": "口袋",
+            "pinyin": "kou3 dai4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "túi"
+        },
+        {
+            "zh": "制服",
+            "pinyin": "zhi4 fu2",
+            "rank": 11,
+            "batch": 1,
+            "vi": "chế ngự"
+        },
+        {
+            "zh": "外套",
+            "pinyin": "wai4 tao4",
+            "rank": 12,
+            "batch": 1,
+            "vi": "áo khoác"
+        },
+        {
+            "zh": "衬衫",
+            "pinyin": "chen4 shan1",
+            "rank": 13,
+            "batch": 1,
+            "vi": "áo sơ mi"
+        },
+        {
+            "zh": "眼镜",
+            "pinyin": "yan3 jing4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "kính mắt"
+        },
+        {
+            "zh": "手套",
+            "pinyin": "shou3 tao4",
+            "rank": 15,
+            "batch": 1,
+            "vi": "găng tay"
+        },
+        {
+            "zh": "西装",
+            "pinyin": "xi1 zhuang1",
+            "rank": 16,
+            "batch": 1,
+            "vi": "bộ vest"
+        },
+        {
+            "zh": "内衣",
+            "pinyin": "nei4 yi1",
+            "rank": 17,
+            "batch": 1,
+            "vi": "đồ lót"
+        },
+        {
+            "zh": "袜子",
+            "pinyin": "wa4 zi5",
+            "rank": 18,
+            "batch": 1,
+            "vi": "tất"
+        },
+        {
+            "zh": "领带",
+            "pinyin": "ling3 dai4",
+            "rank": 19,
+            "batch": 1,
+            "vi": "cà vạt"
+        },
+        {
+            "zh": "靴子",
+            "pinyin": "xue1 zi5",
+            "rank": 20,
+            "batch": 1,
+            "vi": "đôi ủng"
+        },
+        {
+            "zh": "睡衣",
+            "pinyin": "shui4 yi1",
+            "rank": 21,
+            "batch": 1,
+            "vi": "quần áo ngủ"
+        },
+        {
+            "zh": "短裤",
+            "pinyin": "duan3 ku4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "quần ngắn"
+        },
+        {
+            "zh": "毛衣",
+            "pinyin": "mao2 yi1",
+            "rank": 23,
+            "batch": 1,
+            "vi": "áo len"
+        },
+        {
+            "zh": "大衣",
+            "pinyin": "da4 yi1",
+            "rank": 24,
+            "batch": 1,
+            "vi": "áo khoác dài"
+        },
+        {
+            "zh": "牛仔裤",
+            "pinyin": "niu2 zai3 ku4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "quần jean"
+        },
+        {
+            "zh": "尺寸",
+            "pinyin": "chi3 cun5",
+            "rank": 26,
+            "batch": 1,
+            "vi": "kích thước; số đo; chiều đo"
+        },
+        {
+            "zh": "腰带",
+            "pinyin": "yao1 dai4",
+            "rank": 27,
+            "batch": 1,
+            "vi": "thắt lưng"
+        },
+        {
+            "zh": "围巾",
+            "pinyin": "wei2 jin1",
+            "rank": 28,
+            "batch": 1,
+            "vi": "khăn quàng"
+        },
+        {
+            "zh": "拉链",
+            "pinyin": "la1 lian4",
+            "rank": 29,
+            "batch": 1,
+            "vi": "dây kéo"
+        },
+        {
+            "zh": "袖子",
+            "pinyin": "xiu4 zi5",
+            "rank": 30,
+            "batch": 1,
+            "vi": "tay áo"
+        },
+        {
+            "zh": "拖鞋",
+            "pinyin": "tuo1 xie2",
+            "rank": 31,
+            "batch": 1,
+            "vi": "dép lê"
+        },
+        {
+            "zh": "泳衣",
+            "pinyin": "yong3 yi1",
+            "rank": 32,
+            "batch": 1,
+            "vi": "đồ bơi; đồ tắm"
+        },
+        {
+            "zh": "运动鞋",
+            "pinyin": "yun4 dong4 xie2",
+            "rank": 33,
+            "batch": 1,
+            "vi": "giày thể thao; giày sneakers"
+        },
+        {
+            "zh": "扣子",
+            "pinyin": "kou4 zi5",
+            "rank": 34,
+            "batch": 1,
+            "vi": "cúc áo"
+        },
+        {
+            "zh": "皮鞋",
+            "pinyin": "pi2 xie2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "giày da"
+        },
+        {
+            "zh": "试穿",
+            "pinyin": "shi4 chuan1",
+            "rank": 36,
+            "batch": 1,
+            "vi": "mặc thử"
+        },
+        {
+            "zh": "凉鞋",
+            "pinyin": "liang2 xie2",
+            "rank": 37,
+            "batch": 1,
+            "vi": "dép sandal"
+        },
+        {
+            "zh": "领子",
+            "pinyin": "ling3 zi5",
+            "rank": 38,
+            "batch": 1,
+            "vi": "cổ áo"
+        },
+        {
+            "zh": "连衣裙",
+            "pinyin": "lian2 yi1 qun2",
+            "rank": 39,
+            "batch": 1,
+            "vi": "váy đầm"
+        }
+    ]
+}

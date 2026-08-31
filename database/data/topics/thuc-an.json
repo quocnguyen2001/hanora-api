@@ -1,0 +1,300 @@
+{
+    "slug": "thuc-an",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:50:56+07:00",
+    "words": [
+        {
+            "zh": "吃",
+            "pinyin": "chi1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "ăn; tiêu thụ"
+        },
+        {
+            "zh": "喝",
+            "pinyin": "he1",
+            "rank": 2,
+            "batch": 1,
+            "vi": "uống",
+            "rejected": [
+                {
+                    "pinyin": "he4",
+                    "vi": "hô"
+                }
+            ]
+        },
+        {
+            "zh": "水",
+            "pinyin": "shui3",
+            "rank": 3,
+            "batch": 1,
+            "vi": "nước"
+        },
+        {
+            "zh": "酒",
+            "pinyin": "jiu3",
+            "rank": 4,
+            "batch": 1,
+            "vi": "rượu"
+        },
+        {
+            "zh": "咖啡",
+            "pinyin": "ka1 fei1",
+            "rank": 5,
+            "batch": 1,
+            "vi": "cà phê"
+        },
+        {
+            "zh": "饿",
+            "pinyin": "e4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "đói"
+        },
+        {
+            "zh": "蛋",
+            "pinyin": "dan4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "trứng"
+        },
+        {
+            "zh": "鱼",
+            "pinyin": "yu2",
+            "rank": 8,
+            "batch": 1,
+            "vi": "cá"
+        },
+        {
+            "zh": "肉",
+            "pinyin": "rou4",
+            "rank": 9,
+            "batch": 1,
+            "vi": "thịt"
+        },
+        {
+            "zh": "晚餐",
+            "pinyin": "wan3 can1",
+            "rank": 10,
+            "batch": 1,
+            "vi": "bữa tối"
+        },
+        {
+            "zh": "蛋糕",
+            "pinyin": "dan4 gao1",
+            "rank": 11,
+            "batch": 1,
+            "vi": "bánh ngọt"
+        },
+        {
+            "zh": "菜",
+            "pinyin": "cai4",
+            "rank": 12,
+            "batch": 1,
+            "vi": "rau"
+        },
+        {
+            "zh": "饭",
+            "pinyin": "fan4",
+            "rank": 13,
+            "batch": 1,
+            "vi": "cơm đã nấu"
+        },
+        {
+            "zh": "糖",
+            "pinyin": "tang2",
+            "rank": 14,
+            "batch": 1,
+            "vi": "đường"
+        },
+        {
+            "zh": "午餐",
+            "pinyin": "wu3 can1",
+            "rank": 15,
+            "batch": 1,
+            "vi": "bữa trưa"
+        },
+        {
+            "zh": "早餐",
+            "pinyin": "zao3 can1",
+            "rank": 16,
+            "batch": 1,
+            "vi": "bữa sáng"
+        },
+        {
+            "zh": "茶",
+            "pinyin": "cha2",
+            "rank": 17,
+            "batch": 1,
+            "vi": "trà"
+        },
+        {
+            "zh": "面包",
+            "pinyin": "mian4 bao1",
+            "rank": 18,
+            "batch": 1,
+            "vi": "bánh mì"
+        },
+        {
+            "zh": "饼干",
+            "pinyin": "bing3 gan1",
+            "rank": 19,
+            "batch": 1,
+            "vi": "bánh quy; bánh cookie"
+        },
+        {
+            "zh": "汤",
+            "pinyin": "tang1",
+            "rank": 20,
+            "batch": 1,
+            "vi": "canh",
+            "rejected": [
+                {
+                    "pinyin": "shang1",
+                    "vi": "dòng nước cuồn cuộn"
+                }
+            ]
+        },
+        {
+            "zh": "饮料",
+            "pinyin": "yin3 liao4",
+            "rank": 21,
+            "batch": 1,
+            "vi": "đồ uống"
+        },
+        {
+            "zh": "牛奶",
+            "pinyin": "niu2 nai3",
+            "rank": 22,
+            "batch": 1,
+            "vi": "sữa bò"
+        },
+        {
+            "zh": "苹果",
+            "pinyin": "ping2 guo3",
+            "rank": 23,
+            "batch": 1,
+            "vi": "quả táo"
+        },
+        {
+            "zh": "水果",
+            "pinyin": "shui3 guo3",
+            "rank": 24,
+            "batch": 1,
+            "vi": "trái cây"
+        },
+        {
+            "zh": "冰淇淋",
+            "pinyin": "bing1 qi2 lin2",
+            "rank": 25,
+            "batch": 1,
+            "vi": "kem"
+        },
+        {
+            "zh": "牛肉",
+            "pinyin": "niu2 rou4",
+            "rank": 26,
+            "batch": 1,
+            "vi": "thịt bò"
+        },
+        {
+            "zh": "鸡肉",
+            "pinyin": "ji1 rou4",
+            "rank": 27,
+            "batch": 1,
+            "vi": "thịt gà"
+        },
+        {
+            "zh": "果汁",
+            "pinyin": "guo3 zhi1",
+            "rank": 28,
+            "batch": 1,
+            "vi": "nước ép trái cây"
+        },
+        {
+            "zh": "盐",
+            "pinyin": "yan2",
+            "rank": 29,
+            "batch": 1,
+            "vi": "muối"
+        },
+        {
+            "zh": "香蕉",
+            "pinyin": "xiang1 jiao1",
+            "rank": 30,
+            "batch": 1,
+            "vi": "quả chuối"
+        },
+        {
+            "zh": "蔬菜",
+            "pinyin": "shu1 cai4",
+            "rank": 31,
+            "batch": 1,
+            "vi": "rau"
+        },
+        {
+            "zh": "面条",
+            "pinyin": "mian4 tiao2",
+            "rank": 32,
+            "batch": 1,
+            "vi": "mì sợi"
+        },
+        {
+            "zh": "渴",
+            "pinyin": "ke3",
+            "rank": 33,
+            "batch": 1,
+            "vi": "khát"
+        },
+        {
+            "zh": "猪肉",
+            "pinyin": "zhu1 rou4",
+            "rank": 34,
+            "batch": 1,
+            "vi": "thịt lợn"
+        },
+        {
+            "zh": "米饭",
+            "pinyin": "mi3 fan4",
+            "rank": 35,
+            "batch": 1,
+            "vi": "(cơm) đã nấu"
+        },
+        {
+            "zh": "饺子",
+            "pinyin": "jiao3 zi5",
+            "rank": 36,
+            "batch": 1,
+            "vi": "bánh sủi cảo"
+        },
+        {
+            "zh": "包子",
+            "pinyin": "bao1 zi5",
+            "rank": 37,
+            "batch": 1,
+            "vi": "bánh bao"
+        },
+        {
+            "zh": "火锅",
+            "pinyin": "huo3 guo1",
+            "rank": 38,
+            "batch": 1,
+            "vi": "lẩu"
+        },
+        {
+            "zh": "炒饭",
+            "pinyin": "chao3 fan4",
+            "rank": 39,
+            "batch": 1,
+            "vi": "cơm chiên"
+        },
+        {
+            "zh": "甜点",
+            "pinyin": "tian2 dian3",
+            "rank": 40,
+            "batch": 1,
+            "vi": "món tráng miệng"
+        }
+    ]
+}

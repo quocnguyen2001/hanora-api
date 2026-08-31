@@ -1,0 +1,586 @@
+{
+    "slug": "mua-sam",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:52:51+07:00",
+    "words": [
+        {
+            "zh": "东西",
+            "pinyin": "dong1 xi5",
+            "rank": 1,
+            "batch": 1,
+            "vi": "đồ vật",
+            "rejected": [
+                {
+                    "pinyin": "dong1 xi1",
+                    "vi": "đông và tây"
+                }
+            ]
+        },
+        {
+            "zh": "钱",
+            "pinyin": "qian2",
+            "rank": 2,
+            "batch": 1,
+            "vi": "tiền xu"
+        },
+        {
+            "zh": "买",
+            "pinyin": "mai3",
+            "rank": 3,
+            "batch": 1,
+            "vi": "mua"
+        },
+        {
+            "zh": "衣服",
+            "pinyin": "yi1 fu5",
+            "rank": 4,
+            "batch": 1,
+            "vi": "quần áo"
+        },
+        {
+            "zh": "卖",
+            "pinyin": "mai4",
+            "rank": 5,
+            "batch": 1,
+            "vi": "bán"
+        },
+        {
+            "zh": "试",
+            "pinyin": "shi4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "thử"
+        },
+        {
+            "zh": "付",
+            "pinyin": "fu4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "trả"
+        },
+        {
+            "zh": "适合",
+            "pinyin": "shi4 he2",
+            "rank": 8,
+            "batch": 1,
+            "vi": "phù hợp; thích hợp"
+        },
+        {
+            "zh": "裤子",
+            "pinyin": "ku4 zi5",
+            "rank": 9,
+            "batch": 1,
+            "vi": "quần tây"
+        },
+        {
+            "zh": "颜色",
+            "pinyin": "yan2 se4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "màu sắc"
+        },
+        {
+            "zh": "帽子",
+            "pinyin": "mao4 zi5",
+            "rank": 11,
+            "batch": 1,
+            "vi": "mũ"
+        },
+        {
+            "zh": "满意",
+            "pinyin": "man3 yi4",
+            "rank": 12,
+            "batch": 1,
+            "vi": "hài lòng"
+        },
+        {
+            "zh": "现金",
+            "pinyin": "xian4 jin1",
+            "rank": 13,
+            "batch": 1,
+            "vi": "tiền mặt"
+        },
+        {
+            "zh": "商店",
+            "pinyin": "shang1 dian4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "cửa hàng; tiệm"
+        },
+        {
+            "zh": "鞋子",
+            "pinyin": "xie2 zi5",
+            "rank": 15,
+            "batch": 1,
+            "vi": "giày"
+        },
+        {
+            "zh": "裙子",
+            "pinyin": "qun2 zi5",
+            "rank": 16,
+            "batch": 1,
+            "vi": "váy"
+        },
+        {
+            "zh": "钱包",
+            "pinyin": "qian2 bao1",
+            "rank": 17,
+            "batch": 2,
+            "vi": "ví"
+        },
+        {
+            "zh": "顾客",
+            "pinyin": "gu4 ke4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "khách hàng; thân chủ"
+        },
+        {
+            "zh": "贵",
+            "pinyin": "gui4",
+            "rank": 19,
+            "batch": 1,
+            "vi": "đắt"
+        },
+        {
+            "zh": "外套",
+            "pinyin": "wai4 tao4",
+            "rank": 20,
+            "batch": 2,
+            "vi": "áo khoác"
+        },
+        {
+            "zh": "便宜",
+            "pinyin": "pian2 yi5",
+            "rank": 21,
+            "batch": 1,
+            "vi": "rẻ; không đắt",
+            "rejected": [
+                {
+                    "pinyin": "bian4 yi2",
+                    "vi": "thuận tiện"
+                }
+            ]
+        },
+        {
+            "zh": "衬衫",
+            "pinyin": "chen4 shan1",
+            "rank": 22,
+            "batch": 2,
+            "vi": "áo sơ mi"
+        },
+        {
+            "zh": "评价",
+            "pinyin": "ping2 jia4",
+            "rank": 23,
+            "batch": 2,
+            "vi": "đánh giá"
+        },
+        {
+            "zh": "袋子",
+            "pinyin": "dai4 zi5",
+            "rank": 24,
+            "batch": 2,
+            "vi": "túi"
+        },
+        {
+            "zh": "价格",
+            "pinyin": "jia4 ge2",
+            "rank": 25,
+            "batch": 1,
+            "vi": "giá"
+        },
+        {
+            "zh": "品牌",
+            "pinyin": "pin3 pai2",
+            "rank": 26,
+            "batch": 2,
+            "vi": "tên thương hiệu"
+        },
+        {
+            "zh": "挑选",
+            "pinyin": "tiao1 xuan3",
+            "rank": 27,
+            "batch": 1,
+            "vi": "chọn"
+        },
+        {
+            "zh": "袜子",
+            "pinyin": "wa4 zi5",
+            "rank": 28,
+            "batch": 2,
+            "vi": "tất"
+        },
+        {
+            "zh": "收藏",
+            "pinyin": "shou1 cang2",
+            "rank": 29,
+            "batch": 2,
+            "vi": "sưu tầm; cất giữ an toàn; (Internet) đánh dấu"
+        },
+        {
+            "zh": "商场",
+            "pinyin": "shang1 chang3",
+            "rank": 30,
+            "batch": 2,
+            "vi": "trung tâm mua sắm"
+        },
+        {
+            "zh": "超市",
+            "pinyin": "chao1 shi4",
+            "rank": 31,
+            "batch": 1,
+            "vi": "siêu thị"
+        },
+        {
+            "zh": "大小",
+            "pinyin": "da4 xiao3",
+            "rank": 32,
+            "batch": 1,
+            "vi": "lớn và nhỏ"
+        },
+        {
+            "zh": "质量",
+            "pinyin": "zhi4 liang4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "chất lượng"
+        },
+        {
+            "zh": "标签",
+            "pinyin": "biao1 qian1",
+            "rank": 34,
+            "batch": 1,
+            "vi": "nhãn"
+        },
+        {
+            "zh": "收据",
+            "pinyin": "shou1 ju4",
+            "rank": 35,
+            "batch": 1,
+            "vi": "biên lai"
+        },
+        {
+            "zh": "化妆品",
+            "pinyin": "hua4 zhuang1 pin3",
+            "rank": 36,
+            "batch": 2,
+            "vi": "mỹ phẩm"
+        },
+        {
+            "zh": "包装",
+            "pinyin": "bao1 zhuang1",
+            "rank": 37,
+            "batch": 2,
+            "vi": "đóng gói"
+        },
+        {
+            "zh": "零钱",
+            "pinyin": "ling2 qian2",
+            "rank": 38,
+            "batch": 2,
+            "vi": "tiền thối"
+        },
+        {
+            "zh": "商品",
+            "pinyin": "shang1 pin3",
+            "rank": 39,
+            "batch": 1,
+            "vi": "hàng hóa; sản phẩm; thương phẩm"
+        },
+        {
+            "zh": "尺寸",
+            "pinyin": "chi3 cun5",
+            "rank": 40,
+            "batch": 2,
+            "vi": "kích thước; số đo; chiều đo"
+        },
+        {
+            "zh": "昂贵",
+            "pinyin": "ang2 gui4",
+            "rank": 41,
+            "batch": 2,
+            "vi": "đắt đỏ"
+        },
+        {
+            "zh": "柜台",
+            "pinyin": "gui4 tai2",
+            "rank": 42,
+            "batch": 2,
+            "vi": "quầy bán hàng"
+        },
+        {
+            "zh": "型号",
+            "pinyin": "xing2 hao4",
+            "rank": 43,
+            "batch": 2,
+            "vi": "mẫu"
+        },
+        {
+            "zh": "快递",
+            "pinyin": "kuai4 di4",
+            "rank": 44,
+            "batch": 2,
+            "vi": "chuyển phát nhanh"
+        },
+        {
+            "zh": "首饰",
+            "pinyin": "shou3 shi4",
+            "rank": 45,
+            "batch": 2,
+            "vi": "trang sức"
+        },
+        {
+            "zh": "付款",
+            "pinyin": "fu4 kuan3",
+            "rank": 46,
+            "batch": 1,
+            "vi": "trả một số tiền"
+        },
+        {
+            "zh": "皮包",
+            "pinyin": "pi2 bao1",
+            "rank": 47,
+            "batch": 2,
+            "vi": "túi xách"
+        },
+        {
+            "zh": "打折",
+            "pinyin": "da3 zhe2",
+            "rank": 48,
+            "batch": 1,
+            "vi": "giảm giá"
+        },
+        {
+            "zh": "优惠",
+            "pinyin": "you1 hui4",
+            "rank": 49,
+            "batch": 1,
+            "vi": "ưu đãi"
+        },
+        {
+            "zh": "款式",
+            "pinyin": "kuan3 shi4",
+            "rank": 50,
+            "batch": 3,
+            "vi": "mẫu mã",
+            "rejected": [
+                {
+                    "pinyin": "kuan3 shi5",
+                    "vi": "thanh lịch"
+                }
+            ]
+        },
+        {
+            "zh": "赠送",
+            "pinyin": "zeng4 song4",
+            "rank": 51,
+            "batch": 2,
+            "vi": "tặng quà"
+        },
+        {
+            "zh": "布料",
+            "pinyin": "bu4 liao4",
+            "rank": 52,
+            "batch": 2,
+            "vi": "vải"
+        },
+        {
+            "zh": "发票",
+            "pinyin": "fa1 piao4",
+            "rank": 53,
+            "batch": 1,
+            "vi": "hóa đơn; biên nhận; phiếu thu"
+        },
+        {
+            "zh": "减价",
+            "pinyin": "jian3 jia4",
+            "rank": 54,
+            "batch": 2,
+            "vi": "giảm giá"
+        },
+        {
+            "zh": "试穿",
+            "pinyin": "shi4 chuan1",
+            "rank": 55,
+            "batch": 1,
+            "vi": "mặc thử"
+        },
+        {
+            "zh": "样式",
+            "pinyin": "yang4 shi4",
+            "rank": 56,
+            "batch": 2,
+            "vi": "loại"
+        },
+        {
+            "zh": "新款",
+            "pinyin": "xin1 kuan3",
+            "rank": 57,
+            "batch": 1,
+            "vi": "mẫu mới"
+        },
+        {
+            "zh": "结账",
+            "pinyin": "jie2 zhang4",
+            "rank": 58,
+            "batch": 2,
+            "vi": "trả hóa đơn"
+        },
+        {
+            "zh": "退货",
+            "pinyin": "tui4 huo4",
+            "rank": 59,
+            "batch": 1,
+            "vi": "trả lại hàng"
+        },
+        {
+            "zh": "货架",
+            "pinyin": "huo4 jia4",
+            "rank": 60,
+            "batch": 2,
+            "vi": "kệ hàng"
+        },
+        {
+            "zh": "赠品",
+            "pinyin": "zeng4 pin3",
+            "rank": 61,
+            "batch": 2,
+            "vi": "quà tặng"
+        },
+        {
+            "zh": "余额",
+            "pinyin": "yu2 e2",
+            "rank": 62,
+            "batch": 2,
+            "vi": "số dư"
+        },
+        {
+            "zh": "找钱",
+            "pinyin": "zhao3 qian2",
+            "rank": 63,
+            "batch": 1,
+            "vi": "trả tiền thừa"
+        },
+        {
+            "zh": "实惠",
+            "pinyin": "shi2 hui4",
+            "rank": 64,
+            "batch": 2,
+            "vi": "lợi ích thiết thực"
+        },
+        {
+            "zh": "试衣间",
+            "pinyin": "shi4 yi1 jian1",
+            "rank": 65,
+            "batch": 2,
+            "vi": "phòng thử đồ"
+        },
+        {
+            "zh": "营业员",
+            "pinyin": "ying2 ye4 yuan2",
+            "rank": 66,
+            "batch": 1,
+            "vi": "nhân viên bán hàng"
+        },
+        {
+            "zh": "缺货",
+            "pinyin": "que1 huo4",
+            "rank": 67,
+            "batch": 2,
+            "vi": "thiếu hàng"
+        },
+        {
+            "zh": "平价",
+            "pinyin": "ping2 jia4",
+            "rank": 68,
+            "batch": 2,
+            "vi": "giá cả phải chăng"
+        },
+        {
+            "zh": "邮费",
+            "pinyin": "you2 fei4",
+            "rank": 69,
+            "batch": 2,
+            "vi": "bưu phí"
+        },
+        {
+            "zh": "纯棉",
+            "pinyin": "chun2 mian2",
+            "rank": 70,
+            "batch": 2,
+            "vi": "cotton nguyên chất"
+        },
+        {
+            "zh": "刷卡",
+            "pinyin": "shua1 ka3",
+            "rank": 71,
+            "batch": 1,
+            "vi": "sử dụng thẻ tín dụng"
+        },
+        {
+            "zh": "购物车",
+            "pinyin": "gou4 wu4 che1",
+            "rank": 72,
+            "batch": 1,
+            "vi": "xe đẩy mua sắm"
+        },
+        {
+            "zh": "网购",
+            "pinyin": "wang3 gou4",
+            "rank": 73,
+            "batch": 1,
+            "vi": "mua sắm qua mạng"
+        },
+        {
+            "zh": "网店",
+            "pinyin": "wang3 dian4",
+            "rank": 74,
+            "batch": 2,
+            "vi": "cửa hàng trực tuyến"
+        },
+        {
+            "zh": "下单",
+            "pinyin": "xia4 dan1",
+            "rank": 75,
+            "batch": 2,
+            "vi": "đặt hàng"
+        },
+        {
+            "zh": "断货",
+            "pinyin": "duan4 huo4",
+            "rank": 76,
+            "batch": 2,
+            "vi": "hết hàng"
+        },
+        {
+            "zh": "扫码",
+            "pinyin": "sao3 ma3",
+            "rank": 77,
+            "batch": 2,
+            "vi": "quét mã QR hoặc mã vạch"
+        },
+        {
+            "zh": "客服",
+            "pinyin": "ke4 fu2",
+            "rank": 78,
+            "batch": 2,
+            "vi": "dịch vụ khách hàng"
+        },
+        {
+            "zh": "收银台",
+            "pinyin": "shou1 yin2 tai2",
+            "rank": 79,
+            "batch": 3,
+            "vi": "quầy thanh toán"
+        },
+        {
+            "zh": "包邮",
+            "pinyin": "bao1 you2",
+            "rank": 80,
+            "batch": 3,
+            "vi": "bao gồm phí vận chuyển"
+        }
+    ]
+}

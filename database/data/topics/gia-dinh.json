@@ -1,0 +1,259 @@
+{
+    "slug": "gia-dinh",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:50:07+07:00",
+    "words": [
+        {
+            "zh": "先生",
+            "pinyin": "xian1 sheng5",
+            "rank": 1,
+            "batch": 1,
+            "vi": "giáo viên"
+        },
+        {
+            "zh": "孩子",
+            "pinyin": "hai2 zi5",
+            "rank": 2,
+            "batch": 1,
+            "vi": "trẻ em"
+        },
+        {
+            "zh": "家",
+            "pinyin": "jia1",
+            "rank": 3,
+            "batch": 1,
+            "vi": "nhà"
+        },
+        {
+            "zh": "妈妈",
+            "pinyin": "ma1 ma5",
+            "rank": 4,
+            "batch": 1,
+            "vi": "mẹ"
+        },
+        {
+            "zh": "爸爸",
+            "pinyin": "ba4 ba5",
+            "rank": 5,
+            "batch": 1,
+            "vi": "(thông tục) cha; ba"
+        },
+        {
+            "zh": "儿子",
+            "pinyin": "er2 zi5",
+            "rank": 6,
+            "batch": 1,
+            "vi": "con trai"
+        },
+        {
+            "zh": "兄弟",
+            "pinyin": "xiong1 di4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "anh em"
+        },
+        {
+            "zh": "女儿",
+            "pinyin": "nu:3 er2",
+            "rank": 8,
+            "batch": 1,
+            "vi": "con gái"
+        },
+        {
+            "zh": "结婚",
+            "pinyin": "jie2 hun1",
+            "rank": 9,
+            "batch": 1,
+            "vi": "kết hôn"
+        },
+        {
+            "zh": "妻子",
+            "pinyin": "qi1 zi5",
+            "rank": 10,
+            "batch": 1,
+            "vi": "vợ",
+            "rejected": [
+                {
+                    "pinyin": "qi1 zi3",
+                    "vi": "vợ và con cái"
+                }
+            ]
+        },
+        {
+            "zh": "父母",
+            "pinyin": "fu4 mu3",
+            "rank": 11,
+            "batch": 1,
+            "vi": "cha và mẹ; phụ huynh"
+        },
+        {
+            "zh": "家庭",
+            "pinyin": "jia1 ting2",
+            "rank": 12,
+            "batch": 1,
+            "vi": "gia đình"
+        },
+        {
+            "zh": "太太",
+            "pinyin": "tai4 tai5",
+            "rank": 13,
+            "batch": 1,
+            "vi": "phụ nữ đã kết hôn"
+        },
+        {
+            "zh": "哥哥",
+            "pinyin": "ge1 ge5",
+            "rank": 14,
+            "batch": 1,
+            "vi": "anh trai"
+        },
+        {
+            "zh": "妹妹",
+            "pinyin": "mei4 mei5",
+            "rank": 15,
+            "batch": 1,
+            "vi": "em gái"
+        },
+        {
+            "zh": "家人",
+            "pinyin": "jia1 ren2",
+            "rank": 16,
+            "batch": 1,
+            "vi": "thành viên gia đình"
+        },
+        {
+            "zh": "叔叔",
+            "pinyin": "shu1 shu5",
+            "rank": 17,
+            "batch": 1,
+            "vi": "em trai của bố"
+        },
+        {
+            "zh": "奶奶",
+            "pinyin": "nai3 nai5",
+            "rank": 18,
+            "batch": 1,
+            "vi": "(thân mật) bà"
+        },
+        {
+            "zh": "离婚",
+            "pinyin": "li2 hun1",
+            "rank": 19,
+            "batch": 1,
+            "vi": "ly hôn"
+        },
+        {
+            "zh": "爷爷",
+            "pinyin": "ye2 ye5",
+            "rank": 20,
+            "batch": 1,
+            "vi": "(thân mật) ông nội"
+        },
+        {
+            "zh": "姐妹",
+            "pinyin": "jie3 mei4",
+            "rank": 21,
+            "batch": 1,
+            "vi": "chị em"
+        },
+        {
+            "zh": "单身",
+            "pinyin": "dan1 shen1",
+            "rank": 22,
+            "batch": 1,
+            "vi": "chưa kết hôn; độc thân"
+        },
+        {
+            "zh": "阿姨",
+            "pinyin": "a1 yi2",
+            "rank": 23,
+            "batch": 1,
+            "vi": "dì"
+        },
+        {
+            "zh": "祖母",
+            "pinyin": "zu3 mu3",
+            "rank": 24,
+            "batch": 1,
+            "vi": "bà nội"
+        },
+        {
+            "zh": "孙子",
+            "pinyin": "sun1 zi5",
+            "rank": 25,
+            "batch": 1,
+            "vi": "cháu trai"
+        },
+        {
+            "zh": "爱人",
+            "pinyin": "ai4 ren5",
+            "rank": 26,
+            "batch": 1,
+            "vi": "vợ hoặc chồng"
+        },
+        {
+            "zh": "亲戚",
+            "pinyin": "qin1 qi5",
+            "rank": 27,
+            "batch": 1,
+            "vi": "một người thân"
+        },
+        {
+            "zh": "外婆",
+            "pinyin": "wai4 po2",
+            "rank": 28,
+            "batch": 1,
+            "vi": "(thông tục) bà ngoại"
+        },
+        {
+            "zh": "侄子",
+            "pinyin": "zhi2 zi5",
+            "rank": 29,
+            "batch": 1,
+            "vi": "con trai của anh hoặc em trai; cháu trai"
+        },
+        {
+            "zh": "祖父",
+            "pinyin": "zu3 fu4",
+            "rank": 30,
+            "batch": 1,
+            "vi": "ông nội"
+        },
+        {
+            "zh": "姑姑",
+            "pinyin": "gu1 gu5",
+            "rank": 31,
+            "batch": 1,
+            "vi": "cô ruột"
+        },
+        {
+            "zh": "孙女",
+            "pinyin": "sun1 nu:3",
+            "rank": 32,
+            "batch": 1,
+            "vi": "con gái của con trai"
+        },
+        {
+            "zh": "外公",
+            "pinyin": "wai4 gong1",
+            "rank": 33,
+            "batch": 1,
+            "vi": "(thông tục) ông ngoại"
+        },
+        {
+            "zh": "外孙",
+            "pinyin": "wai4 sun1",
+            "rank": 34,
+            "batch": 1,
+            "vi": "con trai của con gái"
+        },
+        {
+            "zh": "堂兄弟",
+            "pinyin": "tang2 xiong1 di4",
+            "rank": 35,
+            "batch": 2,
+            "vi": "con trai của anh em trai của cha"
+        }
+    ]
+}

@@ -1,0 +1,304 @@
+{
+    "slug": "thien-nhien",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:51:11+07:00",
+    "words": [
+        {
+            "zh": "天",
+            "pinyin": "tian1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "ngày"
+        },
+        {
+            "zh": "地",
+            "pinyin": "di4",
+            "rank": 2,
+            "batch": 1,
+            "vi": "đất",
+            "rejected": [
+                {
+                    "pinyin": "de5",
+                    "vi": "trợ từ kết cấu: dùng trước động từ hoặc tính từ, liên kết với trạng ngữ bổ nghĩa đứng trước"
+                }
+            ]
+        },
+        {
+            "zh": "月",
+            "pinyin": "yue4",
+            "rank": 3,
+            "batch": 1,
+            "vi": "mặt trăng"
+        },
+        {
+            "zh": "花",
+            "pinyin": "hua1",
+            "rank": 4,
+            "batch": 1,
+            "vi": "hoa"
+        },
+        {
+            "zh": "水",
+            "pinyin": "shui3",
+            "rank": 5,
+            "batch": 1,
+            "vi": "nước"
+        },
+        {
+            "zh": "日",
+            "pinyin": "ri4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "mặt trời"
+        },
+        {
+            "zh": "气",
+            "pinyin": "qi4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "khí; không khí"
+        },
+        {
+            "zh": "光",
+            "pinyin": "guang1",
+            "rank": 8,
+            "batch": 1,
+            "vi": "ánh sáng; tia"
+        },
+        {
+            "zh": "火",
+            "pinyin": "huo3",
+            "rank": 9,
+            "batch": 1,
+            "vi": "lửa"
+        },
+        {
+            "zh": "雷",
+            "pinyin": "lei2",
+            "rank": 10,
+            "batch": 1,
+            "vi": "sấm sét"
+        },
+        {
+            "zh": "星",
+            "pinyin": "xing1",
+            "rank": 11,
+            "batch": 1,
+            "vi": "ngôi sao"
+        },
+        {
+            "zh": "山",
+            "pinyin": "shan1",
+            "rank": 12,
+            "batch": 1,
+            "vi": "núi; đồi"
+        },
+        {
+            "zh": "树",
+            "pinyin": "shu4",
+            "rank": 13,
+            "batch": 1,
+            "vi": "cây"
+        },
+        {
+            "zh": "风",
+            "pinyin": "feng1",
+            "rank": 14,
+            "batch": 1,
+            "vi": "gió"
+        },
+        {
+            "zh": "海",
+            "pinyin": "hai3",
+            "rank": 15,
+            "batch": 1,
+            "vi": "đại dương"
+        },
+        {
+            "zh": "原",
+            "pinyin": "yuan2",
+            "rank": 16,
+            "batch": 1,
+            "vi": "trước đây",
+            "rejected": [
+                {
+                    "pinyin": "Yuan2",
+                    "vi": "(họ Nhật Bản) Hara"
+                }
+            ]
+        },
+        {
+            "zh": "冰",
+            "pinyin": "bing1",
+            "rank": 17,
+            "batch": 1,
+            "vi": "băng"
+        },
+        {
+            "zh": "电",
+            "pinyin": "dian4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "sét"
+        },
+        {
+            "zh": "雨",
+            "pinyin": "yu3",
+            "rank": 19,
+            "batch": 1,
+            "vi": "mưa",
+            "rejected": [
+                {
+                    "pinyin": "yu4",
+                    "vi": "(văn học) mưa"
+                }
+            ]
+        },
+        {
+            "zh": "林",
+            "pinyin": "lin2",
+            "rank": 20,
+            "batch": 1,
+            "vi": "(dùng trong từ ghép) rừng"
+        },
+        {
+            "zh": "波",
+            "pinyin": "bo1",
+            "rank": 21,
+            "batch": 1,
+            "vi": "sóng",
+            "rejected": [
+                {
+                    "pinyin": "bo1",
+                    "vi": "sóng"
+                }
+            ]
+        },
+        {
+            "zh": "河",
+            "pinyin": "he2",
+            "rank": 22,
+            "batch": 1,
+            "vi": "sông"
+        },
+        {
+            "zh": "木",
+            "pinyin": "mu4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "(dạng kết hợp) cây"
+        },
+        {
+            "zh": "雪",
+            "pinyin": "xue3",
+            "rank": 24,
+            "batch": 1,
+            "vi": "tuyết"
+        },
+        {
+            "zh": "野",
+            "pinyin": "ye3",
+            "rank": 25,
+            "batch": 1,
+            "vi": "cánh đồng"
+        },
+        {
+            "zh": "湖",
+            "pinyin": "hu2",
+            "rank": 26,
+            "batch": 1,
+            "vi": "hồ"
+        },
+        {
+            "zh": "土",
+            "pinyin": "tu3",
+            "rank": 27,
+            "batch": 1,
+            "vi": "đất",
+            "rejected": [
+                {
+                    "pinyin": "Tu3",
+                    "vi": "nhóm dân tộc Thổ"
+                }
+            ]
+        },
+        {
+            "zh": "石",
+            "pinyin": "shi2",
+            "rank": 28,
+            "batch": 1,
+            "vi": "đá"
+        },
+        {
+            "zh": "草",
+            "pinyin": "cao3",
+            "rank": 29,
+            "batch": 1,
+            "vi": "cỏ"
+        },
+        {
+            "zh": "沙",
+            "pinyin": "sha1",
+            "rank": 30,
+            "batch": 1,
+            "vi": "hạt"
+        },
+        {
+            "zh": "谷",
+            "pinyin": "gu3",
+            "rank": 31,
+            "batch": 1,
+            "vi": "ngũ cốc"
+        },
+        {
+            "zh": "田",
+            "pinyin": "tian2",
+            "rank": 32,
+            "batch": 1,
+            "vi": "cánh đồng"
+        },
+        {
+            "zh": "雾",
+            "pinyin": "wu4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "sương mù"
+        },
+        {
+            "zh": "云",
+            "pinyin": "yun2",
+            "rank": 34,
+            "batch": 1,
+            "vi": "(văn cổ) nói"
+        },
+        {
+            "zh": "岩",
+            "pinyin": "yan2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "vách đá"
+        },
+        {
+            "zh": "阳",
+            "pinyin": "yang2",
+            "rank": 36,
+            "batch": 1,
+            "vi": "dương"
+        },
+        {
+            "zh": "洋",
+            "pinyin": "yang2",
+            "rank": 37,
+            "batch": 1,
+            "vi": "đại dương"
+        },
+        {
+            "zh": "泉",
+            "pinyin": "quan2",
+            "rank": 38,
+            "batch": 1,
+            "vi": "suối"
+        }
+    ]
+}

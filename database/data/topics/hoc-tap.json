@@ -1,0 +1,367 @@
+{
+    "slug": "hoc-tap",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:50:41+07:00",
+    "words": [
+        {
+            "zh": "说",
+            "pinyin": "shuo1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "nói; trò chuyện; nói ra",
+            "rejected": [
+                {
+                    "pinyin": "shui4",
+                    "vi": "thuyết phục"
+                }
+            ]
+        },
+        {
+            "zh": "知道",
+            "pinyin": "zhi1 dao4",
+            "rank": 2,
+            "batch": 1,
+            "vi": "biết; nhận thức được"
+        },
+        {
+            "zh": "听",
+            "pinyin": "ting1",
+            "rank": 3,
+            "batch": 1,
+            "vi": "nghe",
+            "rejected": [
+                {
+                    "pinyin": "yin3",
+                    "vi": "cười"
+                }
+            ]
+        },
+        {
+            "zh": "问题",
+            "pinyin": "wen4 ti2",
+            "rank": 4,
+            "batch": 1,
+            "vi": "câu hỏi"
+        },
+        {
+            "zh": "写",
+            "pinyin": "xie3",
+            "rank": 5,
+            "batch": 1,
+            "vi": "viết"
+        },
+        {
+            "zh": "难",
+            "pinyin": "nan2",
+            "rank": 6,
+            "batch": 1,
+            "vi": "khó",
+            "rejected": [
+                {
+                    "pinyin": "nan4",
+                    "vi": "thảm họa"
+                }
+            ]
+        },
+        {
+            "zh": "学校",
+            "pinyin": "xue2 xiao4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "trường học"
+        },
+        {
+            "zh": "书",
+            "pinyin": "shu1",
+            "rank": 8,
+            "batch": 1,
+            "vi": "sách"
+        },
+        {
+            "zh": "懂",
+            "pinyin": "dong3",
+            "rank": 9,
+            "batch": 1,
+            "vi": "hiểu"
+        },
+        {
+            "zh": "容易",
+            "pinyin": "rong2 yi4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "dễ dàng; đơn giản"
+        },
+        {
+            "zh": "读",
+            "pinyin": "du2",
+            "rank": 11,
+            "batch": 1,
+            "vi": "đọc ra; đọc to",
+            "rejected": [
+                {
+                    "pinyin": "dou4",
+                    "vi": "dấu phẩy"
+                }
+            ]
+        },
+        {
+            "zh": "大学",
+            "pinyin": "da4 xue2",
+            "rank": 12,
+            "batch": 1,
+            "vi": "trường đại học"
+        },
+        {
+            "zh": "老师",
+            "pinyin": "lao3 shi1",
+            "rank": 13,
+            "batch": 1,
+            "vi": "giáo viên"
+        },
+        {
+            "zh": "笔",
+            "pinyin": "bi3",
+            "rank": 14,
+            "batch": 1,
+            "vi": "bút"
+        },
+        {
+            "zh": "研究",
+            "pinyin": "yan2 jiu1",
+            "rank": 15,
+            "batch": 2,
+            "vi": "nghiên cứu"
+        },
+        {
+            "zh": "学生",
+            "pinyin": "xue2 sheng5",
+            "rank": 16,
+            "batch": 1,
+            "vi": "học sinh"
+        },
+        {
+            "zh": "答案",
+            "pinyin": "da2 an4",
+            "rank": 17,
+            "batch": 1,
+            "vi": "câu trả lời"
+        },
+        {
+            "zh": "学习",
+            "pinyin": "xue2 xi2",
+            "rank": 18,
+            "batch": 1,
+            "vi": "học"
+        },
+        {
+            "zh": "课",
+            "pinyin": "ke4",
+            "rank": 19,
+            "batch": 1,
+            "vi": "môn học"
+        },
+        {
+            "zh": "毕业",
+            "pinyin": "bi4 ye4",
+            "rank": 20,
+            "batch": 1,
+            "vi": "tốt nghiệp"
+        },
+        {
+            "zh": "练习",
+            "pinyin": "lian4 xi2",
+            "rank": 21,
+            "batch": 1,
+            "vi": "luyện tập"
+        },
+        {
+            "zh": "专业",
+            "pinyin": "zhuan1 ye4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "chuyên môn"
+        },
+        {
+            "zh": "重点",
+            "pinyin": "zhong4 dian3",
+            "rank": 23,
+            "batch": 1,
+            "vi": "điểm quan trọng; điểm chính; trọng tâm",
+            "rejected": [
+                {
+                    "pinyin": "chong2 dian3",
+                    "vi": "kể lại"
+                }
+            ]
+        },
+        {
+            "zh": "教育",
+            "pinyin": "jiao4 yu4",
+            "rank": 24,
+            "batch": 1,
+            "vi": "giáo dục"
+        },
+        {
+            "zh": "考试",
+            "pinyin": "kao3 shi4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "dự thi"
+        },
+        {
+            "zh": "水平",
+            "pinyin": "shui3 ping2",
+            "rank": 26,
+            "batch": 1,
+            "vi": "mức độ"
+        },
+        {
+            "zh": "作业",
+            "pinyin": "zuo4 ye4",
+            "rank": 27,
+            "batch": 1,
+            "vi": "bài tập về nhà"
+        },
+        {
+            "zh": "成绩",
+            "pinyin": "cheng2 ji4",
+            "rank": 28,
+            "batch": 1,
+            "vi": "thành tích"
+        },
+        {
+            "zh": "图书馆",
+            "pinyin": "tu2 shu1 guan3",
+            "rank": 29,
+            "batch": 1,
+            "vi": "thư viện"
+        },
+        {
+            "zh": "进步",
+            "pinyin": "jin4 bu4",
+            "rank": 30,
+            "batch": 1,
+            "vi": "tiến bộ; cải thiện"
+        },
+        {
+            "zh": "论文",
+            "pinyin": "lun4 wen2",
+            "rank": 31,
+            "batch": 2,
+            "vi": "bài báo"
+        },
+        {
+            "zh": "教室",
+            "pinyin": "jiao4 shi4",
+            "rank": 32,
+            "batch": 1,
+            "vi": "phòng học"
+        },
+        {
+            "zh": "辅导",
+            "pinyin": "fu3 dao3",
+            "rank": 33,
+            "batch": 2,
+            "vi": "hướng dẫn"
+        },
+        {
+            "zh": "课堂",
+            "pinyin": "ke4 tang2",
+            "rank": 34,
+            "batch": 1,
+            "vi": "lớp học"
+        },
+        {
+            "zh": "复习",
+            "pinyin": "fu4 xi2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "xem lại"
+        },
+        {
+            "zh": "请假",
+            "pinyin": "qing3 jia4",
+            "rank": 36,
+            "batch": 2,
+            "vi": "xin nghỉ phép"
+        },
+        {
+            "zh": "缺席",
+            "pinyin": "que1 xi2",
+            "rank": 37,
+            "batch": 2,
+            "vi": "vắng mặt"
+        },
+        {
+            "zh": "本子",
+            "pinyin": "ben3 zi5",
+            "rank": 38,
+            "batch": 1,
+            "vi": "sách"
+        },
+        {
+            "zh": "黑板",
+            "pinyin": "hei1 ban3",
+            "rank": 39,
+            "batch": 1,
+            "vi": "bảng đen"
+        },
+        {
+            "zh": "语法",
+            "pinyin": "yu3 fa3",
+            "rank": 40,
+            "batch": 2,
+            "vi": "ngữ pháp"
+        },
+        {
+            "zh": "词典",
+            "pinyin": "ci2 dian3",
+            "rank": 41,
+            "batch": 1,
+            "vi": "từ điển"
+        },
+        {
+            "zh": "汉语",
+            "pinyin": "Han4 yu3",
+            "rank": 42,
+            "batch": 1,
+            "vi": "Ngôn ngữ tiếng Trung"
+        },
+        {
+            "zh": "留学",
+            "pinyin": "liu2 xue2",
+            "rank": 43,
+            "batch": 1,
+            "vi": "du học"
+        },
+        {
+            "zh": "笔画",
+            "pinyin": "bi3 hua4",
+            "rank": 44,
+            "batch": 2,
+            "vi": "nét của chữ Hán"
+        },
+        {
+            "zh": "预习",
+            "pinyin": "yu4 xi2",
+            "rank": 45,
+            "batch": 1,
+            "vi": "chuẩn bị bài"
+        },
+        {
+            "zh": "课文",
+            "pinyin": "ke4 wen2",
+            "rank": 46,
+            "batch": 2,
+            "vi": "bài đọc"
+        },
+        {
+            "zh": "生词",
+            "pinyin": "sheng1 ci2",
+            "rank": 47,
+            "batch": 2,
+            "vi": "từ mới"
+        }
+    ]
+}

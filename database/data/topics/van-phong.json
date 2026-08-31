@@ -1,0 +1,287 @@
+{
+    "slug": "van-phong",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:50:23+07:00",
+    "words": [
+        {
+            "zh": "工作",
+            "pinyin": "gong1 zuo4",
+            "rank": 1,
+            "batch": 1,
+            "vi": "làm việc"
+        },
+        {
+            "zh": "电话",
+            "pinyin": "dian4 hua4",
+            "rank": 2,
+            "batch": 1,
+            "vi": "điện thoại"
+        },
+        {
+            "zh": "公司",
+            "pinyin": "gong1 si1",
+            "rank": 3,
+            "batch": 1,
+            "vi": "công ty; hãng; tập đoàn"
+        },
+        {
+            "zh": "计划",
+            "pinyin": "ji4 hua4",
+            "rank": 4,
+            "batch": 1,
+            "vi": "kế hoạch"
+        },
+        {
+            "zh": "办公室",
+            "pinyin": "ban4 gong1 shi4",
+            "rank": 5,
+            "batch": 1,
+            "vi": "văn phòng"
+        },
+        {
+            "zh": "任务",
+            "pinyin": "ren4 wu5",
+            "rank": 6,
+            "batch": 1,
+            "vi": "nhiệm vụ; công việc; bổn phận; vai trò"
+        },
+        {
+            "zh": "报告",
+            "pinyin": "bao4 gao4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "thông báo"
+        },
+        {
+            "zh": "手机",
+            "pinyin": "shou3 ji1",
+            "rank": 8,
+            "batch": 1,
+            "vi": "điện thoại di động"
+        },
+        {
+            "zh": "老板",
+            "pinyin": "lao3 ban3",
+            "rank": 9,
+            "batch": 1,
+            "vi": "sếp",
+            "rejected": [
+                {
+                    "pinyin": "Lao3 ban3",
+                    "vi": "Robam"
+                }
+            ]
+        },
+        {
+            "zh": "笔",
+            "pinyin": "bi3",
+            "rank": 10,
+            "batch": 1,
+            "vi": "bút"
+        },
+        {
+            "zh": "电脑",
+            "pinyin": "dian4 nao3",
+            "rank": 11,
+            "batch": 1,
+            "vi": "máy tính"
+        },
+        {
+            "zh": "文件",
+            "pinyin": "wen2 jian4",
+            "rank": 12,
+            "batch": 1,
+            "vi": "tài liệu"
+        },
+        {
+            "zh": "会议",
+            "pinyin": "hui4 yi4",
+            "rank": 13,
+            "batch": 1,
+            "vi": "cuộc họp"
+        },
+        {
+            "zh": "项目",
+            "pinyin": "xiang4 mu4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "mục"
+        },
+        {
+            "zh": "经理",
+            "pinyin": "jing1 li3",
+            "rank": 15,
+            "batch": 1,
+            "vi": "quản lý"
+        },
+        {
+            "zh": "部门",
+            "pinyin": "bu4 men2",
+            "rank": 16,
+            "batch": 1,
+            "vi": "phòng"
+        },
+        {
+            "zh": "纸",
+            "pinyin": "zhi3",
+            "rank": 17,
+            "batch": 1,
+            "vi": "giấy"
+        },
+        {
+            "zh": "同事",
+            "pinyin": "tong2 shi4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "đồng nghiệp; cộng sự"
+        },
+        {
+            "zh": "邮件",
+            "pinyin": "you2 jian4",
+            "rank": 19,
+            "batch": 1,
+            "vi": "thư từ"
+        },
+        {
+            "zh": "椅子",
+            "pinyin": "yi3 zi5",
+            "rank": 20,
+            "batch": 1,
+            "vi": "ghế"
+        },
+        {
+            "zh": "员工",
+            "pinyin": "yuan2 gong1",
+            "rank": 21,
+            "batch": 1,
+            "vi": "nhân viên; nhân sự; nhân công"
+        },
+        {
+            "zh": "合同",
+            "pinyin": "he2 tong5",
+            "rank": 22,
+            "batch": 1,
+            "vi": "(kinh doanh) hợp đồng"
+        },
+        {
+            "zh": "面试",
+            "pinyin": "mian4 shi4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "được phỏng vấn"
+        },
+        {
+            "zh": "工资",
+            "pinyin": "gong1 zi1",
+            "rank": 24,
+            "batch": 1,
+            "vi": "tiền lương; lương"
+        },
+        {
+            "zh": "奖金",
+            "pinyin": "jiang3 jin1",
+            "rank": 25,
+            "batch": 1,
+            "vi": "tiền thưởng"
+        },
+        {
+            "zh": "秘书",
+            "pinyin": "mi4 shu1",
+            "rank": 26,
+            "batch": 1,
+            "vi": "thư ký"
+        },
+        {
+            "zh": "表格",
+            "pinyin": "biao3 ge2",
+            "rank": 27,
+            "batch": 1,
+            "vi": "biểu mẫu"
+        },
+        {
+            "zh": "简历",
+            "pinyin": "jian3 li4",
+            "rank": 28,
+            "batch": 1,
+            "vi": "sơ yếu lý lịch"
+        },
+        {
+            "zh": "出差",
+            "pinyin": "chu1 chai1",
+            "rank": 29,
+            "batch": 1,
+            "vi": "đi công tác hoặc chuyến đi kinh doanh"
+        },
+        {
+            "zh": "加班",
+            "pinyin": "jia1 ban1",
+            "rank": 30,
+            "batch": 1,
+            "vi": "làm thêm giờ"
+        },
+        {
+            "zh": "进度",
+            "pinyin": "jin4 du4",
+            "rank": 31,
+            "batch": 1,
+            "vi": "tốc độ tiến triển"
+        },
+        {
+            "zh": "效率",
+            "pinyin": "xiao4 lu:4",
+            "rank": 32,
+            "batch": 1,
+            "vi": "hiệu suất"
+        },
+        {
+            "zh": "请假",
+            "pinyin": "qing3 jia4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "xin nghỉ phép"
+        },
+        {
+            "zh": "键盘",
+            "pinyin": "jian4 pan2",
+            "rank": 34,
+            "batch": 1,
+            "vi": "bàn phím"
+        },
+        {
+            "zh": "复印机",
+            "pinyin": "fu4 yin4 ji1",
+            "rank": 35,
+            "batch": 1,
+            "vi": "máy photocopy"
+        },
+        {
+            "zh": "打印机",
+            "pinyin": "da3 yin4 ji1",
+            "rank": 36,
+            "batch": 1,
+            "vi": "máy in"
+        },
+        {
+            "zh": "老板娘",
+            "pinyin": "lao3 ban3 niang2",
+            "rank": 37,
+            "batch": 1,
+            "vi": "bà chủ"
+        },
+        {
+            "zh": "加班费",
+            "pinyin": "jia1 ban1 fei4",
+            "rank": 38,
+            "batch": 1,
+            "vi": "tiền lương làm thêm giờ"
+        },
+        {
+            "zh": "鼠标",
+            "pinyin": "shu3 biao1",
+            "rank": 39,
+            "batch": 1,
+            "vi": "chuột"
+        }
+    ]
+}
