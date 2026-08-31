@@ -248,6 +248,20 @@ truy vấn đó. Thứ khiến nó chịu được là nội dung KHÔNG do ngư
 trả chữ Hán, và `SearchInterpreter::resolve()` loại mọi chữ không có trong
 `dictionary_words`. Không có đường bơm chữ tuỳ ý vào kết quả của người khác.
 
+**`Cache-Control` đi theo mức chung kết của câu trả lời**, và đây là chỗ đã từng
+sai đúng một lần:
+
+| nhánh | header | vì sao |
+|---|---|---|
+| AI hỏng | `no-store` | sự cố 30 giây không được đóng băng thành 24 giờ kết quả kém |
+| `source: ai` | `public, max-age=86400` | diễn giải cache vĩnh viễn phía DB, không đổi nữa |
+| `source: sql` | `public, max-age=300` | một lượt bấm refine đổi câu trả lời này bất cứ lúc nào |
+
+Trước khi có nút refine, cả ba nhánh dùng 24 giờ vì "dữ liệu từ điển tĩnh hoàn
+toàn". Cái nút giết tiền đề đó: giữ 24 giờ cho nhánh `sql` khiến chính người vừa
+bấm nút tra lại vẫn nhận bản cũ từ cache trình duyệt — không hỏi server lấy một
+lần — và tính năng trông như không chạy.
+
 Hai điều đi kèm, đừng bỏ quên khi sửa lớp này:
 
 - Trúng cache kéo theo `UPDATE hit_count`, nên `/search` vẫn là đường GHI và

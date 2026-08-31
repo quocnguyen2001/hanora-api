@@ -15,15 +15,33 @@ use Illuminate\Http\JsonResponse;
 final class DictionarySearchController
 {
     /**
-     * Cache dài được vì dữ liệu từ điển hoàn toàn tĩnh sau V1 — không còn trạng
-     * thái dịch thay đổi theo thời gian. `public` an toàn vì response KHÔNG
-     * chứa trường nào theo user.
+     * Câu trả lời của AI là CHUNG KẾT nên cache dài được.
+     *
+     * Diễn giải được cache vĩnh viễn theo `(truy vấn, mode)` phía DB, nên tra
+     * lại — kể cả bấm refine lại — cho ra đúng danh sách này. Không có gì đợi
+     * để thay đổi nữa.
+     *
+     * `public` an toàn vì response KHÔNG chứa trường nào theo user.
      *
      * `mode` nằm trong query string nên mỗi mode có entry cache riêng — đúng,
      * vì `?q=xin chào&mode=vi` và `&mode=cn` là hai kết quả khác nhau thật.
-     * Đổi lại, một truy vấn tra ở cả hai mode chiếm gấp đôi chỗ cache.
      */
-    private const CACHE_SECONDS = 60 * 60 * 24;
+    private const CACHE_SECONDS_AI = 60 * 60 * 24;
+
+    /**
+     * Kết quả SQL thuần thì KHÔNG chung kết, và đây là chỗ đã từng sai.
+     *
+     * Trước khi có nút "Tìm lại bằng AI", cache 24 giờ đúng vì dữ liệu từ điển
+     * tĩnh hoàn toàn. Cái nút đó giết tiền đề ấy: bất kỳ ai bấm nó cũng đổi câu
+     * trả lời của truy vấn đó kể từ lúc ấy. Giữ nguyên 24 giờ nghĩa là người vừa
+     * bấm nút tra lại vẫn thấy y hệt kết quả cũ — trình duyệt phục vụ từ cache
+     * mà không thèm hỏi server, và tính năng trông như hỏng.
+     *
+     * 5 phút: đủ để hấp thụ nhịp gõ và tra lặp trong một phiên, đủ ngắn để một
+     * lượt refine lan ra mà không ai kịp gọi nó là lỗi. Đường SQL vốn ~9ms nên
+     * cái giá của việc bỏ cache dài ở đây là nhỏ.
+     */
+    private const CACHE_SECONDS_SQL = 60 * 5;
 
     public function __invoke(
         DictionarySearchRequest $request,
@@ -136,10 +154,20 @@ final class DictionarySearchController
         ])->header(
             'Cache-Control',
             /*
-             * Một sự cố Gemini 30 giây KHÔNG được phép bị CDN đóng băng thành 24
-             * giờ kết quả kém. Nhánh hỏng luôn `no-store`.
+             * Ba nhánh, và độ dài cache đi theo mức CHUNG KẾT của câu trả lời:
+             *
+             * - hỏng   → `no-store`. Một sự cố Gemini 30 giây không được phép bị
+             *            CDN đóng băng thành 24 giờ kết quả kém.
+             * - `ai`   → 24 giờ. Diễn giải cache vĩnh viễn phía DB, không đổi nữa.
+             * - `sql`  → 5 phút. Một lượt bấm "Tìm lại bằng AI" đổi câu trả lời
+             *            này bất cứ lúc nào; cache dài ở đây khiến chính người
+             *            vừa bấm nút tra lại vẫn thấy kết quả cũ.
              */
-            $aiFailed ? 'no-store' : 'public, max-age='.self::CACHE_SECONDS,
+            match (true) {
+                $aiFailed => 'no-store',
+                $source === 'ai' => 'public, max-age='.self::CACHE_SECONDS_AI,
+                default => 'public, max-age='.self::CACHE_SECONDS_SQL,
+            },
         );
     }
 }

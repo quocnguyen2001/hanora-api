@@ -113,11 +113,16 @@ describe('Gemini hỏng thì rơi về SQL, không bao giờ 5xx', function (): 
             ->assertHeader('Cache-Control', 'max-age=86400, public');
     });
 
-    it('vẫn cache dài khi không đụng tới AI', function (): void {
+    it('cache NGẮN khi kết quả mới chỉ là SQL', function (): void {
+        /*
+         * Không chung kết: một lượt bấm "Tìm lại bằng AI" đổi câu trả lời này
+         * bất cứ lúc nào. Cache 24 giờ ở đây khiến chính người vừa bấm nút tra
+         * lại vẫn nhận bản cũ từ trình duyệt, không hỏi server lấy một lần.
+         */
         Http::fake();
 
         searchApi('学习', null)->assertOk()
-            ->assertHeader('Cache-Control', 'max-age=86400, public');
+            ->assertHeader('Cache-Control', 'max-age=300, public');
     });
 });
 
@@ -163,17 +168,20 @@ describe('không cấu hình key thì lớp AI tắt êm', function (): void {
         Http::assertNothingSent();
     });
 
-    it('vẫn cache dài — thiếu key không phải sự cố', function (): void {
+    it('vẫn cache được — thiếu key không phải sự cố', function (): void {
         /*
          * Chốt chặn cho một lỗi thật đã sửa: gộp "thiếu key" vào nhánh "AI hỏng"
          * khiến mọi `/search` của một cài đặt không key thành `no-store`, tức
          * trả giá cache cho một tính năng thậm chí chưa bật.
+         *
+         * Bất biến là KHÔNG `no-store`, không phải một con số cụ thể — thiếu key
+         * cho ra `source: 'sql'`, nên nó đi theo trần ngắn của nhánh đó.
          */
         config(['services.gemini.key' => '']);
         Http::fake();
 
         searchApi('học')->assertOk()
-            ->assertHeader('Cache-Control', 'max-age=86400, public');
+            ->assertHeader('Cache-Control', 'max-age=300, public');
     });
 });
 

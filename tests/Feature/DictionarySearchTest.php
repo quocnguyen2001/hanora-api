@@ -139,6 +139,17 @@ describe('response không chứa dữ liệu theo user — red team C2', functio
     });
 
     it('đặt Cache-Control public vì response không theo user', function (): void {
-        search('学习')->assertOk()->assertHeader('Cache-Control', 'max-age=86400, public');
+        /*
+         * Bất biến ở ĐÂY là `public`: response không mang trường nào theo user
+         * nên chia sẻ được ở cache dùng chung.
+         *
+         * KHÔNG khoá con số TTL. Độ dài cache đi theo mức chung kết của câu trả
+         * lời (`sql` ngắn, `ai` dài) và đã có test riêng ở `SearchAiLayerTest`;
+         * khoá lại con số ở đây chỉ tạo thêm một chỗ phải sửa khi chỉnh TTL, cho
+         * một bất biến mà bài test này không nói về.
+         */
+        $header = search('学习')->assertOk()->headers->get('Cache-Control');
+
+        expect($header)->toContain('public')->not->toContain('no-store');
     });
 });

@@ -73,6 +73,18 @@ describe('SQL mạnh vẫn dùng diễn giải đã có', function (): void {
         searchApi('学习', null)->assertOk()->assertJsonPath('translation.zh', '我要学习');
     });
 
+    it('cache HTTP dài vì câu trả lời đã chung kết', function (): void {
+        /*
+         * Ngược với nhánh `sql` (5 phút): diễn giải cache vĩnh viễn phía DB nên
+         * response này không còn gì đợi để thay đổi.
+         */
+        Http::fake();
+        cacheRow('学习', 'auto', ['学生']);
+
+        searchApi('学习', null)->assertOk()
+            ->assertHeader('Cache-Control', 'max-age=86400, public');
+    });
+
     it('không đọc cache ở trang 2', function (): void {
         Http::fake();
         cacheRow('学习', 'auto', ['学生']);
