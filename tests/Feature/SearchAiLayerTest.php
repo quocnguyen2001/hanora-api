@@ -3,53 +3,14 @@
 declare(strict_types=1);
 
 use App\Models\DictionaryWord;
-use App\Models\User;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Testing\TestResponse;
 
+// `seedSearchFixtures`, `aiReturns` và `searchApi` nằm ở `tests/Pest.php`:
+// `SearchRefineTest` dùng chung, và hai file phải dựng corpus bằng cùng một tay.
 beforeEach(function (): void {
-    Artisan::call('dictionary:import', [
-        '--path' => base_path('tests/Fixtures/cedict-sample.u8'),
-        '--hsk' => base_path('tests/Fixtures/hsk-sample.json'),
-        '--frequency' => base_path('tests/Fixtures/subtlex-sample.json'),
-    ]);
-    Artisan::call('han-viet:import', [
-        '--unihan' => base_path('tests/Fixtures/unihan-sample.txt'),
-        '--supplement' => base_path('tests/Fixtures/hanviet-supplement-sample.csv'),
-    ]);
-
-    config(['services.gemini.key' => 'test-key', 'services.gemini.model' => 'gemini-3.1-flash-lite']);
-    $this->user = User::factory()->create();
+    seedSearchFixtures();
 });
-
-function aiReturns(array $words, ?array $translation = null): void
-{
-    $payload = ['words' => $words];
-
-    if ($translation !== null) {
-        $payload['translation'] = $translation;
-    }
-
-    Http::fake(['*' => Http::response([
-        'usage' => ['total_input_tokens' => 40, 'total_output_tokens' => 20],
-        'steps' => [
-            ['type' => 'thought', 'signature' => 'x'],
-            ['type' => 'model_output', 'content' => [
-                ['type' => 'text', 'text' => json_encode($payload)],
-            ]],
-        ],
-    ])]);
-}
-
-function searchApi(string $q, ?string $mode = 'vi', int $page = 1): TestResponse
-{
-    $query = array_filter(['q' => $q, 'mode' => $mode, 'page' => $page]);
-
-    return test()->actingAs(test()->user, 'sanctum')
-        ->getJson('/api/dictionary/search?'.http_build_query($query));
-}
 
 describe('không gọi AI khi SQL đã có bằng chứng mạnh', function (): void {
     it('bỏ qua AI với truy vấn chữ Hán', function (): void {

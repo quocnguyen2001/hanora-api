@@ -54,11 +54,29 @@ final class DictionarySearchController
         $translation = null;
 
         /*
+         * `refine=ai` là đường vòng THỦ CÔNG quanh `SearchWeakness`, không phải
+         * một ngưỡng mới.
+         *
+         * Cổng tự động chỉ hỏi AI khi SQL trông yếu, nên ca "SQL tự tin nhưng
+         * sai" — `rank ≤ 4`, hoặc `rank 6` khớp gloss chính xác — không bao giờ
+         * tới được AI. Theo đúng thứ `SearchWeakness` đã đo, KHÔNG có tín hiệu
+         * cấu trúc nào nhận ra ca đó; người dùng là tín hiệu duy nhất. Nút báo
+         * kết quả sai chính là đường đưa tín hiệu đó vào.
+         *
+         * Cổng tự động giữ nguyên: nó vẫn quyết cho mọi truy vấn không có ai bấm
+         * nút phía sau.
+         */
+        $forced = $request->wantsAiRefine();
+
+        /*
          * Chỉ trang 1. Xếp hạng của AI là khái niệm của trang đầu — nó trả tối
          * đa 10 từ, không có gì để đóng góp cho trang 3, và trả tiền cho mỗi
          * trang là trả tiền cho cùng một câu trả lời nhiều lần.
+         *
+         * Điều đó đúng cả với `refine`: bấm nút ở trang 3 vẫn không có gì để AI
+         * đóng góp, nên `$page === 1` đứng ngoài chứ không nằm trong ngoặc.
          */
-        if ($page === 1 && SearchWeakness::isWeak($top->rank ?? null, $top->precision ?? null, $results->total())) {
+        if ($page === 1 && ($forced || SearchWeakness::isWeak($top->rank ?? null, $top->precision ?? null, $results->total()))) {
             $interpretation = $interpreter->interpret($request->searchTerm(), $request->mode() ?? 'auto');
 
             if ($interpretation->failed) {

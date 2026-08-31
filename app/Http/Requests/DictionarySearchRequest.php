@@ -36,6 +36,16 @@ final class DictionarySearchRequest extends FormRequest
              * gõ nhầm mà vẫn trả 200 thì client không bao giờ biết mình sai.
              */
             'mode' => ['nullable', Rule::in([WordSearchService::MODE_VI, WordSearchService::MODE_CN])],
+
+            /*
+             * `refine=ai` — người dùng nói kết quả không chuẩn và xin hỏi AI.
+             *
+             * Chuỗi trong `Rule::in`, KHÔNG phải boolean, vì đúng hai lý do mà
+             * `mode` ngay trên đã có: giá trị gõ nhầm phải 422 chứ không im lặng
+             * rơi về mặc định, và một chuỗi để ngỏ đường thêm chiến lược refine
+             * khác sau này mà không phá hợp đồng.
+             */
+            'refine' => ['nullable', Rule::in(['ai'])],
         ];
     }
 
@@ -74,5 +84,16 @@ final class DictionarySearchRequest extends FormRequest
         $mode = $this->validated('mode');
 
         return $mode === null ? null : (string) $mode;
+    }
+
+    /**
+     * Người dùng chủ động xin hỏi AI, kể cả khi SQL trông mạnh.
+     *
+     * Đọc qua `validated()`, KHÔNG qua `input()`: giá trị chưa đi qua validation
+     * không được phép mở đường tới một lời gọi tính tiền.
+     */
+    public function wantsAiRefine(): bool
+    {
+        return $this->validated('refine') === 'ai';
     }
 }

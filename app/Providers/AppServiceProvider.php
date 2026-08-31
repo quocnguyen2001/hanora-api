@@ -151,6 +151,27 @@ class AppServiceProvider extends ServiceProvider
             'handwriting',
             fn (Request $request) => Limit::perMinute(60)->by((string) $request->user()?->id),
         );
+
+        /*
+         * Lượt "tìm lại bằng AI" — bề mặt thứ hai, sau `topic-create`, mà người
+         * dùng cuối ép được một khoản chi Gemini.
+         *
+         * `Limit::none()` khi KHÔNG có `refine` là bắt buộc, không phải phòng xa:
+         * limiter này gắn lên chính `/search`, nên nó nhìn thấy cả những lượt tra
+         * bình thường. Thiếu nhánh đó thì gõ nhanh vài chục nhịp là mất luôn ô
+         * tìm kiếm trong một giờ — hỏng nặng hơn hẳn thứ nó định chặn.
+         *
+         * 20/giờ suy từ `topic-create` (5/giờ, mỗi request 2-3 lời gọi trong hàng
+         * đợi); refine nhẹ hơn — tối đa MỘT lời gọi ~3,3s, và trúng cache diễn
+         * giải thì không tốn gì. Trần đếm cả lượt trúng cache, nên đây là van an
+         * toàn chứ không phải hạn mức chi tiêu chính xác.
+         */
+        RateLimiter::for(
+            'search-refine',
+            fn (Request $request) => $request->input('refine') === 'ai'
+                ? Limit::perHour(20)->by((string) $request->user()?->id)
+                : Limit::none(),
+        );
     }
 
     /**

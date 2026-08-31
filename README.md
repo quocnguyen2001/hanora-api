@@ -218,6 +218,29 @@ Ba tính chất bắt buộc, mỗi cái có test khóa lại:
 `tests/Unit/SearchWeaknessTest.php` — **đó là số đo, không phải ví dụ**. Đổi luật
 thì đo lại, đừng sửa kỳ vọng cho khớp luật mới.
 
+#### `refine=ai` — người dùng ép hỏi AI
+
+Tính chất số 2 ở trên có mặt trái: khi SQL trông mạnh mà SAI, AI không bao giờ
+được hỏi. Theo đúng thứ `SearchWeakness` đã đo, KHÔNG có tín hiệu cấu trúc nào
+nhận ra ca đó — người dùng là tín hiệu duy nhất.
+
+`GET /api/dictionary/search?q=…&refine=ai` bỏ qua cổng `SearchWeakness` và luôn
+gọi lớp diễn giải. Đây là đường vòng THỦ CÔNG, không phải một ngưỡng mới: cổng tự
+động giữ nguyên cho mọi truy vấn không có ai bấm nút phía sau.
+
+- `refine` chỉ nhận `ai`; giá trị khác trả 422, cùng luật với `mode`.
+- Chỉ trang 1 — bấm nút ở trang 3 vẫn không cho AI thứ gì để đóng góp.
+- Trần `throttle:search-refine` = **20/giờ theo user**. Limiter tự trả
+  `Limit::none()` cho request KHÔNG mang `refine`, nên tra từ bình thường không
+  bị nó đụng tới dù middleware nằm trên cùng một route.
+- Cache diễn giải dùng chung với đường tự động, nên bấm lại một truy vấn đã hỏi
+  là lượt trúng cache, không tốn lời gọi nào.
+
+Lưu ý đã biết: cache diễn giải KHÔNG được đường tra thường đọc. Sau khi ai đó
+refine `bác sĩ`, lần tra sau vẫn trả kết quả SQL. Sửa được bằng một `SELECT` —
+nhưng nó khiến một lượt bấm của một người đổi kết quả của mọi người, nên đó là
+một quyết định sản phẩm riêng.
+
 ### Làm giàu mục từ — đang chạy
 
 `GET /api/dictionary/words/{word}/enrichment` trả nghĩa theo từ loại, ví dụ song

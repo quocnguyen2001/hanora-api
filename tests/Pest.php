@@ -10,7 +10,10 @@ use App\Services\Review\AnswerGrader;
 use App\Services\Streak\StreakService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)
@@ -97,6 +100,68 @@ function finishedSessionOn(User $user, CarbonImmutable $day, int $logs = 1): Rev
 function streak(): StreakService
 {
     return app(StreakService::class);
+}
+
+/*
+ * Helper của lớp search AI, đặt ở đây vì HAI file test dùng chung
+ * (`SearchAiLayerTest` và `SearchRefineTest`) — cùng lý do các helper chuỗi ngày
+ * ở trên đã nêu. Hai file đó phải dựng cùng một corpus và giả lập Gemini bằng
+ * cùng một tay, nếu không thì "AI có được gọi không" ở hai bên không so được.
+ */
+
+/** Corpus mẫu + khoá Gemini giả + user đã đăng nhập, dùng trong `beforeEach`. */
+function seedSearchFixtures(): void
+{
+    Artisan::call('dictionary:import', [
+        '--path' => base_path('tests/Fixtures/cedict-sample.u8'),
+        '--hsk' => base_path('tests/Fixtures/hsk-sample.json'),
+        '--frequency' => base_path('tests/Fixtures/subtlex-sample.json'),
+    ]);
+    Artisan::call('han-viet:import', [
+        '--unihan' => base_path('tests/Fixtures/unihan-sample.txt'),
+        '--supplement' => base_path('tests/Fixtures/hanviet-supplement-sample.csv'),
+    ]);
+
+    config(['services.gemini.key' => 'test-key', 'services.gemini.model' => 'gemini-3.1-flash-lite']);
+    test()->user = User::factory()->create();
+}
+
+/**
+ * Giả lập một phản hồi Gemini thành công.
+ *
+ * @param  list<string>  $words
+ * @param  array{zh: string, pinyin: string, vi: string}|null  $translation
+ */
+function aiReturns(array $words, ?array $translation = null): void
+{
+    $payload = ['words' => $words];
+
+    if ($translation !== null) {
+        $payload['translation'] = $translation;
+    }
+
+    Http::fake(['*' => Http::response([
+        'usage' => ['total_input_tokens' => 40, 'total_output_tokens' => 20],
+        'steps' => [
+            ['type' => 'thought', 'signature' => 'x'],
+            ['type' => 'model_output', 'content' => [
+                ['type' => 'text', 'text' => json_encode($payload)],
+            ]],
+        ],
+    ])]);
+}
+
+/**
+ * `null` tự rụng khỏi query string nhờ `array_filter` — `mode=` hay `refine=`
+ * rỗng sẽ trượt `Rule::in` phía API và trả 422, đúng thứ ta KHÔNG muốn test
+ * vô tình dựng lên.
+ */
+function searchApi(string $q, ?string $mode = 'vi', int $page = 1, ?string $refine = null): TestResponse
+{
+    $query = array_filter(['q' => $q, 'mode' => $mode, 'page' => $page, 'refine' => $refine]);
+
+    return test()->actingAs(test()->user, 'sanctum')
+        ->getJson('/api/dictionary/search?'.http_build_query($query));
 }
 
 /**

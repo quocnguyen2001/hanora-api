@@ -59,7 +59,14 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     // D8: từ điển cũng nằm sau auth. Không có chế độ khách.
     Route::prefix('dictionary')->name('api.dictionary.')->group(function (): void {
-        Route::get('/search', DictionarySearchController::class)->name('search');
+        /*
+         * `throttle:search-refine` chỉ đếm các request mang `refine=ai` — limiter
+         * tự trả `Limit::none()` cho phần còn lại. Tra từ bình thường vì thế
+         * KHÔNG bị trần này đụng tới, dù middleware nằm trên cùng một route.
+         */
+        Route::get('/search', DictionarySearchController::class)
+            ->middleware('throttle:search-refine')
+            ->name('search');
 
         /*
          * Chi tiết một CÂU. Khoá là chuỗi Hán trong query string, không phải id
