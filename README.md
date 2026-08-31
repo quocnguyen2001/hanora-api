@@ -347,6 +347,138 @@ Ba hàng đợi, theo thứ tự ưu tiên: `default` (mail, có người đang 
 > `.env.example`, không log. Key nào đã từng bị dán ra ngoài trình quản lý bí mật
 > thì phải rotate ở Google AI Studio trước khi deploy.
 
+## Chủ đề từ vựng
+
+Lối vào nội dung mới: người học chọn một chủ đề (tình yêu, văn phòng, thiên
+nhiên, thức ăn…) và nhận thẻ từ CHƯA có trong kho.
+
+**Khác ba lớp AI ở trên: production KHÔNG gọi Gemini.** Nội dung sinh ở máy
+maintainer, commit thành JSON, rồi nạp bằng một lệnh tất định — nên đường
+request là SQL thuần, không 202, không polling, không trạng thái `unavailable`.
+
+```
+topics:generate  ── Gemini, máy maintainer, hiếm khi chạy
+      ↓
+database/data/topics/*.json   ◄── NGƯỜI RÀ trong diff git
+      ↓
+topics:import    ── tất định, trong transaction, KHÔNG AI
+      ↓
+topics:status    ── cổng deploy, chỉ đọc
+```
+
+```bash
+docker compose exec app php artisan topics:generate --pretend        # xem trước, không ghi
+docker compose exec app php artisan topics:generate --topic=thuc-an  # một chủ đề
+docker compose exec app php artisan topics:generate --force          # ghi đè file đã có
+docker compose exec app php artisan topics:import                    # nạp vào DB
+docker compose exec app php artisan topics:status                    # gate deploy
+```
+
+### Số đo lần sinh đầu tiên (2026-08-31)
+
+16 chủ đề, **863 từ**, nạp 100%. Chi phí ~$0,06.
+
+| | |
+|---|---|
+| Chủ đề model TÔN TRỌNG danh sách loại trừ | 6 (`tinh-yeu` 114 từ, `nha-cua` 83, `mua-sam` 80, `cong-nghe` 79, `thoi-gian` 70, `hoc-tap` 47) |
+| Chủ đề model BỎ QUA danh sách loại trừ | 10 — vòng 2 trả lại **đúng 40 từ của vòng 1**, dừng ở 35-40 từ |
+
+Cổng `DUPLICATE_CEILING` phát hiện đúng và dừng thay vì ghi thêm rác. Muốn bộ từ
+sâu hơn thì xin **nhiều từ hơn trong MỘT vòng**, không phải thêm vòng — đã đo là
+thêm vòng không có tác dụng với nhóm 10 chủ đề đó.
+
+### Chữ đa âm: khoá tự nhiên phân biệt HOA/thường
+
+`frequency_rank` gán theo HÌNH CHỮ, không theo âm, nên mọi luật xếp hạng đều hoà
+với chữ đa âm và thứ tự dòng CC-CEDICT sẽ quyết định thay. Đo thật: luật "id nhỏ
+nhất" cho `东西` = "đông và tây" thay vì "đồ vật".
+
+Thêm một tầng nữa: CC-CEDICT viết hoa âm tiết của danh từ riêng, nên `美 Mei3`
+(Châu Mỹ) và `美 mei3` (đẹp) là hai mục khác nhau. So khớp pinyin bỏ qua
+hoa/thường sẽ đưa luật "id nhỏ nhất" quay lại bằng cửa sau — đo được 5 mục sai
+(`老板` → "Robam" thay vì "sếp", `波` → "Ba Lan" thay vì "sóng").
+
+Luật: khớp **chính xác cả hoa/thường** trước; khớp lỏng chỉ khi DUY NHẤT; nhiều
+hơn một thì chấm điểm bằng nghĩa; hoà thì `ambiguous` để người rà quyết.
+
+### Cổng chất lượng nghĩa
+
+Nghĩa hiển thị trên thẻ phải DỌN trước khi dùng, và phải quét **cả mảng**
+`definitions_vi` chứ không chỉ index 0 — CVDICT hay xếp một mục siêu dữ liệu lên
+đầu (`家` → `["dùng trong 傢伙…", "nhà", …]`).
+
+| Cổng | Hình chữ mất hẳn | Mất trong top-2000 |
+|---|---|---|
+| Loại thẳng khi thấy chữ Hán / mã pinyin | 195 / 8.013 | 64 |
+| **Dọn + quét cả mảng** | **62 (0,8%)** | **7** |
+
+Bảy từ còn mất là `点儿 据 以 而言 呀 啥 干吗` — hư từ, không chủ đề nào nên dạy.
+
+### Endpoint
+
+| Endpoint | Cache | Ghi chú |
+|---|---|---|
+| `GET /topics` | `private, no-store` | Mang tiến độ theo user |
+| `GET /topics/{slug}/words` | `public, max-age=300, stale-while-revalidate=86400` | Cả bộ, KHÔNG trường nào theo user |
+| `GET /topics/skips` | `private, no-store` | Hợp của từ đã bỏ qua **và** từ đã tự xoá khỏi kho |
+| `POST /topics/skips` | — | Idempotent, limiter `topic-skips` 60/phút theo user |
+
+`processed_count` là MỘT con số, không phải hai để client cộng: một từ có thể
+vừa được lưu vừa bị bỏ qua, và cộng hai bộ đếm sẽ cho tiến độ vượt 100%.
+
+### Chủ đề tự tạo — ngoại lệ DUY NHẤT của "AI không chạy ở production"
+
+`POST /topics {name}` cho người dùng tự tạo chủ đề; job sinh bộ từ bằng chính
+`TopicGenerator` mà `topics:generate` dùng.
+
+Đây là chỗ duy nhất production gọi Gemini, và nó **vẫn không nằm trong đường
+request**: endpoint tạo row `generating`, xếp job, trả `202` trong ~80ms. Sinh
+một bộ từ mất 16-25 giây (đo thật: 19 giây cho "phim ảnh" → 38 từ).
+
+**Bước rà bằng mắt được thay bằng PHẠM VI, không phải bị bỏ.** Chủ đề tự tạo có
+`topics.user_id` và CHỈ người tạo thấy — nội dung chưa ai duyệt không bao giờ
+được dạy cho người khác. Hai lớp bảo vệ còn lại vẫn nguyên: corpus là trọng tài
+(từ phải có thật, có Hán-Việt, qua `TopicGloss`), và `topics:status` chỉ gate
+trên 16 chủ đề gốc.
+
+| | |
+|---|---|
+| Trần theo giờ | `throttle:topic-create` — 5/giờ theo user |
+| Trần theo tài khoản | `Topic::MAX_PER_USER = 20` |
+| Queue | `enrichment` — `default` là của mail đặt lại mật khẩu, ở đó có người đang chờ đăng nhập lại |
+| Job hỏng | `status=failed` + `failed_reason`; app hiện nút xoá. KHÔNG để treo ở `generating` |
+
+Hai unique index có điều kiện, không phải một:
+
+```sql
+CREATE UNIQUE INDEX ... ON topics (slug)          WHERE user_id IS NULL;
+CREATE UNIQUE INDEX ... ON topics (user_id, slug) WHERE user_id IS NOT NULL;
+```
+
+`unique(user_id, slug)` một mình KHÔNG đủ — Postgres coi mọi `NULL` là khác
+nhau nên hai chủ đề gốc trùng slug vẫn lọt.
+
+Tên trùng slug của `TopicCatalog` bị **từ chối** (422), không tự thêm hậu tố:
+`/topics/{slug}` tra theo `(user_id = tôi OR user_id IS NULL)`, nên một chủ đề
+riêng trùng slug sẽ CHE chủ đề gốc và người đó âm thầm học một bộ từ khác với
+mọi người.
+
+**Mọi truy vấn `topics` phải scope** (`Topic::visibleTo`). Đây là chỗ hỏng im
+lặng: quên một lần là bộ từ riêng của người này đọc được bởi người khác. Có test
+riêng cho cả `index` lẫn `words`.
+
+### Trần từ mới mỗi phiên ôn
+
+`ReviewSessionBuilder::dueWords()` giới hạn **30% mỗi phiên là từ mới**.
+
+`ORDER BY next_review_at ASC NULLS FIRST` không chỉ *nhận* từ mới — nó cho chúng
+quyền ưu tiên TUYỆT ĐỐI, rồi `limit()` cắt sạch từ quá hạn. Khi từ mới còn nhỏ
+giọt thì không ai thấy; từ khi màn học chủ đề đổ vào 10 từ mới một lúc, người có
+120 từ quá hạn sẽ ôn 8 phiên liên tiếp mà không chạm một từ quá hạn nào.
+
+Trần là TRẦN, không phải hạn mức: kho chưa có từ quá hạn thì phiên vẫn lấp đầy
+bằng từ mới. Công thức `SrsScheduler` không đổi một dòng.
+
 ## Deploy (P20)
 
 > **Chưa chạy lần nào.** Toàn bộ cấu hình dưới đây đã viết và kiểm cú pháp,
@@ -399,8 +531,23 @@ docker compose -f docker-compose.prod.yml exec app php artisan examples:import
 docker compose -f docker-compose.prod.yml exec app php artisan cvdict:import
 docker compose -f docker-compose.prod.yml exec app php artisan cvdict:status    # gate ≥95% tập ưu tiên
 
+# `topics:import` chạy SAU `cvdict:status` PASS — ràng buộc THỨ TỰ, không phải
+# vị trí cho đẹp. Cổng của nó lọc theo `definitions_vi` và `han_viet_status`,
+# nên đặt trước `cvdict:import`/`han-viet:import` sẽ loại sạch mọi từ và báo độ
+# phủ 0%. Lệnh tự kiểm tiên quyết và dừng với thông báo nói rõ phải chạy gì
+# trước, nhưng runbook vẫn ghi ràng buộc ra để không ai phải phát hiện bằng
+# cách chạy sai.
+docker compose -f docker-compose.prod.yml exec app php artisan topics:import
+docker compose -f docker-compose.prod.yml exec app php artisan topics:status   # gate: không chủ đề nào rỗng
+
 # 5. Frontend
-# CHỈ deploy frontend sau khi `cvdict:status` PASS. Thiếu nghĩa tiếng Việt thì
+# CHỈ deploy frontend sau khi `cvdict:status` VÀ `topics:status` PASS.
+#
+# Thiếu dữ liệu chủ đề cũng hỏng IM LẶNG, chỉ khác hình dạng: bảng `topics` do
+# chính `topics:import` tạo, nên quên bước đó thì `GET /topics` trả `[]` và lưới
+# chủ đề là một trang trắng — không lỗi, không log, đúng lúc người dùng bấm "học
+# từ mới". App có trạng thái riêng cho ca này ("Chưa có chủ đề nào"), nhưng đó
+# là lưới an toàn, không phải lý do để bỏ gate. Thiếu nghĩa tiếng Việt thì
 # hỏng IM LẶNG theo hai đường cùng lúc — không lỗi, không log: tìm bằng tiếng
 # Việt không ra gì, và thẻ từ không hiện nghĩa Việt mà màn Tài khoản đã hứa.
 #
