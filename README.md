@@ -42,6 +42,7 @@ docker compose exec app composer lint:test # Pint, chỉ kiểm tra
 docker compose exec app composer analyse   # Larastan level 6
 docker compose exec app php artisan migrate
 docker compose exec app php artisan dictionary:search-stats  # cache AI: tỉ lệ trúng, chi phí
+docker compose exec app php artisan hanora:streak-rebuild     # dựng lại chuỗi ngày từ nguồn
 ```
 
 ### Test chạy trên database riêng
@@ -478,6 +479,65 @@ giọt thì không ai thấy; từ khi màn học chủ đề đổ vào 10 từ
 
 Trần là TRẦN, không phải hạn mức: kho chưa có từ quá hạn thì phiên vẫn lấp đầy
 bằng từ mới. Công thức `SrsScheduler` không đổi một dòng.
+
+## Chuỗi ngày
+
+Mục tiêu **mỗi ngày**, và số ngày liên tiếp đạt nó. Ngày tính theo
+`Asia/Ho_Chi_Minh`, không phải UTC.
+
+Đạt mục tiêu khi trong ngày người dùng làm **một trong hai**:
+
+- thêm **≥ 5 từ mới** vào kho, từ bất kỳ nguồn nào; hoặc
+- có **≥ 1 phiên ôn đã chốt** mang ít nhất một lượt trả lời.
+
+Luật đó viết ở đúng MỘT chỗ: `StreakService`. `StatsSummaryService::streakDays()`
+từng giữ một bản riêng với luật lỏng hơn (một lượt trả lời bất kỳ là đủ) và đã
+bị **xoá** — xem thay đổi hợp đồng bên dưới.
+
+### Bốn điểm dễ làm sai
+
+**Điều kiện "đã ôn" đọc `review_logs`, KHÔNG đọc `answered_count`.**
+`ReviewSessionManager::finish()` chốt được một phiên không có lượt trả lời nào,
+nên tin bộ đếm là cho phép mở phiên rồi bấm kết thúc để ăn chuỗi miễn phí.
+
+**Hook nằm trong `ReviewSessionManager::finish()`, không ở controller.** `finish()`
+có hai caller, và caller thứ hai — `finishStale()`, chạy bên trong `start()` —
+chốt phiên bỏ dở với `finished_at` = **lượt trả lời cuối**, tức một ngày quá
+khứ. Hook ở controller bỏ sót đúng những người đóng tab giữa phiên, và chuỗi 40
+ngày của họ sẽ về 1 vào hôm sau. Vì thế `registerActivity()` nhận NGÀY.
+
+**Đếm từ mới dùng `withTrashed()` và vị từ KHOẢNG.** `withTrashed()` vì xoá một
+từ khỏi kho không được viết lại lịch sử; khoảng (`>= from AND < until`) thay vì
+`(created_at AT TIME ZONE ?)::date = ?` vì bọc cột làm index sẵn có vô dụng trên
+một truy vấn chạy ở mỗi lần lưu từ.
+
+**Ba cột trên `users` là dữ liệu materialize.** `hanora:streak-rebuild` dựng lại
+chúng từ `review_sessions` + `user_words` bất cứ lúc nào, và kết quả của nó phải
+KHỚP những gì đường ghi đã lưu — có test khẳng định điều đó, và nó so
+"rebuild ≡ đường ghi" chứ không phải "rebuild ≡ rebuild".
+
+### Hai thay đổi hợp đồng
+
+| Endpoint | Đổi gì |
+|---|---|
+| `GET /stats/summary` | **Bỏ** trường `streak_days` |
+| `GET /auth/me` | Thêm `data.streak` = `{ current, met_today }` |
+| `GET /streak` | Mới. `?calendar=1` mới trả lịch 30 ngày |
+| `POST /vocabulary`, `POST /reviews/sessions/{id}/finish` | Thêm `streak` ở **cấp envelope** (cạnh `data`) |
+
+`streak_days` rời khỏi `/stats/summary` vì controller đó bọc toàn bộ payload
+trong `Cache::remember` 60 giây × 4 range: giữ trường đó lại nghĩa là người dùng
+thêm từ thứ 5 sẽ thấy chip trên header nói 12 cạnh màn Thống kê nói 11 trong tối
+đa một phút. Một nguồn, không cache, không lệch.
+
+`streak` ở **cấp envelope** chứ không trong `data` cho hai endpoint ghi: `data`
+của `finish` phải giữ đúng hình dạng của `GET /reviews/sessions/{id}` (có test
+khoá sự bằng nhau đó), và chuỗi là trạng thái của người dùng lúc ghi chứ không
+phải một phần của phiên ôn. Cùng chỗ mà `/dictionary/search` đặt `translation`.
+
+App dựa vào việc đường ghi trả sẵn `streak`: màn học chủ đề cố ý không invalidate
+gì sau mỗi thẻ vì trần 60 request/phút, nên đây là đường duy nhất chip trên
+header nhích được giữa phiên.
 
 ## Deploy (P20)
 
