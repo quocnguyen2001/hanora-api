@@ -71,6 +71,25 @@ function submitAnswer(array $payload, ?User $as = null): TestResponse
         ->postJson('/api/reviews/answers', $payload);
 }
 
+/**
+ * Sinh `$count` từ hợp lệ cho `$user`.
+ *
+ * `overdue: true` → quá hạn theo lịch; `false` → từ mới (`next_review_at` null).
+ */
+function seedDueWords(User $user, int $count, bool $overdue): void
+{
+    $words = DictionaryWord::factory()->count($count)->create(['is_priority' => true]);
+
+    foreach ($words as $index => $word) {
+        UserWord::create([
+            'user_id' => $user->id,
+            'word_id' => $word->id,
+            // Quá hạn lâu nhất lên trước, nên lệch ngày để thứ tự xác định.
+            'next_review_at' => $overdue ? now()->subDays($index + 1) : null,
+        ]);
+    }
+}
+
 describe('mở phiên ôn', function (): void {
     it('chỉ trả từ tới hạn hoặc từ mới', function (): void {
         UserWord::create([
@@ -83,6 +102,52 @@ describe('mở phiên ôn', function (): void {
 
         expect($items)->toHaveCount(1)
             ->and($items[0]['user_word_id'])->toBe($this->userWord->id);
+    });
+
+    /*
+     * D8 — trần từ mới mỗi phiên.
+     *
+     * `orderByRaw('next_review_at ASC NULLS FIRST')` cho từ mới quyền ưu tiên
+     * TUYỆT ĐỐI, rồi `limit()` cắt sạch từ quá hạn. Trước tính năng chủ đề, từ
+     * mới nhỏ giọt (1 từ/lần qua tìm kiếm) nên không ai thấy. Sau nó, mỗi phiên
+     * học đổ vào 10 từ mới cùng lúc, và người có 120 từ quá hạn sẽ ôn 8 phiên
+     * liên tiếp KHÔNG chạm một từ quá hạn nào.
+     *
+     * Ba ca dưới đây khoá cả ba hướng: trộn, chỉ-mới, và chỉ-quá-hạn (hành vi cũ).
+     */
+    it('trộn từ quá hạn với từ mới thay vì để từ mới chiếm cả phiên', function (): void {
+        // 12 từ quá hạn + 10 từ mới, xin 10 thẻ.
+        seedDueWords($this->user, 12, overdue: true);
+        seedDueWords($this->user, 10, overdue: false);
+
+        $items = startSession(['limit' => 10])->assertCreated()->json('data.items');
+        $ids = array_column($items, 'user_word_id');
+
+        $new = UserWord::whereIn('id', $ids)->whereNull('next_review_at')->count();
+        $due = UserWord::whereIn('id', $ids)->whereNotNull('next_review_at')->count();
+
+        expect($items)->toHaveCount(10)
+            ->and($new)->toBeLessThanOrEqual(3)   // trần 30%
+            ->and($due)->toBeGreaterThanOrEqual(7);
+    });
+
+    it('vẫn lấp đầy phiên bằng từ mới khi kho chưa có từ quá hạn', function (): void {
+        // Người mới học KHÔNG được bị trần chặn: trần là TRẦN, không phải hạn mức.
+        seedDueWords($this->user, 10, overdue: false);
+
+        $items = startSession(['limit' => 10])->assertCreated()->json('data.items');
+
+        expect($items)->toHaveCount(10);
+    });
+
+    it('giữ nguyên hành vi cũ khi kho chỉ có từ quá hạn', function (): void {
+        seedDueWords($this->user, 12, overdue: true);
+
+        $items = startSession(['limit' => 10])->assertCreated()->json('data.items');
+        $ids = array_column($items, 'user_word_id');
+
+        expect($items)->toHaveCount(10)
+            ->and(UserWord::whereIn('id', $ids)->whereNull('next_review_at')->count())->toBe(1);
     });
 
     it('KHÔNG đưa từ chưa ghép được âm Hán-Việt vào phiên', function (): void {
