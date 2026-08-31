@@ -1,0 +1,294 @@
+{
+    "slug": "thanh-pho",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:54:30+07:00",
+    "words": [
+        {
+            "zh": "地方",
+            "pinyin": "di4 fang1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "khu vực",
+            "rejected": [
+                {
+                    "pinyin": "di4 fang5",
+                    "vi": "khu vực"
+                }
+            ]
+        },
+        {
+            "zh": "学校",
+            "pinyin": "xue2 xiao4",
+            "rank": 2,
+            "batch": 1,
+            "vi": "trường học"
+        },
+        {
+            "zh": "医院",
+            "pinyin": "yi1 yuan4",
+            "rank": 3,
+            "batch": 1,
+            "vi": "bệnh viện"
+        },
+        {
+            "zh": "城市",
+            "pinyin": "cheng2 shi4",
+            "rank": 4,
+            "batch": 1,
+            "vi": "thành phố; thị trấn"
+        },
+        {
+            "zh": "中心",
+            "pinyin": "zhong1 xin1",
+            "rank": 5,
+            "batch": 1,
+            "vi": "trung tâm; trái tim; cốt lõi"
+        },
+        {
+            "zh": "附近",
+            "pinyin": "fu4 jin4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "gần đó; lân cận"
+        },
+        {
+            "zh": "银行",
+            "pinyin": "yin2 hang2",
+            "rank": 7,
+            "batch": 1,
+            "vi": "ngân hàng"
+        },
+        {
+            "zh": "公园",
+            "pinyin": "gong1 yuan2",
+            "rank": 8,
+            "batch": 1,
+            "vi": "công viên"
+        },
+        {
+            "zh": "旁边",
+            "pinyin": "pang2 bian1",
+            "rank": 9,
+            "batch": 1,
+            "vi": "bên; nơi liền kề"
+        },
+        {
+            "zh": "酒店",
+            "pinyin": "jiu3 dian4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "quán rượu"
+        },
+        {
+            "zh": "厕所",
+            "pinyin": "ce4 suo3",
+            "rank": 11,
+            "batch": 1,
+            "vi": "nhà vệ sinh; toa lét"
+        },
+        {
+            "zh": "发展",
+            "pinyin": "fa1 zhan3",
+            "rank": 12,
+            "batch": 1,
+            "vi": "sự phát triển"
+        },
+        {
+            "zh": "机场",
+            "pinyin": "ji1 chang3",
+            "rank": 13,
+            "batch": 1,
+            "vi": "sân bay; phi trường"
+        },
+        {
+            "zh": "环境",
+            "pinyin": "huan2 jing4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "môi trường"
+        },
+        {
+            "zh": "建筑",
+            "pinyin": "jian4 zhu4",
+            "rank": 15,
+            "batch": 1,
+            "vi": "xây dựng"
+        },
+        {
+            "zh": "出口",
+            "pinyin": "chu1 kou3",
+            "rank": 16,
+            "batch": 1,
+            "vi": "lối ra"
+        },
+        {
+            "zh": "交通",
+            "pinyin": "jiao1 tong1",
+            "rank": 17,
+            "batch": 1,
+            "vi": "kết nối"
+        },
+        {
+            "zh": "公共",
+            "pinyin": "gong1 gong4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "công cộng; chung; công"
+        },
+        {
+            "zh": "图书馆",
+            "pinyin": "tu2 shu1 guan3",
+            "rank": 19,
+            "batch": 1,
+            "vi": "thư viện"
+        },
+        {
+            "zh": "治安",
+            "pinyin": "zhi4 an1",
+            "rank": 20,
+            "batch": 1,
+            "vi": "trị an"
+        },
+        {
+            "zh": "广场",
+            "pinyin": "guang3 chang3",
+            "rank": 21,
+            "batch": 1,
+            "vi": "quảng trường"
+        },
+        {
+            "zh": "饭店",
+            "pinyin": "fan4 dian4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "nhà hàng"
+        },
+        {
+            "zh": "对面",
+            "pinyin": "dui4 mian4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "(ngồi) đối diện"
+        },
+        {
+            "zh": "地铁",
+            "pinyin": "di4 tie3",
+            "rank": 24,
+            "batch": 1,
+            "vi": "đường sắt ngầm; tàu điện ngầm"
+        },
+        {
+            "zh": "剧院",
+            "pinyin": "ju4 yuan4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "rạp hát"
+        },
+        {
+            "zh": "车站",
+            "pinyin": "che1 zhan4",
+            "rank": 26,
+            "batch": 1,
+            "vi": "ga tàu"
+        },
+        {
+            "zh": "入口",
+            "pinyin": "ru4 kou3",
+            "rank": 27,
+            "batch": 1,
+            "vi": "lối vào"
+        },
+        {
+            "zh": "居民",
+            "pinyin": "ju1 min2",
+            "rank": 28,
+            "batch": 1,
+            "vi": "cư dân; người dân"
+        },
+        {
+            "zh": "街道",
+            "pinyin": "jie1 dao4",
+            "rank": 29,
+            "batch": 1,
+            "vi": "đường phố"
+        },
+        {
+            "zh": "超市",
+            "pinyin": "chao1 shi4",
+            "rank": 30,
+            "batch": 1,
+            "vi": "siêu thị"
+        },
+        {
+            "zh": "马路",
+            "pinyin": "ma3 lu4",
+            "rank": 31,
+            "batch": 1,
+            "vi": "đường phố"
+        },
+        {
+            "zh": "设施",
+            "pinyin": "she4 shi1",
+            "rank": 32,
+            "batch": 1,
+            "vi": "cơ sở vật chất"
+        },
+        {
+            "zh": "规划",
+            "pinyin": "gui1 hua4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "lập kế hoạch; vạch ra chương trình"
+        },
+        {
+            "zh": "建设",
+            "pinyin": "jian4 she4",
+            "rank": 34,
+            "batch": 1,
+            "vi": "xây dựng; kiến thiết; thành lập; phát triển; thiết lập"
+        },
+        {
+            "zh": "邮局",
+            "pinyin": "you2 ju2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "bưu điện"
+        },
+        {
+            "zh": "堵车",
+            "pinyin": "du3 che1",
+            "rank": 36,
+            "batch": 1,
+            "vi": "kẹt xe"
+        },
+        {
+            "zh": "十字路口",
+            "pinyin": "shi2 zi4 lu4 kou3",
+            "rank": 37,
+            "batch": 1,
+            "vi": "ngã tư"
+        },
+        {
+            "zh": "楼房",
+            "pinyin": "lou2 fang2",
+            "rank": 38,
+            "batch": 1,
+            "vi": "một tòa nhà hai tầng trở lên"
+        },
+        {
+            "zh": "繁华",
+            "pinyin": "fan2 hua2",
+            "rank": 39,
+            "batch": 1,
+            "vi": "phồn hoa"
+        },
+        {
+            "zh": "红绿灯",
+            "pinyin": "hong2 lu:4 deng1",
+            "rank": 40,
+            "batch": 1,
+            "vi": "đèn giao thông"
+        }
+    ]
+}

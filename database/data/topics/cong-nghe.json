@@ -1,0 +1,561 @@
+{
+    "slug": "cong-nghe",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:53:57+07:00",
+    "words": [
+        {
+            "zh": "控制",
+            "pinyin": "kong4 zhi4",
+            "rank": 1,
+            "batch": 2,
+            "vi": "kiểm soát"
+        },
+        {
+            "zh": "系统",
+            "pinyin": "xi4 tong3",
+            "rank": 2,
+            "batch": 1,
+            "vi": "hệ thống"
+        },
+        {
+            "zh": "信息",
+            "pinyin": "xin4 xi1",
+            "rank": 3,
+            "batch": 1,
+            "vi": "thông tin"
+        },
+        {
+            "zh": "手机",
+            "pinyin": "shou3 ji1",
+            "rank": 4,
+            "batch": 1,
+            "vi": "điện thoại di động"
+        },
+        {
+            "zh": "电脑",
+            "pinyin": "dian4 nao3",
+            "rank": 5,
+            "batch": 1,
+            "vi": "máy tính"
+        },
+        {
+            "zh": "文件",
+            "pinyin": "wen2 jian4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "tài liệu"
+        },
+        {
+            "zh": "信号",
+            "pinyin": "xin4 hao4",
+            "rank": 7,
+            "batch": 2,
+            "vi": "tín hiệu"
+        },
+        {
+            "zh": "技术",
+            "pinyin": "ji4 shu4",
+            "rank": 8,
+            "batch": 1,
+            "vi": "công nghệ; kỹ thuật; kỹ năng"
+        },
+        {
+            "zh": "密码",
+            "pinyin": "mi4 ma3",
+            "rank": 9,
+            "batch": 1,
+            "vi": "mã hóa; mã bí mật"
+        },
+        {
+            "zh": "程序",
+            "pinyin": "cheng2 xu4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "quy trình"
+        },
+        {
+            "zh": "数据",
+            "pinyin": "shu4 ju4",
+            "rank": 11,
+            "batch": 1,
+            "vi": "dữ liệu"
+        },
+        {
+            "zh": "病毒",
+            "pinyin": "bing4 du2",
+            "rank": 12,
+            "batch": 1,
+            "vi": "vi rút"
+        },
+        {
+            "zh": "搜索",
+            "pinyin": "sou1 suo3",
+            "rank": 13,
+            "batch": 1,
+            "vi": "tìm kiếm"
+        },
+        {
+            "zh": "网络",
+            "pinyin": "wang3 luo4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "mạng lưới"
+        },
+        {
+            "zh": "电子",
+            "pinyin": "dian4 zi3",
+            "rank": 15,
+            "batch": 2,
+            "vi": "điện tử"
+        },
+        {
+            "zh": "网站",
+            "pinyin": "wang3 zhan4",
+            "rank": 16,
+            "batch": 1,
+            "vi": "trang web"
+        },
+        {
+            "zh": "连接",
+            "pinyin": "lian2 jie1",
+            "rank": 17,
+            "batch": 1,
+            "vi": "liên kết; nối; kết nối"
+        },
+        {
+            "zh": "发送",
+            "pinyin": "fa1 song4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "truyền đi"
+        },
+        {
+            "zh": "扫描",
+            "pinyin": "sao3 miao2",
+            "rank": 19,
+            "batch": 2,
+            "vi": "quét"
+        },
+        {
+            "zh": "保存",
+            "pinyin": "bao3 cun2",
+            "rank": 20,
+            "batch": 1,
+            "vi": "bảo tồn"
+        },
+        {
+            "zh": "相机",
+            "pinyin": "xiang4 ji1",
+            "rank": 21,
+            "batch": 3,
+            "vi": "máy ảnh"
+        },
+        {
+            "zh": "复制",
+            "pinyin": "fu4 zhi4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "nhân bản"
+        },
+        {
+            "zh": "电池",
+            "pinyin": "dian4 chi2",
+            "rank": 23,
+            "batch": 1,
+            "vi": "pin, ắc quy"
+        },
+        {
+            "zh": "屏幕",
+            "pinyin": "ping2 mu4",
+            "rank": 24,
+            "batch": 1,
+            "vi": "màn hình"
+        },
+        {
+            "zh": "设置",
+            "pinyin": "she4 zhi4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "thiết lập; cài đặt"
+        },
+        {
+            "zh": "下载",
+            "pinyin": "xia4 zai3",
+            "rank": 26,
+            "batch": 1,
+            "vi": "tải xuống"
+        },
+        {
+            "zh": "后台",
+            "pinyin": "hou4 tai2",
+            "rank": 27,
+            "batch": 2,
+            "vi": "khu vực hậu trường"
+        },
+        {
+            "zh": "代码",
+            "pinyin": "dai4 ma3",
+            "rank": 28,
+            "batch": 2,
+            "vi": "mã"
+        },
+        {
+            "zh": "输入",
+            "pinyin": "shu1 ru4",
+            "rank": 29,
+            "batch": 1,
+            "vi": "nhập khẩu"
+        },
+        {
+            "zh": "修复",
+            "pinyin": "xiu1 fu4",
+            "rank": 30,
+            "batch": 2,
+            "vi": "khôi phục; trùng tu"
+        },
+        {
+            "zh": "识别",
+            "pinyin": "shi2 bie2",
+            "rank": 31,
+            "batch": 2,
+            "vi": "phân biệt; nhận thức; nhận dạng; nhận biết"
+        },
+        {
+            "zh": "升级",
+            "pinyin": "sheng1 ji2",
+            "rank": 32,
+            "batch": 2,
+            "vi": "lên một cấp; được thăng chức"
+        },
+        {
+            "zh": "菜单",
+            "pinyin": "cai4 dan1",
+            "rank": 33,
+            "batch": 2,
+            "vi": "thực đơn"
+        },
+        {
+            "zh": "上网",
+            "pinyin": "shang4 wang3",
+            "rank": 34,
+            "batch": 1,
+            "vi": "lên mạng"
+        },
+        {
+            "zh": "软件",
+            "pinyin": "ruan3 jian4",
+            "rank": 35,
+            "batch": 1,
+            "vi": "phần mềm"
+        },
+        {
+            "zh": "硬盘",
+            "pinyin": "ying4 pan2",
+            "rank": 36,
+            "batch": 3,
+            "vi": "đĩa cứng"
+        },
+        {
+            "zh": "服务器",
+            "pinyin": "fu2 wu4 qi4",
+            "rank": 37,
+            "batch": 2,
+            "vi": "máy chủ"
+        },
+        {
+            "zh": "加密",
+            "pinyin": "jia1 mi4",
+            "rank": 38,
+            "batch": 2,
+            "vi": "mã hóa"
+        },
+        {
+            "zh": "删除",
+            "pinyin": "shan1 chu2",
+            "rank": 39,
+            "batch": 1,
+            "vi": "xóa"
+        },
+        {
+            "zh": "漏洞",
+            "pinyin": "lou4 dong4",
+            "rank": 40,
+            "batch": 2,
+            "vi": "rò rỉ"
+        },
+        {
+            "zh": "无线",
+            "pinyin": "wu2 xian4",
+            "rank": 41,
+            "batch": 3,
+            "vi": "không dây"
+        },
+        {
+            "zh": "平台",
+            "pinyin": "ping2 tai2",
+            "rank": 42,
+            "batch": 1,
+            "vi": "nền tảng"
+        },
+        {
+            "zh": "充电",
+            "pinyin": "chong1 dian4",
+            "rank": 43,
+            "batch": 1,
+            "vi": "sạc"
+        },
+        {
+            "zh": "耳机",
+            "pinyin": "er3 ji1",
+            "rank": 44,
+            "batch": 2,
+            "vi": "tai nghe"
+        },
+        {
+            "zh": "黑客",
+            "pinyin": "hei1 ke4",
+            "rank": 45,
+            "batch": 2,
+            "vi": "hacker"
+        },
+        {
+            "zh": "同步",
+            "pinyin": "tong2 bu4",
+            "rank": 46,
+            "batch": 2,
+            "vi": "đồng bộ"
+        },
+        {
+            "zh": "更新",
+            "pinyin": "geng1 xin1",
+            "rank": 47,
+            "batch": 1,
+            "vi": "thay cũ đổi mới"
+        },
+        {
+            "zh": "传感器",
+            "pinyin": "chuan2 gan3 qi4",
+            "rank": 48,
+            "batch": 2,
+            "vi": "cảm biến; thiết bị chuyển đổi"
+        },
+        {
+            "zh": "键盘",
+            "pinyin": "jian4 pan2",
+            "rank": 49,
+            "batch": 1,
+            "vi": "bàn phím"
+        },
+        {
+            "zh": "网页",
+            "pinyin": "wang3 ye4",
+            "rank": 50,
+            "batch": 1,
+            "vi": "trang web"
+        },
+        {
+            "zh": "备份",
+            "pinyin": "bei4 fen4",
+            "rank": 51,
+            "batch": 2,
+            "vi": "sao lưu"
+        },
+        {
+            "zh": "智能",
+            "pinyin": "zhi4 neng2",
+            "rank": 52,
+            "batch": 1,
+            "vi": "thông minh"
+        },
+        {
+            "zh": "虚拟",
+            "pinyin": "xu1 ni3",
+            "rank": 53,
+            "batch": 2,
+            "vi": "tưởng tượng; bịa ra"
+        },
+        {
+            "zh": "应用",
+            "pinyin": "ying4 yong4",
+            "rank": 54,
+            "batch": 1,
+            "vi": "đưa vào sử dụng; áp dụng"
+        },
+        {
+            "zh": "人工智能",
+            "pinyin": "ren2 gong1 zhi4 neng2",
+            "rank": 55,
+            "batch": 2,
+            "vi": "trí tuệ nhân tạo"
+        },
+        {
+            "zh": "账号",
+            "pinyin": "zhang4 hao4",
+            "rank": 56,
+            "batch": 1,
+            "vi": "số tài khoản; tên đăng nhập"
+        },
+        {
+            "zh": "硬件",
+            "pinyin": "ying4 jian4",
+            "rank": 57,
+            "batch": 1,
+            "vi": "phần cứng"
+        },
+        {
+            "zh": "打印机",
+            "pinyin": "da3 yin4 ji1",
+            "rank": 58,
+            "batch": 3,
+            "vi": "máy in"
+        },
+        {
+            "zh": "充电器",
+            "pinyin": "chong1 dian4 qi4",
+            "rank": 59,
+            "batch": 2,
+            "vi": "bộ sạc pin"
+        },
+        {
+            "zh": "刷新",
+            "pinyin": "shua1 xin1",
+            "rank": 60,
+            "batch": 2,
+            "vi": "cải tiến"
+        },
+        {
+            "zh": "配置",
+            "pinyin": "pei4 zhi4",
+            "rank": 61,
+            "batch": 2,
+            "vi": "triển khai"
+        },
+        {
+            "zh": "光盘",
+            "pinyin": "guang1 pan2",
+            "rank": 62,
+            "batch": 3,
+            "vi": "đĩa CD; DVD; CD-ROM"
+        },
+        {
+            "zh": "内存",
+            "pinyin": "nei4 cun2",
+            "rank": 63,
+            "batch": 1,
+            "vi": "bộ nhớ trong"
+        },
+        {
+            "zh": "界面",
+            "pinyin": "jie4 mian4",
+            "rank": 64,
+            "batch": 2,
+            "vi": "bề mặt tiếp xúc"
+        },
+        {
+            "zh": "音箱",
+            "pinyin": "yin1 xiang1",
+            "rank": 65,
+            "batch": 2,
+            "vi": "thùng loa"
+        },
+        {
+            "zh": "图标",
+            "pinyin": "tu2 biao1",
+            "rank": 66,
+            "batch": 2,
+            "vi": "biểu tượng"
+        },
+        {
+            "zh": "浏览器",
+            "pinyin": "liu2 lan3 qi4",
+            "rank": 67,
+            "batch": 2,
+            "vi": "trình duyệt"
+        },
+        {
+            "zh": "鼠标",
+            "pinyin": "shu3 biao1",
+            "rank": 68,
+            "batch": 1,
+            "vi": "chuột"
+        },
+        {
+            "zh": "缓存",
+            "pinyin": "huan3 cun2",
+            "rank": 69,
+            "batch": 2,
+            "vi": "(tin học) bộ nhớ đệm"
+        },
+        {
+            "zh": "粘贴",
+            "pinyin": "zhan1 tie1",
+            "rank": 70,
+            "batch": 1,
+            "vi": "dán"
+        },
+        {
+            "zh": "重启",
+            "pinyin": "chong2 qi3",
+            "rank": 71,
+            "batch": 2,
+            "vi": "khởi động lại; kích hoạt lại"
+        },
+        {
+            "zh": "上传",
+            "pinyin": "shang4 chuan2",
+            "rank": 72,
+            "batch": 1,
+            "vi": "tải lên"
+        },
+        {
+            "zh": "点击",
+            "pinyin": "dian3 ji1",
+            "rank": 73,
+            "batch": 1,
+            "vi": "nhấn"
+        },
+        {
+            "zh": "显卡",
+            "pinyin": "xian3 ka3",
+            "rank": 74,
+            "batch": 1,
+            "vi": "card đồ họa"
+        },
+        {
+            "zh": "链接",
+            "pinyin": "lian4 jie1",
+            "rank": 75,
+            "batch": 2,
+            "vi": "liên kết"
+        },
+        {
+            "zh": "客户端",
+            "pinyin": "ke4 hu4 duan1",
+            "rank": 76,
+            "batch": 2,
+            "vi": "máy khách, client"
+        },
+        {
+            "zh": "截屏",
+            "pinyin": "jie2 ping2",
+            "rank": 77,
+            "batch": 2,
+            "vi": "(tin học) ảnh chụp màn hình; chụp màn hình"
+        },
+        {
+            "zh": "蓝牙",
+            "pinyin": "Lan2 ya2",
+            "rank": 78,
+            "batch": 3,
+            "vi": "Bluetooth"
+        },
+        {
+            "zh": "像素",
+            "pinyin": "xiang4 su4",
+            "rank": 79,
+            "batch": 3,
+            "vi": "điểm ảnh"
+        }
+    ]
+}

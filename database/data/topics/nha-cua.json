@@ -1,0 +1,589 @@
+{
+    "slug": "nha-cua",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:52:30+07:00",
+    "words": [
+        {
+            "zh": "家",
+            "pinyin": "jia1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "nhà"
+        },
+        {
+            "zh": "门",
+            "pinyin": "men2",
+            "rank": 2,
+            "batch": 1,
+            "vi": "cổng"
+        },
+        {
+            "zh": "房子",
+            "pinyin": "fang2 zi5",
+            "rank": 3,
+            "batch": 2,
+            "vi": "nhà"
+        },
+        {
+            "zh": "房间",
+            "pinyin": "fang2 jian1",
+            "rank": 4,
+            "batch": 1,
+            "vi": "phòng"
+        },
+        {
+            "zh": "床",
+            "pinyin": "chuang2",
+            "rank": 5,
+            "batch": 1,
+            "vi": "giường"
+        },
+        {
+            "zh": "电视",
+            "pinyin": "dian4 shi4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "truyền hình; TV"
+        },
+        {
+            "zh": "钥匙",
+            "pinyin": "yao4 shi5",
+            "rank": 7,
+            "batch": 1,
+            "vi": "chìa khóa"
+        },
+        {
+            "zh": "锁",
+            "pinyin": "suo3",
+            "rank": 8,
+            "batch": 2,
+            "vi": "khóa; khóa lại"
+        },
+        {
+            "zh": "公寓",
+            "pinyin": "gong1 yu4",
+            "rank": 9,
+            "batch": 2,
+            "vi": "toà nhà chung cư; khu căn hộ"
+        },
+        {
+            "zh": "墙",
+            "pinyin": "qiang2",
+            "rank": 10,
+            "batch": 1,
+            "vi": "tường"
+        },
+        {
+            "zh": "厕所",
+            "pinyin": "ce4 suo3",
+            "rank": 11,
+            "batch": 2,
+            "vi": "nhà vệ sinh; toa lét"
+        },
+        {
+            "zh": "灯",
+            "pinyin": "deng1",
+            "rank": 12,
+            "batch": 1,
+            "vi": "đèn"
+        },
+        {
+            "zh": "桌子",
+            "pinyin": "zhuo1 zi5",
+            "rank": 13,
+            "batch": 1,
+            "vi": "bàn"
+        },
+        {
+            "zh": "厨房",
+            "pinyin": "chu2 fang2",
+            "rank": 14,
+            "batch": 1,
+            "vi": "nhà bếp"
+        },
+        {
+            "zh": "屋子",
+            "pinyin": "wu1 zi5",
+            "rank": 15,
+            "batch": 2,
+            "vi": "nhà"
+        },
+        {
+            "zh": "餐厅",
+            "pinyin": "can1 ting1",
+            "rank": 16,
+            "batch": 2,
+            "vi": "phòng ăn"
+        },
+        {
+            "zh": "窗户",
+            "pinyin": "chuang1 hu5",
+            "rank": 17,
+            "batch": 1,
+            "vi": "cửa sổ"
+        },
+        {
+            "zh": "椅子",
+            "pinyin": "yi3 zi5",
+            "rank": 18,
+            "batch": 1,
+            "vi": "ghế"
+        },
+        {
+            "zh": "电梯",
+            "pinyin": "dian4 ti1",
+            "rank": 19,
+            "batch": 1,
+            "vi": "thang máy"
+        },
+        {
+            "zh": "卧室",
+            "pinyin": "wo4 shi4",
+            "rank": 20,
+            "batch": 1,
+            "vi": "phòng ngủ"
+        },
+        {
+            "zh": "地板",
+            "pinyin": "di4 ban3",
+            "rank": 21,
+            "batch": 1,
+            "vi": "sàn nhà"
+        },
+        {
+            "zh": "洗手间",
+            "pinyin": "xi3 shou3 jian1",
+            "rank": 22,
+            "batch": 3,
+            "vi": "nhà vệ sinh"
+        },
+        {
+            "zh": "沙发",
+            "pinyin": "sha1 fa1",
+            "rank": 23,
+            "batch": 1,
+            "vi": "ghế sô pha"
+        },
+        {
+            "zh": "门口",
+            "pinyin": "men2 kou3",
+            "rank": 24,
+            "batch": 2,
+            "vi": "cửa ra vào"
+        },
+        {
+            "zh": "楼梯",
+            "pinyin": "lou2 ti1",
+            "rank": 25,
+            "batch": 2,
+            "vi": "cầu thang"
+        },
+        {
+            "zh": "屋顶",
+            "pinyin": "wu1 ding3",
+            "rank": 26,
+            "batch": 2,
+            "vi": "mái nhà"
+        },
+        {
+            "zh": "走廊",
+            "pinyin": "zou3 lang2",
+            "rank": 27,
+            "batch": 1,
+            "vi": "hành lang"
+        },
+        {
+            "zh": "镜子",
+            "pinyin": "jing4 zi5",
+            "rank": 28,
+            "batch": 1,
+            "vi": "gương"
+        },
+        {
+            "zh": "浴室",
+            "pinyin": "yu4 shi4",
+            "rank": 29,
+            "batch": 2,
+            "vi": "phòng tắm"
+        },
+        {
+            "zh": "冰箱",
+            "pinyin": "bing1 xiang1",
+            "rank": 30,
+            "batch": 1,
+            "vi": "tủ lạnh"
+        },
+        {
+            "zh": "地毯",
+            "pinyin": "di4 tan3",
+            "rank": 31,
+            "batch": 1,
+            "vi": "thảm"
+        },
+        {
+            "zh": "盘子",
+            "pinyin": "pan2 zi5",
+            "rank": 32,
+            "batch": 2,
+            "vi": "khay"
+        },
+        {
+            "zh": "窗",
+            "pinyin": "chuang1",
+            "rank": 33,
+            "batch": 2,
+            "vi": "cửa sổ"
+        },
+        {
+            "zh": "房租",
+            "pinyin": "fang2 zu1",
+            "rank": 34,
+            "batch": 1,
+            "vi": "tiền thuê phòng hoặc nhà"
+        },
+        {
+            "zh": "枕头",
+            "pinyin": "zhen3 tou5",
+            "rank": 35,
+            "batch": 1,
+            "vi": "gối"
+        },
+        {
+            "zh": "毛巾",
+            "pinyin": "mao2 jin1",
+            "rank": 36,
+            "batch": 2,
+            "vi": "khăn lau"
+        },
+        {
+            "zh": "家具",
+            "pinyin": "jia1 ju4",
+            "rank": 37,
+            "batch": 1,
+            "vi": "đồ nội thất"
+        },
+        {
+            "zh": "浴缸",
+            "pinyin": "yu4 gang1",
+            "rank": 38,
+            "batch": 3,
+            "vi": "bồn tắm"
+        },
+        {
+            "zh": "客厅",
+            "pinyin": "ke4 ting1",
+            "rank": 39,
+            "batch": 1,
+            "vi": "phòng khách"
+        },
+        {
+            "zh": "肥皂",
+            "pinyin": "fei2 zao4",
+            "rank": 40,
+            "batch": 2,
+            "vi": "xà phòng"
+        },
+        {
+            "zh": "卫生间",
+            "pinyin": "wei4 sheng1 jian1",
+            "rank": 41,
+            "batch": 1,
+            "vi": "phòng tắm"
+        },
+        {
+            "zh": "柜子",
+            "pinyin": "gui4 zi5",
+            "rank": 42,
+            "batch": 1,
+            "vi": "tủ đựng"
+        },
+        {
+            "zh": "床单",
+            "pinyin": "chuang2 dan1",
+            "rank": 43,
+            "batch": 2,
+            "vi": "ga trải giường"
+        },
+        {
+            "zh": "阳台",
+            "pinyin": "yang2 tai2",
+            "rank": 44,
+            "batch": 1,
+            "vi": "ban công"
+        },
+        {
+            "zh": "窗帘",
+            "pinyin": "chuang1 lian2",
+            "rank": 45,
+            "batch": 1,
+            "vi": "rèm cửa sổ"
+        },
+        {
+            "zh": "空调",
+            "pinyin": "kong1 tiao2",
+            "rank": 46,
+            "batch": 1,
+            "vi": "điều hòa không khí"
+        },
+        {
+            "zh": "垃圾桶",
+            "pinyin": "la1 ji1 tong3",
+            "rank": 47,
+            "batch": 1,
+            "vi": "thùng rác"
+        },
+        {
+            "zh": "衣柜",
+            "pinyin": "yi1 gui4",
+            "rank": 48,
+            "batch": 1,
+            "vi": "tủ quần áo"
+        },
+        {
+            "zh": "墙壁",
+            "pinyin": "qiang2 bi4",
+            "rank": 49,
+            "batch": 3,
+            "vi": "tường"
+        },
+        {
+            "zh": "天花板",
+            "pinyin": "tian1 hua1 ban3",
+            "rank": 50,
+            "batch": 2,
+            "vi": "trần nhà"
+        },
+        {
+            "zh": "开关",
+            "pinyin": "kai1 guan1",
+            "rank": 51,
+            "batch": 2,
+            "vi": "công tắc điện"
+        },
+        {
+            "zh": "微波炉",
+            "pinyin": "wei1 bo1 lu2",
+            "rank": 52,
+            "batch": 2,
+            "vi": "lò vi sóng"
+        },
+        {
+            "zh": "花瓶",
+            "pinyin": "hua1 ping2",
+            "rank": 53,
+            "batch": 2,
+            "vi": "bình hoa"
+        },
+        {
+            "zh": "门铃",
+            "pinyin": "men2 ling2",
+            "rank": 54,
+            "batch": 3,
+            "vi": "chuông cửa"
+        },
+        {
+            "zh": "书房",
+            "pinyin": "shu1 fang2",
+            "rank": 55,
+            "batch": 1,
+            "vi": "phòng làm việc"
+        },
+        {
+            "zh": "牙刷",
+            "pinyin": "ya2 shua1",
+            "rank": 56,
+            "batch": 2,
+            "vi": "bàn chải đánh răng"
+        },
+        {
+            "zh": "住宅",
+            "pinyin": "zhu4 zhai2",
+            "rank": 57,
+            "batch": 2,
+            "vi": "nơi ở; ngôi nhà; chỗ ở"
+        },
+        {
+            "zh": "牙膏",
+            "pinyin": "ya2 gao1",
+            "rank": 58,
+            "batch": 2,
+            "vi": "kem đánh răng"
+        },
+        {
+            "zh": "洗衣机",
+            "pinyin": "xi3 yi1 ji1",
+            "rank": 59,
+            "batch": 2,
+            "vi": "máy giặt"
+        },
+        {
+            "zh": "被子",
+            "pinyin": "bei4 zi5",
+            "rank": 60,
+            "batch": 1,
+            "vi": "chăn"
+        },
+        {
+            "zh": "筷子",
+            "pinyin": "kuai4 zi5",
+            "rank": 61,
+            "batch": 2,
+            "vi": "đũa"
+        },
+        {
+            "zh": "水龙头",
+            "pinyin": "shui3 long2 tou2",
+            "rank": 62,
+            "batch": 3,
+            "vi": "vòi nước"
+        },
+        {
+            "zh": "洗碗机",
+            "pinyin": "xi3 wan3 ji1",
+            "rank": 63,
+            "batch": 1,
+            "vi": "máy rửa chén"
+        },
+        {
+            "zh": "台灯",
+            "pinyin": "tai2 deng1",
+            "rank": 64,
+            "batch": 2,
+            "vi": "đèn bàn"
+        },
+        {
+            "zh": "板凳",
+            "pinyin": "ban3 deng4",
+            "rank": 65,
+            "batch": 2,
+            "vi": "ghế băng hoặc ghế đẩu"
+        },
+        {
+            "zh": "书架",
+            "pinyin": "shu1 jia4",
+            "rank": 66,
+            "batch": 1,
+            "vi": "giá sách"
+        },
+        {
+            "zh": "插座",
+            "pinyin": "cha1 zuo4",
+            "rank": 67,
+            "batch": 1,
+            "vi": "ổ cắm"
+        },
+        {
+            "zh": "楼房",
+            "pinyin": "lou2 fang2",
+            "rank": 68,
+            "batch": 1,
+            "vi": "một tòa nhà hai tầng trở lên"
+        },
+        {
+            "zh": "梳妆台",
+            "pinyin": "shu1 zhuang1 tai2",
+            "rank": 69,
+            "batch": 2,
+            "vi": "bàn trang điểm"
+        },
+        {
+            "zh": "吊灯",
+            "pinyin": "diao4 deng1",
+            "rank": 70,
+            "batch": 2,
+            "vi": "đèn treo"
+        },
+        {
+            "zh": "热水器",
+            "pinyin": "re4 shui3 qi4",
+            "rank": 71,
+            "batch": 1,
+            "vi": "máy nước nóng"
+        },
+        {
+            "zh": "茶几",
+            "pinyin": "cha2 ji1",
+            "rank": 72,
+            "batch": 2,
+            "vi": "bàn nhỏ"
+        },
+        {
+            "zh": "挂钩",
+            "pinyin": "gua4 gou1",
+            "rank": 73,
+            "batch": 2,
+            "vi": "kết nối; liên kết; móc nối lại với nhau"
+        },
+        {
+            "zh": "家电",
+            "pinyin": "jia1 dian4",
+            "rank": 74,
+            "batch": 1,
+            "vi": "đồ điện gia dụng"
+        },
+        {
+            "zh": "屏风",
+            "pinyin": "ping2 feng1",
+            "rank": 75,
+            "batch": 2,
+            "vi": "bình phong"
+        },
+        {
+            "zh": "电扇",
+            "pinyin": "dian4 shan4",
+            "rank": 76,
+            "batch": 2,
+            "vi": "quạt điện"
+        },
+        {
+            "zh": "电饭煲",
+            "pinyin": "dian4 fan4 bao1",
+            "rank": 77,
+            "batch": 2,
+            "vi": "nồi cơm điện"
+        },
+        {
+            "zh": "碗筷",
+            "pinyin": "wan3 kuai4",
+            "rank": 78,
+            "batch": 3,
+            "vi": "bát đũa"
+        },
+        {
+            "zh": "洗手台",
+            "pinyin": "xi3 shou3 tai2",
+            "rank": 79,
+            "batch": 1,
+            "vi": "bồn rửa mặt"
+        },
+        {
+            "zh": "洗发水",
+            "pinyin": "xi3 fa4 shui3",
+            "rank": 80,
+            "batch": 2,
+            "vi": "dầu gội"
+        },
+        {
+            "zh": "烧水壶",
+            "pinyin": "shao1 shui3 hu2",
+            "rank": 81,
+            "batch": 2,
+            "vi": "ấm đun nước"
+        },
+        {
+            "zh": "相框",
+            "pinyin": "xiang4 kuang4",
+            "rank": 82,
+            "batch": 2,
+            "vi": "khung ảnh"
+        },
+        {
+            "zh": "玄关",
+            "pinyin": "xuan2 guan1",
+            "rank": 83,
+            "batch": 3,
+            "vi": "sảnh vào; tiền sảnh"
+        }
+    ]
+}

@@ -1,0 +1,288 @@
+{
+    "slug": "du-lich",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:52:02+07:00",
+    "words": [
+        {
+            "zh": "房间",
+            "pinyin": "fang2 jian1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "phòng"
+        },
+        {
+            "zh": "出发",
+            "pinyin": "chu1 fa1",
+            "rank": 2,
+            "batch": 1,
+            "vi": "khởi hành"
+        },
+        {
+            "zh": "酒店",
+            "pinyin": "jiu3 dian4",
+            "rank": 3,
+            "batch": 1,
+            "vi": "quán rượu"
+        },
+        {
+            "zh": "到达",
+            "pinyin": "dao4 da2",
+            "rank": 4,
+            "batch": 1,
+            "vi": "đạt đến; đến nơi"
+        },
+        {
+            "zh": "保险",
+            "pinyin": "bao3 xian3",
+            "rank": 5,
+            "batch": 1,
+            "vi": "bảo hiểm"
+        },
+        {
+            "zh": "机场",
+            "pinyin": "ji1 chang3",
+            "rank": 6,
+            "batch": 1,
+            "vi": "sân bay; phi trường"
+        },
+        {
+            "zh": "地图",
+            "pinyin": "di4 tu2",
+            "rank": 7,
+            "batch": 1,
+            "vi": "bản đồ"
+        },
+        {
+            "zh": "拍照",
+            "pinyin": "pai1 zhao4",
+            "rank": 8,
+            "batch": 1,
+            "vi": "chụp ảnh"
+        },
+        {
+            "zh": "行李",
+            "pinyin": "xing2 li5",
+            "rank": 9,
+            "batch": 1,
+            "vi": "hành lý"
+        },
+        {
+            "zh": "交通",
+            "pinyin": "jiao1 tong1",
+            "rank": 10,
+            "batch": 1,
+            "vi": "kết nối"
+        },
+        {
+            "zh": "航班",
+            "pinyin": "hang2 ban1",
+            "rank": 11,
+            "batch": 1,
+            "vi": "chuyến bay; chuyến tàu"
+        },
+        {
+            "zh": "度假",
+            "pinyin": "du4 jia4",
+            "rank": 12,
+            "batch": 1,
+            "vi": "đi nghỉ mát"
+        },
+        {
+            "zh": "乘客",
+            "pinyin": "cheng2 ke4",
+            "rank": 13,
+            "batch": 1,
+            "vi": "hành khách"
+        },
+        {
+            "zh": "路线",
+            "pinyin": "lu4 xian4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "hành trình"
+        },
+        {
+            "zh": "护照",
+            "pinyin": "hu4 zhao4",
+            "rank": 15,
+            "batch": 1,
+            "vi": "hộ chiếu"
+        },
+        {
+            "zh": "车站",
+            "pinyin": "che1 zhan4",
+            "rank": 16,
+            "batch": 1,
+            "vi": "ga tàu"
+        },
+        {
+            "zh": "机票",
+            "pinyin": "ji1 piao4",
+            "rank": 17,
+            "batch": 1,
+            "vi": "vé máy bay"
+        },
+        {
+            "zh": "参观",
+            "pinyin": "can1 guan1",
+            "rank": 18,
+            "batch": 1,
+            "vi": "tham quan"
+        },
+        {
+            "zh": "旅游",
+            "pinyin": "lu:3 you2",
+            "rank": 19,
+            "batch": 1,
+            "vi": "chuyến đi"
+        },
+        {
+            "zh": "门票",
+            "pinyin": "men2 piao4",
+            "rank": 20,
+            "batch": 1,
+            "vi": "vé"
+        },
+        {
+            "zh": "行程",
+            "pinyin": "xing2 cheng2",
+            "rank": 21,
+            "batch": 1,
+            "vi": "hành trình; lộ trình du lịch; quãng đường di chuyển"
+        },
+        {
+            "zh": "纪念品",
+            "pinyin": "ji4 nian4 pin3",
+            "rank": 22,
+            "batch": 1,
+            "vi": "quà lưu niệm"
+        },
+        {
+            "zh": "签证",
+            "pinyin": "qian1 zheng4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "thị thực"
+        },
+        {
+            "zh": "预订",
+            "pinyin": "yu4 ding4",
+            "rank": 24,
+            "batch": 2,
+            "vi": "đặt hàng"
+        },
+        {
+            "zh": "海关",
+            "pinyin": "hai3 guan1",
+            "rank": 25,
+            "batch": 1,
+            "vi": "hải quan"
+        },
+        {
+            "zh": "向导",
+            "pinyin": "xiang4 dao3",
+            "rank": 26,
+            "batch": 1,
+            "vi": "hướng dẫn"
+        },
+        {
+            "zh": "转机",
+            "pinyin": "zhuan3 ji1",
+            "rank": 27,
+            "batch": 1,
+            "vi": "(có) chuyển biến tốt"
+        },
+        {
+            "zh": "导游",
+            "pinyin": "dao3 you2",
+            "rank": 28,
+            "batch": 1,
+            "vi": "hướng dẫn viên du lịch"
+        },
+        {
+            "zh": "住宿",
+            "pinyin": "zhu4 su4",
+            "rank": 29,
+            "batch": 1,
+            "vi": "ở lại"
+        },
+        {
+            "zh": "入住",
+            "pinyin": "ru4 zhu4",
+            "rank": 30,
+            "batch": 1,
+            "vi": "nhận phòng"
+        },
+        {
+            "zh": "往返",
+            "pinyin": "wang3 fan3",
+            "rank": 31,
+            "batch": 1,
+            "vi": "đi tới lui; đi qua lại; làm một chuyến khứ hồi"
+        },
+        {
+            "zh": "单程",
+            "pinyin": "dan1 cheng2",
+            "rank": 32,
+            "batch": 1,
+            "vi": "một chiều"
+        },
+        {
+            "zh": "游玩",
+            "pinyin": "you2 wan2",
+            "rank": 33,
+            "batch": 1,
+            "vi": "giải trí"
+        },
+        {
+            "zh": "景点",
+            "pinyin": "jing3 dian3",
+            "rank": 34,
+            "batch": 1,
+            "vi": "điểm du lịch; danh lam thắng cảnh"
+        },
+        {
+            "zh": "特产",
+            "pinyin": "te4 chan3",
+            "rank": 35,
+            "batch": 1,
+            "vi": "sản phẩm địa phương đặc biệt"
+        },
+        {
+            "zh": "包车",
+            "pinyin": "bao1 che1",
+            "rank": 36,
+            "batch": 1,
+            "vi": "xe thuê"
+        },
+        {
+            "zh": "直飞",
+            "pinyin": "zhi2 fei1",
+            "rank": 37,
+            "batch": 1,
+            "vi": "bay không ngừng; bay thẳng"
+        },
+        {
+            "zh": "订票",
+            "pinyin": "ding4 piao4",
+            "rank": 38,
+            "batch": 1,
+            "vi": "đặt vé"
+        },
+        {
+            "zh": "退房",
+            "pinyin": "tui4 fang2",
+            "rank": 39,
+            "batch": 1,
+            "vi": "trả phòng khách sạn"
+        },
+        {
+            "zh": "订房",
+            "pinyin": "ding4 fang2",
+            "rank": 40,
+            "batch": 1,
+            "vi": "đặt phòng"
+        }
+    ]
+}

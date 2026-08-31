@@ -62,6 +62,11 @@ it('dùng limiter CÓ TÊN cho các endpoint ôn tập ghi dữ liệu', functio
     $expected = [
         'api/reviews/sessions' => 'throttle:review-sessions',
         'api/reviews/answers' => 'throttle:review-answers',
+        // Cùng bẫy: không khoá ở đây thì limiter sẽ bị gỡ "cho gọn" mà không
+        // làm đỏ gì, và endpoint ghi này rơi về trần theo IP của nhóm `api`.
+        'api/topics/skips' => 'throttle:topic-skips',
+        // Bề mặt duy nhất người dùng cuối kích hoạt được chi tiêu Gemini.
+        'api/topics' => 'throttle:topic-create',
     ];
 
     foreach ($expected as $uri => $middleware) {

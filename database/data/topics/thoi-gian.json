@@ -1,0 +1,510 @@
+{
+    "slug": "thoi-gian",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:53:15+07:00",
+    "words": [
+        {
+            "zh": "现在",
+            "pinyin": "xian4 zai4",
+            "rank": 1,
+            "batch": 1,
+            "vi": "bây giờ"
+        },
+        {
+            "zh": "点",
+            "pinyin": "dian3",
+            "rank": 2,
+            "batch": 1,
+            "vi": "điểm"
+        },
+        {
+            "zh": "时间",
+            "pinyin": "shi2 jian1",
+            "rank": 3,
+            "batch": 1,
+            "vi": "(khái niệm) thời gian"
+        },
+        {
+            "zh": "年",
+            "pinyin": "nian2",
+            "rank": 4,
+            "batch": 1,
+            "vi": "năm"
+        },
+        {
+            "zh": "今天",
+            "pinyin": "jin1 tian1",
+            "rank": 5,
+            "batch": 1,
+            "vi": "hôm nay"
+        },
+        {
+            "zh": "过去",
+            "pinyin": "guo4 qu4",
+            "rank": 6,
+            "batch": 1,
+            "vi": "trước đây; trước đó"
+        },
+        {
+            "zh": "月",
+            "pinyin": "yue4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "mặt trăng"
+        },
+        {
+            "zh": "早",
+            "pinyin": "zao3",
+            "rank": 8,
+            "batch": 1,
+            "vi": "sớm"
+        },
+        {
+            "zh": "号",
+            "pinyin": "hao4",
+            "rank": 9,
+            "batch": 1,
+            "vi": "số thứ tự",
+            "rejected": [
+                {
+                    "pinyin": "hao2",
+                    "vi": "gầm"
+                }
+            ]
+        },
+        {
+            "zh": "小时",
+            "pinyin": "xiao3 shi2",
+            "rank": 10,
+            "batch": 1,
+            "vi": "giờ"
+        },
+        {
+            "zh": "分钟",
+            "pinyin": "fen1 zhong1",
+            "rank": 11,
+            "batch": 1,
+            "vi": "phút"
+        },
+        {
+            "zh": "马上",
+            "pinyin": "ma3 shang4",
+            "rank": 12,
+            "batch": 2,
+            "vi": "ngay lập tức"
+        },
+        {
+            "zh": "明天",
+            "pinyin": "ming2 tian1",
+            "rank": 13,
+            "batch": 1,
+            "vi": "ngày mai"
+        },
+        {
+            "zh": "从来",
+            "pinyin": "cong2 lai2",
+            "rank": 14,
+            "batch": 1,
+            "vi": "luôn luôn"
+        },
+        {
+            "zh": "总是",
+            "pinyin": "zong3 shi4",
+            "rank": 15,
+            "batch": 1,
+            "vi": "luôn luôn"
+        },
+        {
+            "zh": "晚",
+            "pinyin": "wan3",
+            "rank": 16,
+            "batch": 1,
+            "vi": "buổi tối"
+        },
+        {
+            "zh": "刚刚",
+            "pinyin": "gang1 gang5",
+            "rank": 17,
+            "batch": 2,
+            "vi": "mới đây"
+        },
+        {
+            "zh": "最近",
+            "pinyin": "zui4 jin4",
+            "rank": 18,
+            "batch": 1,
+            "vi": "gần đây"
+        },
+        {
+            "zh": "分",
+            "pinyin": "fen1",
+            "rank": 19,
+            "batch": 1,
+            "vi": "chia; tách",
+            "rejected": [
+                {
+                    "pinyin": "fen4",
+                    "vi": "phần"
+                }
+            ]
+        },
+        {
+            "zh": "半",
+            "pinyin": "ban4",
+            "rank": 20,
+            "batch": 1,
+            "vi": "một nửa"
+        },
+        {
+            "zh": "昨天",
+            "pinyin": "zuo2 tian1",
+            "rank": 21,
+            "batch": 1,
+            "vi": "hôm qua"
+        },
+        {
+            "zh": "日",
+            "pinyin": "ri4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "mặt trời"
+        },
+        {
+            "zh": "星期",
+            "pinyin": "xing1 qi1",
+            "rank": 23,
+            "batch": 1,
+            "vi": "tuần"
+        },
+        {
+            "zh": "未来",
+            "pinyin": "wei4 lai2",
+            "rank": 24,
+            "batch": 1,
+            "vi": "tương lai"
+        },
+        {
+            "zh": "经常",
+            "pinyin": "jing1 chang2",
+            "rank": 25,
+            "batch": 1,
+            "vi": "thường xuyên; liên tục; đều đặn; thường"
+        },
+        {
+            "zh": "秒",
+            "pinyin": "miao3",
+            "rank": 26,
+            "batch": 1,
+            "vi": "giây"
+        },
+        {
+            "zh": "下午",
+            "pinyin": "xia4 wu3",
+            "rank": 27,
+            "batch": 1,
+            "vi": "buổi chiều"
+        },
+        {
+            "zh": "目前",
+            "pinyin": "mu4 qian2",
+            "rank": 28,
+            "batch": 2,
+            "vi": "hiện tại"
+        },
+        {
+            "zh": "最终",
+            "pinyin": "zui4 zhong1",
+            "rank": 29,
+            "batch": 1,
+            "vi": "cuối cùng; sau cùng"
+        },
+        {
+            "zh": "有时",
+            "pinyin": "you3 shi2",
+            "rank": 30,
+            "batch": 1,
+            "vi": "đôi khi"
+        },
+        {
+            "zh": "时刻",
+            "pinyin": "shi2 ke4",
+            "rank": 31,
+            "batch": 2,
+            "vi": "thời gian"
+        },
+        {
+            "zh": "随时",
+            "pinyin": "sui2 shi2",
+            "rank": 32,
+            "batch": 2,
+            "vi": "bất kỳ lúc nào; mọi lúc"
+        },
+        {
+            "zh": "立刻",
+            "pinyin": "li4 ke4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "ngay lập tức"
+        },
+        {
+            "zh": "去年",
+            "pinyin": "qu4 nian2",
+            "rank": 34,
+            "batch": 1,
+            "vi": "năm ngoái"
+        },
+        {
+            "zh": "年代",
+            "pinyin": "nian2 dai4",
+            "rank": 35,
+            "batch": 2,
+            "vi": "thập kỷ của một thế kỷ"
+        },
+        {
+            "zh": "暂时",
+            "pinyin": "zan4 shi2",
+            "rank": 36,
+            "batch": 1,
+            "vi": "tạm thời; lâm thời; hiện thời"
+        },
+        {
+            "zh": "早晨",
+            "pinyin": "zao3 chen2",
+            "rank": 37,
+            "batch": 2,
+            "vi": "buổi sáng sớm"
+        },
+        {
+            "zh": "将来",
+            "pinyin": "jiang1 lai2",
+            "rank": 38,
+            "batch": 2,
+            "vi": "trong tương lai"
+        },
+        {
+            "zh": "持续",
+            "pinyin": "chi2 xu4",
+            "rank": 39,
+            "batch": 2,
+            "vi": "tiếp tục"
+        },
+        {
+            "zh": "期间",
+            "pinyin": "qi1 jian1",
+            "rank": 40,
+            "batch": 2,
+            "vi": "khoảng thời gian"
+        },
+        {
+            "zh": "偶尔",
+            "pinyin": "ou3 er3",
+            "rank": 41,
+            "batch": 2,
+            "vi": "thỉnh thoảng"
+        },
+        {
+            "zh": "平时",
+            "pinyin": "ping2 shi2",
+            "rank": 42,
+            "batch": 1,
+            "vi": "thường lệ"
+        },
+        {
+            "zh": "中午",
+            "pinyin": "zhong1 wu3",
+            "rank": 43,
+            "batch": 1,
+            "vi": "buổi trưa"
+        },
+        {
+            "zh": "明年",
+            "pinyin": "ming2 nian2",
+            "rank": 44,
+            "batch": 1,
+            "vi": "năm sau"
+        },
+        {
+            "zh": "上午",
+            "pinyin": "shang4 wu3",
+            "rank": 45,
+            "batch": 1,
+            "vi": "buổi sáng"
+        },
+        {
+            "zh": "准时",
+            "pinyin": "zhun3 shi2",
+            "rank": 46,
+            "batch": 2,
+            "vi": "đúng giờ"
+        },
+        {
+            "zh": "始终",
+            "pinyin": "shi3 zhong1",
+            "rank": 47,
+            "batch": 1,
+            "vi": "từ đầu đến cuối"
+        },
+        {
+            "zh": "年度",
+            "pinyin": "nian2 du4",
+            "rank": 48,
+            "batch": 2,
+            "vi": "năm"
+        },
+        {
+            "zh": "长期",
+            "pinyin": "chang2 qi1",
+            "rank": 49,
+            "batch": 2,
+            "vi": "dài hạn"
+        },
+        {
+            "zh": "往常",
+            "pinyin": "wang3 chang2",
+            "rank": 50,
+            "batch": 2,
+            "vi": "thông thường"
+        },
+        {
+            "zh": "以往",
+            "pinyin": "yi3 wang3",
+            "rank": 51,
+            "batch": 2,
+            "vi": "trong quá khứ; trước đây"
+        },
+        {
+            "zh": "季节",
+            "pinyin": "ji4 jie2",
+            "rank": 52,
+            "batch": 2,
+            "vi": "thời gian"
+        },
+        {
+            "zh": "片刻",
+            "pinyin": "pian4 ke4",
+            "rank": 53,
+            "batch": 2,
+            "vi": "khoảng thời gian ngắn"
+        },
+        {
+            "zh": "深夜",
+            "pinyin": "shen1 ye4",
+            "rank": 54,
+            "batch": 2,
+            "vi": "rất khuya"
+        },
+        {
+            "zh": "终究",
+            "pinyin": "zhong1 jiu1",
+            "rank": 55,
+            "batch": 2,
+            "vi": "cuối cùng"
+        },
+        {
+            "zh": "早晚",
+            "pinyin": "zao3 wan3",
+            "rank": 56,
+            "batch": 2,
+            "vi": "sáng và tối"
+        },
+        {
+            "zh": "频繁",
+            "pinyin": "pin2 fan2",
+            "rank": 57,
+            "batch": 2,
+            "vi": "thường xuyên"
+        },
+        {
+            "zh": "时常",
+            "pinyin": "shi2 chang2",
+            "rank": 58,
+            "batch": 2,
+            "vi": "thường xuyên"
+        },
+        {
+            "zh": "短期",
+            "pinyin": "duan3 qi1",
+            "rank": 59,
+            "batch": 2,
+            "vi": "ngắn hạn"
+        },
+        {
+            "zh": "前天",
+            "pinyin": "qian2 tian1",
+            "rank": 60,
+            "batch": 1,
+            "vi": "ngày hôm kia"
+        },
+        {
+            "zh": "此后",
+            "pinyin": "ci3 hou4",
+            "rank": 61,
+            "batch": 2,
+            "vi": "sau việc này"
+        },
+        {
+            "zh": "后天",
+            "pinyin": "hou4 tian1",
+            "rank": 62,
+            "batch": 1,
+            "vi": "ngày mốt"
+        },
+        {
+            "zh": "过往",
+            "pinyin": "guo4 wang3",
+            "rank": 63,
+            "batch": 2,
+            "vi": "đi qua lại"
+        },
+        {
+            "zh": "初期",
+            "pinyin": "chu1 qi1",
+            "rank": 64,
+            "batch": 2,
+            "vi": "giai đoạn đầu"
+        },
+        {
+            "zh": "现今",
+            "pinyin": "xian4 jin1",
+            "rank": 65,
+            "batch": 2,
+            "vi": "bây giờ"
+        },
+        {
+            "zh": "纷纷",
+            "pinyin": "fen1 fen1",
+            "rank": 66,
+            "batch": 2,
+            "vi": "hết cái này đến cái khác"
+        },
+        {
+            "zh": "此前",
+            "pinyin": "ci3 qian2",
+            "rank": 67,
+            "batch": 2,
+            "vi": "trước đó"
+        },
+        {
+            "zh": "日后",
+            "pinyin": "ri4 hou4",
+            "rank": 68,
+            "batch": 2,
+            "vi": "một lúc nào đó"
+        },
+        {
+            "zh": "末期",
+            "pinyin": "mo4 qi1",
+            "rank": 69,
+            "batch": 2,
+            "vi": "cuối"
+        },
+        {
+            "zh": "顿时",
+            "pinyin": "dun4 shi2",
+            "rank": 70,
+            "batch": 2,
+            "vi": "ngay lập tức"
+        }
+    ]
+}

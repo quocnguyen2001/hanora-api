@@ -8,6 +8,7 @@ use App\Models\DictionaryWord;
 use App\Models\ReviewSession;
 use App\Models\User;
 use App\Models\UserWord;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
@@ -28,6 +29,14 @@ final class ReviewSessionBuilder
 
     /** Có từ, nhưng không dựng được câu trắc nghiệm nào từ chúng. */
     public const EMPTY_NOT_ENOUGH_OPTIONS = 'not_enough_options';
+
+    /**
+     * Trần tỉ lệ từ MỚI trong một phiên `due`.
+     *
+     * Là TRẦN, không phải hạn mức: kho chưa có từ quá hạn thì phiên vẫn lấp đầy
+     * bằng từ mới như trước. Xem `dueWords()` cho lý do đầy đủ.
+     */
+    private const NEW_WORD_RATIO = 0.30;
 
     public function __construct(private readonly WeakWordQuery $weakWords) {}
 
@@ -72,35 +81,83 @@ final class ReviewSessionBuilder
     }
 
     /**
-     * Từ tới hạn: `next_review_at <= now()` hoặc `null` (từ mới).
+     * Từ tới hạn: `next_review_at <= now()` hoặc `null` (từ mới), CÓ TRẦN từ mới.
      *
      * Quá hạn lâu nhất lên trước — đó là những từ sắp quên nhất.
+     *
+     * Trước đây đây là MỘT truy vấn với `ORDER BY next_review_at ASC NULLS
+     * FIRST`. Cách đó không chỉ *nhận* từ mới, nó cho chúng quyền ưu tiên TUYỆT
+     * ĐỐI, rồi `limit()` cắt sạch từ quá hạn. Khi từ mới còn nhỏ giọt (một từ
+     * mỗi lần lưu từ màn tìm kiếm) thì không ai thấy; từ khi màn học chủ đề đổ
+     * vào 10 từ mới một lúc, người có 120 từ quá hạn sẽ ôn 8 phiên liên tiếp mà
+     * không chạm một từ quá hạn nào — trái hẳn câu ngay trên đây.
+     *
+     * Trần chỉ đụng truy vấn CHỌN thẻ. Công thức xếp lịch (`SrsScheduler`)
+     * không đổi một dòng.
      *
      * @return Collection<int, UserWord>
      */
     private function dueWords(User $user, int $limit): Collection
     {
+        $newQuota = max(1, (int) floor($limit * self::NEW_WORD_RATIO));
+
+        $new = $this->eligible($user)
+            ->whereNull('next_review_at')
+            ->orderBy('id')
+            ->limit($newQuota)
+            ->get();
+
+        $overdue = $this->eligible($user)
+            ->whereNotNull('next_review_at')
+            ->where('next_review_at', '<=', now())
+            ->orderBy('next_review_at')
+            ->orderBy('id')
+            // `$limit - $new->count()`, KHÔNG `$limit - $newQuota`: kho chỉ có
+            // một từ mới thì chín chỗ còn lại phải thuộc về từ quá hạn.
+            ->limit($limit - $new->count())
+            ->get();
+
+        /*
+         * Còn chỗ trống thì lấp thêm bằng từ mới.
+         *
+         * Đây là thứ giữ cho trần là TRẦN chứ không phải hạn mức: người mới học
+         * chưa có từ quá hạn nào vẫn nhận đủ số thẻ như trước.
+         */
+        $remaining = $limit - $overdue->count() - $new->count();
+
+        if ($remaining > 0) {
+            $new = $new->concat(
+                $this->eligible($user)
+                    ->whereNull('next_review_at')
+                    ->whereNotIn('id', $new->modelKeys())
+                    ->orderBy('id')
+                    ->limit($remaining)
+                    ->get()
+            );
+        }
+
+        // Quá hạn trước, từ mới sau — đúng ý định mà comment gốc đã ghi.
+        return $overdue->concat($new)->values();
+    }
+
+    /**
+     * Nền chung của hai nhánh: từ của user, đã ghép được âm Hán-Việt.
+     *
+     * CHỈ từ có âm Hán-Việt: cả hai mode đều xoay quanh nó (D13) — trắc nghiệm
+     * hỏi nó, mode gõ hiển thị nó làm đề bài. Một từ `missing` cho ra câu hỏi
+     * trống: không phải câu hỏi khó, mà là câu hỏi hỏng.
+     *
+     * @return Builder<UserWord>
+     */
+    private function eligible(User $user): Builder
+    {
         return UserWord::query()
             ->with('word')
             ->where('user_id', $user->id)
-            ->where(function ($query): void {
-                $query->whereNull('next_review_at')->orWhere('next_review_at', '<=', now());
-            })
-            /*
-             * CHỈ từ đã ghép được âm Hán-Việt.
-             *
-             * Cả hai mode đều xoay quanh âm Hán-Việt (D13): trắc nghiệm hỏi nó,
-             * mode gõ hiển thị nó làm đề bài. Một từ `missing` sẽ cho ra câu hỏi
-             * trống — không phải câu hỏi khó, mà là câu hỏi hỏng.
-             */
             ->whereHas('word', fn ($query) => $query->whereIn('han_viet_status', [
                 DictionaryWord::STATUS_OK,
                 DictionaryWord::STATUS_MANUAL,
-            ]))
-            ->orderByRaw('next_review_at ASC NULLS FIRST')
-            ->orderBy('id')
-            ->limit($limit)
-            ->get();
+            ]));
     }
 
     /**

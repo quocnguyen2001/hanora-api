@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ReviewHistoryController;
 use App\Http\Controllers\Api\StatsController;
+use App\Http\Controllers\Api\TopicController;
+use App\Http\Controllers\Api\TopicSkipController;
 use App\Http\Controllers\Api\VocabularyController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,6 +108,41 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/', [VocabularyController::class, 'store'])->name('store');
         Route::delete('/{id}', [VocabularyController::class, 'destroy'])
             ->whereNumber('id')->name('destroy');
+    });
+
+    /*
+     * Chủ đề học từ vựng. SQL thuần — nội dung đã nằm sẵn trong bảng nhờ
+     * `topics:import`, nên đường request không chạm Gemini hay Pixabay.
+     */
+    Route::prefix('topics')->name('api.topics.')->group(function (): void {
+        Route::get('/', [TopicController::class, 'index'])->name('index');
+
+        /*
+         * Tạo chủ đề: endpoint GHI, xếp job gọi Gemini. Limiter CÓ TÊN chặt hơn
+         * hẳn `topic-skips` vì mỗi request tiêu 2-3 lời gọi AI, không phải một
+         * dòng trong bảng.
+         */
+        Route::post('/', [TopicController::class, 'store'])
+            ->middleware('throttle:topic-create')->name('store');
+
+        /*
+         * `skips` đặt trước `{slug}/words` cho dễ đọc, nhưng ở đây KHÔNG có va
+         * chạm thật: `{slug}/words` có hậu tố nên `topics/skips` không thể khớp
+         * nó. Khác hẳn `vocabulary/ids` vs `vocabulary/{id}` — ở đó `{id}`
+         * không có hậu tố nên thứ tự là bắt buộc.
+         */
+        Route::get('/skips', [TopicSkipController::class, 'index'])->name('skips.index');
+
+        // Limiter CÓ TÊN, khoá theo user: endpoint GHI tạo một bản ghi mỗi
+        // request, đúng lập luận đã ghi cho `review-sessions`.
+        Route::post('/skips', [TopicSkipController::class, 'store'])
+            ->middleware('throttle:topic-skips')->name('skips.store');
+
+        Route::get('/{slug}/words', [TopicController::class, 'words'])
+            ->where('slug', '[a-z0-9-]+')->name('words');
+
+        Route::delete('/{slug}', [TopicController::class, 'destroy'])
+            ->where('slug', '[a-z0-9-]+')->name('destroy');
     });
 
     Route::get('/stats/summary', StatsController::class)->name('api.stats.summary');

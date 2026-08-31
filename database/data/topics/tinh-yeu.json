@@ -1,0 +1,842 @@
+{
+    "slug": "tinh-yeu",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:49:52+07:00",
+    "words": [
+        {
+            "zh": "好",
+            "pinyin": "hao3",
+            "rank": 1,
+            "batch": 3,
+            "vi": "tốt",
+            "rejected": [
+                {
+                    "pinyin": "hao4",
+                    "vi": "thích; có khuynh hướng; dễ"
+                }
+            ]
+        },
+        {
+            "zh": "想",
+            "pinyin": "xiang3",
+            "rank": 2,
+            "batch": 3,
+            "vi": "nghĩ"
+        },
+        {
+            "zh": "真",
+            "pinyin": "zhen1",
+            "rank": 3,
+            "batch": 3,
+            "vi": "thật"
+        },
+        {
+            "zh": "喜欢",
+            "pinyin": "xi3 huan5",
+            "rank": 4,
+            "batch": 1,
+            "vi": "thích; ưa thích"
+        },
+        {
+            "zh": "爱",
+            "pinyin": "ai4",
+            "rank": 5,
+            "batch": 1,
+            "vi": "yêu; thích"
+        },
+        {
+            "zh": "见",
+            "pinyin": "jian4",
+            "rank": 6,
+            "batch": 3,
+            "vi": "thấy",
+            "rejected": [
+                {
+                    "pinyin": "xian4",
+                    "vi": "xuất hiện"
+                }
+            ]
+        },
+        {
+            "zh": "感觉",
+            "pinyin": "gan3 jue2",
+            "rank": 7,
+            "batch": 1,
+            "vi": "cảm giác; ấn tượng; cảm nhận"
+        },
+        {
+            "zh": "手",
+            "pinyin": "shou3",
+            "rank": 8,
+            "batch": 3,
+            "vi": "tay"
+        },
+        {
+            "zh": "关系",
+            "pinyin": "guan1 xi5",
+            "rank": 9,
+            "batch": 1,
+            "vi": "quan hệ"
+        },
+        {
+            "zh": "心",
+            "pinyin": "xin1",
+            "rank": 10,
+            "batch": 3,
+            "vi": "tim"
+        },
+        {
+            "zh": "动",
+            "pinyin": "dong4",
+            "rank": 11,
+            "batch": 3,
+            "vi": "(cái gì đó) di chuyển"
+        },
+        {
+            "zh": "信",
+            "pinyin": "xin4",
+            "rank": 12,
+            "batch": 3,
+            "vi": "thư"
+        },
+        {
+            "zh": "美",
+            "pinyin": "mei3",
+            "rank": 13,
+            "batch": 3,
+            "vi": "đẹp",
+            "rejected": [
+                {
+                    "pinyin": "Mei3",
+                    "vi": "(hình thái kết hợp) Châu Mỹ"
+                }
+            ]
+        },
+        {
+            "zh": "懂",
+            "pinyin": "dong3",
+            "rank": 14,
+            "batch": 3,
+            "vi": "hiểu"
+        },
+        {
+            "zh": "结婚",
+            "pinyin": "jie2 hun1",
+            "rank": 15,
+            "batch": 1,
+            "vi": "kết hôn"
+        },
+        {
+            "zh": "约会",
+            "pinyin": "yue1 hui4",
+            "rank": 16,
+            "batch": 1,
+            "vi": "cuộc hẹn"
+        },
+        {
+            "zh": "离",
+            "pinyin": "li2",
+            "rank": 17,
+            "batch": 3,
+            "vi": "rời khỏi",
+            "rejected": [
+                {
+                    "pinyin": "chi1",
+                    "vi": "loài thú thần thoại"
+                }
+            ]
+        },
+        {
+            "zh": "分",
+            "pinyin": "fen1",
+            "rank": 18,
+            "batch": 3,
+            "vi": "chia; tách",
+            "rejected": [
+                {
+                    "pinyin": "fen4",
+                    "vi": "phần"
+                }
+            ]
+        },
+        {
+            "zh": "秘密",
+            "pinyin": "mi4 mi4",
+            "rank": 19,
+            "batch": 1,
+            "vi": "bí mật; riêng tư; tuyệt mật"
+        },
+        {
+            "zh": "伤",
+            "pinyin": "shang1",
+            "rank": 20,
+            "batch": 3,
+            "vi": "làm bị thương"
+        },
+        {
+            "zh": "甜",
+            "pinyin": "tian2",
+            "rank": 21,
+            "batch": 3,
+            "vi": "ngọt"
+        },
+        {
+            "zh": "拥有",
+            "pinyin": "yong1 you3",
+            "rank": 22,
+            "batch": 2,
+            "vi": "có; sở hữu"
+        },
+        {
+            "zh": "关心",
+            "pinyin": "guan1 xin1",
+            "rank": 23,
+            "batch": 1,
+            "vi": "quan tâm đến; chăm sóc"
+        },
+        {
+            "zh": "情",
+            "pinyin": "qing2",
+            "rank": 24,
+            "batch": 3,
+            "vi": "(hình thức kết hợp) tình cảm; cảm xúc; tình; đam mê"
+        },
+        {
+            "zh": "信任",
+            "pinyin": "xin4 ren4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "tin tưởng"
+        },
+        {
+            "zh": "感",
+            "pinyin": "gan3",
+            "rank": 26,
+            "batch": 3,
+            "vi": "cảm thấy"
+        },
+        {
+            "zh": "恨",
+            "pinyin": "hen4",
+            "rank": 27,
+            "batch": 3,
+            "vi": "ghét"
+        },
+        {
+            "zh": "吻",
+            "pinyin": "wen3",
+            "rank": 28,
+            "batch": 3,
+            "vi": "nụ hôn"
+        },
+        {
+            "zh": "遗憾",
+            "pinyin": "yi2 han4",
+            "rank": 29,
+            "batch": 2,
+            "vi": "hối tiếc"
+        },
+        {
+            "zh": "抱",
+            "pinyin": "bao4",
+            "rank": 30,
+            "batch": 3,
+            "vi": "ôm"
+        },
+        {
+            "zh": "痛",
+            "pinyin": "tong4",
+            "rank": 31,
+            "batch": 3,
+            "vi": "đau"
+        },
+        {
+            "zh": "分手",
+            "pinyin": "fen1 shou3",
+            "rank": 32,
+            "batch": 1,
+            "vi": "chia tay"
+        },
+        {
+            "zh": "幸福",
+            "pinyin": "xing4 fu2",
+            "rank": 33,
+            "batch": 1,
+            "vi": "hạnh phúc"
+        },
+        {
+            "zh": "惊喜",
+            "pinyin": "jing1 xi3",
+            "rank": 34,
+            "batch": 2,
+            "vi": "bất ngờ thú vị"
+        },
+        {
+            "zh": "吵",
+            "pinyin": "chao3",
+            "rank": 35,
+            "batch": 3,
+            "vi": "cãi nhau"
+        },
+        {
+            "zh": "意",
+            "pinyin": "yi4",
+            "rank": 36,
+            "batch": 3,
+            "vi": "ý tưởng"
+        },
+        {
+            "zh": "期待",
+            "pinyin": "qi1 dai4",
+            "rank": 37,
+            "batch": 2,
+            "vi": "mong chờ"
+        },
+        {
+            "zh": "伤心",
+            "pinyin": "shang1 xin1",
+            "rank": 38,
+            "batch": 1,
+            "vi": "đau buồn"
+        },
+        {
+            "zh": "结",
+            "pinyin": "jie2",
+            "rank": 39,
+            "batch": 3,
+            "vi": "nút",
+            "rejected": [
+                {
+                    "pinyin": "jie1",
+                    "vi": "(cây) ra"
+                }
+            ]
+        },
+        {
+            "zh": "吸引",
+            "pinyin": "xi1 yin3",
+            "rank": 40,
+            "batch": 2,
+            "vi": "thu hút; hấp dẫn; làm mê hoặc"
+        },
+        {
+            "zh": "难过",
+            "pinyin": "nan2 guo4",
+            "rank": 41,
+            "batch": 1,
+            "vi": "cảm thấy buồn"
+        },
+        {
+            "zh": "想念",
+            "pinyin": "xiang3 nian4",
+            "rank": 42,
+            "batch": 1,
+            "vi": "nhớ"
+        },
+        {
+            "zh": "相处",
+            "pinyin": "xiang1 chu3",
+            "rank": 43,
+            "batch": 2,
+            "vi": "tiếp xúc"
+        },
+        {
+            "zh": "分开",
+            "pinyin": "fen1 kai1",
+            "rank": 44,
+            "batch": 1,
+            "vi": "tách ra"
+        },
+        {
+            "zh": "承诺",
+            "pinyin": "cheng2 nuo4",
+            "rank": 45,
+            "batch": 1,
+            "vi": "hứa"
+        },
+        {
+            "zh": "浪漫",
+            "pinyin": "lang4 man4",
+            "rank": 46,
+            "batch": 1,
+            "vi": "lãng mạn"
+        },
+        {
+            "zh": "念",
+            "pinyin": "nian4",
+            "rank": 47,
+            "batch": 3,
+            "vi": "đọc"
+        },
+        {
+            "zh": "单身",
+            "pinyin": "dan1 shen1",
+            "rank": 48,
+            "batch": 1,
+            "vi": "chưa kết hôn; độc thân"
+        },
+        {
+            "zh": "回忆",
+            "pinyin": "hui2 yi4",
+            "rank": 49,
+            "batch": 1,
+            "vi": "hồi tưởng"
+        },
+        {
+            "zh": "婚",
+            "pinyin": "hun1",
+            "rank": 50,
+            "batch": 3,
+            "vi": "kết hôn"
+        },
+        {
+            "zh": "坦白",
+            "pinyin": "tan3 bai2",
+            "rank": 51,
+            "batch": 2,
+            "vi": "thành thật"
+        },
+        {
+            "zh": "嫉妒",
+            "pinyin": "ji2 du4",
+            "rank": 52,
+            "batch": 1,
+            "vi": "ghen tị với; đố kỵ"
+        },
+        {
+            "zh": "期",
+            "pinyin": "qi1",
+            "rank": 53,
+            "batch": 3,
+            "vi": "thời kỳ"
+        },
+        {
+            "zh": "误会",
+            "pinyin": "wu4 hui4",
+            "rank": 54,
+            "batch": 2,
+            "vi": "hiểu lầm"
+        },
+        {
+            "zh": "恋爱",
+            "pinyin": "lian4 ai4",
+            "rank": 55,
+            "batch": 1,
+            "vi": "(tình) yêu lãng mạn"
+        },
+        {
+            "zh": "恋",
+            "pinyin": "lian4",
+            "rank": 56,
+            "batch": 3,
+            "vi": "cảm thấy gắn bó"
+        },
+        {
+            "zh": "拥抱",
+            "pinyin": "yong1 bao4",
+            "rank": 57,
+            "batch": 1,
+            "vi": "ôm ấp"
+        },
+        {
+            "zh": "渴望",
+            "pinyin": "ke3 wang4",
+            "rank": 58,
+            "batch": 2,
+            "vi": "khao khát"
+        },
+        {
+            "zh": "吵架",
+            "pinyin": "chao3 jia4",
+            "rank": 59,
+            "batch": 1,
+            "vi": "cãi nhau"
+        },
+        {
+            "zh": "忠诚",
+            "pinyin": "zhong1 cheng2",
+            "rank": 60,
+            "batch": 2,
+            "vi": "tận tụy"
+        },
+        {
+            "zh": "安慰",
+            "pinyin": "an1 wei4",
+            "rank": 61,
+            "batch": 2,
+            "vi": "an ủi"
+        },
+        {
+            "zh": "情人",
+            "pinyin": "qing2 ren2",
+            "rank": 62,
+            "batch": 1,
+            "vi": "người yêu"
+        },
+        {
+            "zh": "追求",
+            "pinyin": "zhui1 qiu2",
+            "rank": 63,
+            "batch": 1,
+            "vi": "theo đuổi (một mục tiêu, v.v.) một cách ngoan cố"
+        },
+        {
+            "zh": "温柔",
+            "pinyin": "wen1 rou2",
+            "rank": 64,
+            "batch": 1,
+            "vi": "dịu dàng và mềm mại; nhẹ nhàng; ngọt ngào"
+        },
+        {
+            "zh": "感动",
+            "pinyin": "gan3 dong4",
+            "rank": 65,
+            "batch": 1,
+            "vi": "làm cảm động"
+        },
+        {
+            "zh": "相爱",
+            "pinyin": "xiang1 ai4",
+            "rank": 66,
+            "batch": 1,
+            "vi": "yêu nhau"
+        },
+        {
+            "zh": "伴",
+            "pinyin": "ban4",
+            "rank": 67,
+            "batch": 3,
+            "vi": "bạn đồng hành; đồng chí; cộng sự"
+        },
+        {
+            "zh": "眼泪",
+            "pinyin": "yan3 lei4",
+            "rank": 68,
+            "batch": 1,
+            "vi": "nước mắt"
+        },
+        {
+            "zh": "甜蜜",
+            "pinyin": "tian2 mi4",
+            "rank": 69,
+            "batch": 1,
+            "vi": "ngọt ngào"
+        },
+        {
+            "zh": "牵",
+            "pinyin": "qian1",
+            "rank": 70,
+            "batch": 3,
+            "vi": "dắt"
+        },
+        {
+            "zh": "亲吻",
+            "pinyin": "qin1 wen3",
+            "rank": 71,
+            "batch": 1,
+            "vi": "hôn"
+        },
+        {
+            "zh": "伴侣",
+            "pinyin": "ban4 lu:3",
+            "rank": 72,
+            "batch": 1,
+            "vi": "bạn đồng hành"
+        },
+        {
+            "zh": "永恒",
+            "pinyin": "yong3 heng2",
+            "rank": 73,
+            "batch": 1,
+            "vi": "vĩnh cửu"
+        },
+        {
+            "zh": "真诚",
+            "pinyin": "zhen1 cheng2",
+            "rank": 74,
+            "batch": 2,
+            "vi": "thành thật; chân thành; thật lòng"
+        },
+        {
+            "zh": "望",
+            "pinyin": "wang4",
+            "rank": 75,
+            "batch": 3,
+            "vi": "trăng tròn"
+        },
+        {
+            "zh": "守护",
+            "pinyin": "shou3 hu4",
+            "rank": 76,
+            "batch": 2,
+            "vi": "bảo vệ"
+        },
+        {
+            "zh": "珍惜",
+            "pinyin": "zhen1 xi1",
+            "rank": 77,
+            "batch": 2,
+            "vi": "trân trọng"
+        },
+        {
+            "zh": "依赖",
+            "pinyin": "yi1 lai4",
+            "rank": 78,
+            "batch": 1,
+            "vi": "phụ thuộc vào; lệ thuộc vào"
+        },
+        {
+            "zh": "体贴",
+            "pinyin": "ti3 tie1",
+            "rank": 79,
+            "batch": 1,
+            "vi": "ân cần"
+        },
+        {
+            "zh": "纯洁",
+            "pinyin": "chun2 jie2",
+            "rank": 80,
+            "batch": 2,
+            "vi": "thuần khiết"
+        },
+        {
+            "zh": "陪伴",
+            "pinyin": "pei2 ban4",
+            "rank": 81,
+            "batch": 1,
+            "vi": "đồng hành"
+        },
+        {
+            "zh": "情侣",
+            "pinyin": "qing2 lu:3",
+            "rank": 82,
+            "batch": 2,
+            "vi": "người yêu"
+        },
+        {
+            "zh": "迷恋",
+            "pinyin": "mi2 lian4",
+            "rank": 83,
+            "batch": 2,
+            "vi": "say mê"
+        },
+        {
+            "zh": "心碎",
+            "pinyin": "xin1 sui4",
+            "rank": 84,
+            "batch": 2,
+            "vi": "đau lòng"
+        },
+        {
+            "zh": "默契",
+            "pinyin": "mo4 qi4",
+            "rank": 85,
+            "batch": 2,
+            "vi": "hiểu ngầm"
+        },
+        {
+            "zh": "秘",
+            "pinyin": "mi4",
+            "rank": 86,
+            "batch": 3,
+            "vi": "bí mật"
+        },
+        {
+            "zh": "占有",
+            "pinyin": "zhan4 you3",
+            "rank": 87,
+            "batch": 2,
+            "vi": "có"
+        },
+        {
+            "zh": "初恋",
+            "pinyin": "chu1 lian4",
+            "rank": 88,
+            "batch": 1,
+            "vi": "mối tình đầu"
+        },
+        {
+            "zh": "缘",
+            "pinyin": "yuan2",
+            "rank": 89,
+            "batch": 3,
+            "vi": "nguyên nhân"
+        },
+        {
+            "zh": "泪",
+            "pinyin": "lei4",
+            "rank": 90,
+            "batch": 3,
+            "vi": "nước mắt"
+        },
+        {
+            "zh": "思念",
+            "pinyin": "si1 nian4",
+            "rank": 91,
+            "batch": 2,
+            "vi": "nhớ đến"
+        },
+        {
+            "zh": "宠",
+            "pinyin": "chong3",
+            "rank": 92,
+            "batch": 3,
+            "vi": "yêu thương"
+        },
+        {
+            "zh": "互动",
+            "pinyin": "hu4 dong4",
+            "rank": 93,
+            "batch": 2,
+            "vi": "tương tác"
+        },
+        {
+            "zh": "柔",
+            "pinyin": "rou2",
+            "rank": 94,
+            "batch": 3,
+            "vi": "mềm"
+        },
+        {
+            "zh": "牵挂",
+            "pinyin": "qian1 gua4",
+            "rank": 95,
+            "batch": 2,
+            "vi": "lo lắng về"
+        },
+        {
+            "zh": "深情",
+            "pinyin": "shen1 qing2",
+            "rank": 96,
+            "batch": 2,
+            "vi": "cảm xúc sâu sắc; tình cảm sâu đậm; tình yêu sâu đậm"
+        },
+        {
+            "zh": "包容",
+            "pinyin": "bao1 rong2",
+            "rank": 97,
+            "batch": 2,
+            "vi": "tha thứ"
+        },
+        {
+            "zh": "暧昧",
+            "pinyin": "ai4 mei4",
+            "rank": 98,
+            "batch": 2,
+            "vi": "mơ hồ"
+        },
+        {
+            "zh": "缘分",
+            "pinyin": "yuan2 fen4",
+            "rank": 99,
+            "batch": 1,
+            "vi": "số phận hoặc cơ hội đưa người ta đến với nhau"
+        },
+        {
+            "zh": "悔",
+            "pinyin": "hui3",
+            "rank": 100,
+            "batch": 3,
+            "vi": "(dạng kết hợp) hối hận; ăn năn"
+        },
+        {
+            "zh": "热恋",
+            "pinyin": "re4 lian4",
+            "rank": 101,
+            "batch": 2,
+            "vi": "yêu say đắm"
+        },
+        {
+            "zh": "心动",
+            "pinyin": "xin1 dong4",
+            "rank": 102,
+            "batch": 1,
+            "vi": "nhịp tim; tần số tim"
+        },
+        {
+            "zh": "告白",
+            "pinyin": "gao4 bai2",
+            "rank": 103,
+            "batch": 1,
+            "vi": "công khai thông báo"
+        },
+        {
+            "zh": "苦涩",
+            "pinyin": "ku3 se4",
+            "rank": 104,
+            "batch": 2,
+            "vi": "đắng và chát"
+        },
+        {
+            "zh": "悦",
+            "pinyin": "yue4",
+            "rank": 105,
+            "batch": 3,
+            "vi": "vui lòng"
+        },
+        {
+            "zh": "心疼",
+            "pinyin": "xin1 teng2",
+            "rank": 106,
+            "batch": 2,
+            "vi": "rất yêu thương"
+        },
+        {
+            "zh": "羞涩",
+            "pinyin": "xiu1 se4",
+            "rank": 107,
+            "batch": 2,
+            "vi": "nhút nhát; bẽn lẽn"
+        },
+        {
+            "zh": "磨合",
+            "pinyin": "mo2 he2",
+            "rank": 108,
+            "batch": 2,
+            "vi": "mài giũa"
+        },
+        {
+            "zh": "眷恋",
+            "pinyin": "juan4 lian4",
+            "rank": 109,
+            "batch": 2,
+            "vi": "nhớ nhung"
+        },
+        {
+            "zh": "暗恋",
+            "pinyin": "an4 lian4",
+            "rank": 110,
+            "batch": 2,
+            "vi": "thầm yêu"
+        },
+        {
+            "zh": "牵手",
+            "pinyin": "qian1 shou3",
+            "rank": 111,
+            "batch": 2,
+            "vi": "nắm tay"
+        },
+        {
+            "zh": "执着",
+            "pinyin": "zhi2 zhuo2",
+            "rank": 112,
+            "batch": 2,
+            "vi": "quá gắn bó"
+        },
+        {
+            "zh": "心甘",
+            "pinyin": "xin1 gan1",
+            "rank": 113,
+            "batch": 2,
+            "vi": "sẵn lòng"
+        },
+        {
+            "zh": "默念",
+            "pinyin": "mo4 nian4",
+            "rank": 114,
+            "batch": 2,
+            "vi": "đọc thầm"
+        }
+    ]
+}

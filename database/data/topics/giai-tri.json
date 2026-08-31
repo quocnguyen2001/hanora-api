@@ -1,0 +1,288 @@
+{
+    "slug": "giai-tri",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:53:33+07:00",
+    "words": [
+        {
+            "zh": "比赛",
+            "pinyin": "bi3 sai4",
+            "rank": 1,
+            "batch": 1,
+            "vi": "cuộc thi"
+        },
+        {
+            "zh": "赢",
+            "pinyin": "ying2",
+            "rank": 2,
+            "batch": 1,
+            "vi": "thắng"
+        },
+        {
+            "zh": "队",
+            "pinyin": "dui4",
+            "rank": 3,
+            "batch": 1,
+            "vi": "phi đội"
+        },
+        {
+            "zh": "记录",
+            "pinyin": "ji4 lu4",
+            "rank": 4,
+            "batch": 1,
+            "vi": "ghi chép"
+        },
+        {
+            "zh": "加油",
+            "pinyin": "jia1 you2",
+            "rank": 5,
+            "batch": 1,
+            "vi": "thêm dầu; đổ xăng; tiếp nhiên liệu"
+        },
+        {
+            "zh": "选手",
+            "pinyin": "xuan3 shou3",
+            "rank": 6,
+            "batch": 1,
+            "vi": "vận động viên"
+        },
+        {
+            "zh": "输",
+            "pinyin": "shu1",
+            "rank": 7,
+            "batch": 1,
+            "vi": "thua; bị đánh bại"
+        },
+        {
+            "zh": "动作",
+            "pinyin": "dong4 zuo4",
+            "rank": 8,
+            "batch": 1,
+            "vi": "chuyển động; cử động; hành động"
+        },
+        {
+            "zh": "冠军",
+            "pinyin": "guan4 jun1",
+            "rank": 9,
+            "batch": 1,
+            "vi": "nhà vô địch"
+        },
+        {
+            "zh": "教练",
+            "pinyin": "jiao4 lian4",
+            "rank": 10,
+            "batch": 1,
+            "vi": "người hướng dẫn"
+        },
+        {
+            "zh": "运动",
+            "pinyin": "yun4 dong4",
+            "rank": 11,
+            "batch": 1,
+            "vi": "di chuyển"
+        },
+        {
+            "zh": "游泳",
+            "pinyin": "you2 yong3",
+            "rank": 12,
+            "batch": 1,
+            "vi": "bơi lội"
+        },
+        {
+            "zh": "射击",
+            "pinyin": "she4 ji1",
+            "rank": 13,
+            "batch": 1,
+            "vi": "bắn; nổ súng"
+        },
+        {
+            "zh": "篮球",
+            "pinyin": "lan2 qiu2",
+            "rank": 14,
+            "batch": 1,
+            "vi": "bóng rổ"
+        },
+        {
+            "zh": "运动员",
+            "pinyin": "yun4 dong4 yuan2",
+            "rank": 15,
+            "batch": 1,
+            "vi": "vận động viên"
+        },
+        {
+            "zh": "得分",
+            "pinyin": "de2 fen1",
+            "rank": 16,
+            "batch": 1,
+            "vi": "ghi điểm"
+        },
+        {
+            "zh": "体育",
+            "pinyin": "ti3 yu4",
+            "rank": 17,
+            "batch": 1,
+            "vi": "thể thao"
+        },
+        {
+            "zh": "足球",
+            "pinyin": "zu2 qiu2",
+            "rank": 18,
+            "batch": 1,
+            "vi": "quả bóng đá"
+        },
+        {
+            "zh": "健身",
+            "pinyin": "jian4 shen1",
+            "rank": 19,
+            "batch": 1,
+            "vi": "tập thể dục"
+        },
+        {
+            "zh": "锻炼",
+            "pinyin": "duan4 lian4",
+            "rank": 20,
+            "batch": 1,
+            "vi": "rèn luyện"
+        },
+        {
+            "zh": "球场",
+            "pinyin": "qiu2 chang3",
+            "rank": 21,
+            "batch": 1,
+            "vi": "sân vận động"
+        },
+        {
+            "zh": "裁判",
+            "pinyin": "cai2 pan4",
+            "rank": 22,
+            "batch": 1,
+            "vi": "(pháp luật) phán xét; xét xử; phán quyết; bản án"
+        },
+        {
+            "zh": "跑步",
+            "pinyin": "pao3 bu4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "chạy"
+        },
+        {
+            "zh": "网球",
+            "pinyin": "wang3 qiu2",
+            "rank": 24,
+            "batch": 1,
+            "vi": "quần vợt"
+        },
+        {
+            "zh": "健身房",
+            "pinyin": "jian4 shen1 fang2",
+            "rank": 25,
+            "batch": 1,
+            "vi": "phòng gym"
+        },
+        {
+            "zh": "滑冰",
+            "pinyin": "hua2 bing1",
+            "rank": 26,
+            "batch": 1,
+            "vi": "trượt băng"
+        },
+        {
+            "zh": "马拉松",
+            "pinyin": "ma3 la1 song1",
+            "rank": 27,
+            "batch": 1,
+            "vi": "marathon"
+        },
+        {
+            "zh": "金牌",
+            "pinyin": "jin1 pai2",
+            "rank": 28,
+            "batch": 1,
+            "vi": "huy chương vàng"
+        },
+        {
+            "zh": "操场",
+            "pinyin": "cao1 chang3",
+            "rank": 29,
+            "batch": 1,
+            "vi": "sân chơi"
+        },
+        {
+            "zh": "平局",
+            "pinyin": "ping2 ju2",
+            "rank": 30,
+            "batch": 1,
+            "vi": "một trận hòa"
+        },
+        {
+            "zh": "乒乓球",
+            "pinyin": "ping1 pang1 qiu2",
+            "rank": 31,
+            "batch": 1,
+            "vi": "bóng bàn"
+        },
+        {
+            "zh": "排球",
+            "pinyin": "pai2 qiu2",
+            "rank": 32,
+            "batch": 1,
+            "vi": "bóng chuyền"
+        },
+        {
+            "zh": "举重",
+            "pinyin": "ju3 zhong4",
+            "rank": 33,
+            "batch": 1,
+            "vi": "nâng tạ"
+        },
+        {
+            "zh": "羽毛球",
+            "pinyin": "yu3 mao2 qiu2",
+            "rank": 34,
+            "batch": 1,
+            "vi": "cầu lông"
+        },
+        {
+            "zh": "银牌",
+            "pinyin": "yin2 pai2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "huy chương bạc"
+        },
+        {
+            "zh": "跳高",
+            "pinyin": "tiao4 gao1",
+            "rank": 36,
+            "batch": 1,
+            "vi": "nhảy cao"
+        },
+        {
+            "zh": "铜牌",
+            "pinyin": "tong2 pai2",
+            "rank": 37,
+            "batch": 1,
+            "vi": "huy chương đồng"
+        },
+        {
+            "zh": "太极拳",
+            "pinyin": "tai4 ji2 quan2",
+            "rank": 38,
+            "batch": 1,
+            "vi": "thái cực quyền"
+        },
+        {
+            "zh": "跳远",
+            "pinyin": "tiao4 yuan3",
+            "rank": 39,
+            "batch": 1,
+            "vi": "nhảy xa"
+        },
+        {
+            "zh": "瑜伽",
+            "pinyin": "yu2 jia1",
+            "rank": 40,
+            "batch": 1,
+            "vi": "yoga"
+        }
+    ]
+}

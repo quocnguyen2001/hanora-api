@@ -98,6 +98,33 @@ class AppServiceProvider extends ServiceProvider
          * bên thứ ba. 60/phút đủ cho người vẽ liên tục, và chặn được việc biến
          * endpoint này thành proxy miễn phí cho người khác.
          */
+        /*
+         * Bỏ qua từ ở màn học chủ đề: khoá theo USER, mỗi request tạo một bản
+         * ghi trong `user_skipped_words`.
+         *
+         * 60/phút rộng gấp sáu lần một phiên 10 thẻ, nên không chạm được bằng
+         * thao tác thật; nhưng không có nó thì trần duy nhất là `throttle:60,1`
+         * theo IP của nhóm `api`, và một tài khoản hợp lệ có thể bơm bảng này
+         * lên hàng triệu dòng.
+         */
+        /*
+         * Tạo chủ đề: 5/GIỜ theo user, chặt hơn hẳn mọi limiter khác.
+         *
+         * Mỗi request xếp một job tiêu 2-3 lời gọi Gemini. Đây là bề mặt duy
+         * nhất mà người dùng cuối kích hoạt được chi tiêu AI, nên nó là bề mặt
+         * duy nhất đáng siết tới mức này. Trần theo tài khoản
+         * (`Topic::MAX_PER_USER`) chặn lớp còn lại: tích luỹ dài hạn.
+         */
+        RateLimiter::for(
+            'topic-create',
+            fn (Request $request) => Limit::perHour(5)->by((string) $request->user()?->id),
+        );
+
+        RateLimiter::for(
+            'topic-skips',
+            fn (Request $request) => Limit::perMinute(60)->by((string) $request->user()?->id),
+        );
+
         RateLimiter::for(
             'handwriting',
             fn (Request $request) => Limit::perMinute(60)->by((string) $request->user()?->id),

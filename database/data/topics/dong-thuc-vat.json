@@ -1,0 +1,300 @@
+{
+    "slug": "dong-thuc-vat",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:51:29+07:00",
+    "words": [
+        {
+            "zh": "狗",
+            "pinyin": "gou3",
+            "rank": 1,
+            "batch": 1,
+            "vi": "chó"
+        },
+        {
+            "zh": "花",
+            "pinyin": "hua1",
+            "rank": 2,
+            "batch": 1,
+            "vi": "hoa"
+        },
+        {
+            "zh": "马",
+            "pinyin": "ma3",
+            "rank": 3,
+            "batch": 1,
+            "vi": "ngựa"
+        },
+        {
+            "zh": "象",
+            "pinyin": "xiang4",
+            "rank": 4,
+            "batch": 1,
+            "vi": "voi"
+        },
+        {
+            "zh": "猫",
+            "pinyin": "mao1",
+            "rank": 5,
+            "batch": 1,
+            "vi": "mèo"
+        },
+        {
+            "zh": "根",
+            "pinyin": "gen1",
+            "rank": 6,
+            "batch": 1,
+            "vi": "rễ"
+        },
+        {
+            "zh": "鸡",
+            "pinyin": "ji1",
+            "rank": 7,
+            "batch": 1,
+            "vi": "gia cầm"
+        },
+        {
+            "zh": "动物",
+            "pinyin": "dong4 wu4",
+            "rank": 8,
+            "batch": 1,
+            "vi": "động vật"
+        },
+        {
+            "zh": "鱼",
+            "pinyin": "yu2",
+            "rank": 9,
+            "batch": 1,
+            "vi": "cá"
+        },
+        {
+            "zh": "鸟",
+            "pinyin": "niao3",
+            "rank": 10,
+            "batch": 1,
+            "vi": "chim",
+            "rejected": [
+                {
+                    "pinyin": "diao3",
+                    "vi": "dương vật"
+                }
+            ]
+        },
+        {
+            "zh": "树",
+            "pinyin": "shu4",
+            "rank": 11,
+            "batch": 1,
+            "vi": "cây"
+        },
+        {
+            "zh": "猪",
+            "pinyin": "zhu1",
+            "rank": 12,
+            "batch": 1,
+            "vi": "lợn"
+        },
+        {
+            "zh": "牛",
+            "pinyin": "niu2",
+            "rank": 13,
+            "batch": 1,
+            "vi": "con bò"
+        },
+        {
+            "zh": "龙",
+            "pinyin": "long2",
+            "rank": 14,
+            "batch": 1,
+            "vi": "rồng"
+        },
+        {
+            "zh": "蛇",
+            "pinyin": "she2",
+            "rank": 15,
+            "batch": 1,
+            "vi": "rắn"
+        },
+        {
+            "zh": "虫",
+            "pinyin": "chong2",
+            "rank": 16,
+            "batch": 1,
+            "vi": "dạng động vật cấp thấp, bao gồm côn trùng, ấu trùng côn trùng, giun và sinh vật tương tự"
+        },
+        {
+            "zh": "猴子",
+            "pinyin": "hou2 zi5",
+            "rank": 17,
+            "batch": 1,
+            "vi": "con khỉ"
+        },
+        {
+            "zh": "森林",
+            "pinyin": "sen1 lin2",
+            "rank": 18,
+            "batch": 1,
+            "vi": "rừng"
+        },
+        {
+            "zh": "苹果",
+            "pinyin": "ping2 guo3",
+            "rank": 19,
+            "batch": 1,
+            "vi": "quả táo"
+        },
+        {
+            "zh": "草",
+            "pinyin": "cao3",
+            "rank": 20,
+            "batch": 1,
+            "vi": "cỏ"
+        },
+        {
+            "zh": "羊",
+            "pinyin": "yang2",
+            "rank": 21,
+            "batch": 1,
+            "vi": "cừu; dê"
+        },
+        {
+            "zh": "水果",
+            "pinyin": "shui3 guo3",
+            "rank": 22,
+            "batch": 1,
+            "vi": "trái cây"
+        },
+        {
+            "zh": "玫瑰",
+            "pinyin": "mei2 gui1",
+            "rank": 23,
+            "batch": 1,
+            "vi": "cây hồng rugosa"
+        },
+        {
+            "zh": "虎",
+            "pinyin": "hu3",
+            "rank": 24,
+            "batch": 1,
+            "vi": "con hổ"
+        },
+        {
+            "zh": "木头",
+            "pinyin": "mu4 tou5",
+            "rank": 25,
+            "batch": 1,
+            "vi": "chậm chạp"
+        },
+        {
+            "zh": "植物",
+            "pinyin": "zhi2 wu4",
+            "rank": 26,
+            "batch": 1,
+            "vi": "thực vật"
+        },
+        {
+            "zh": "狮子",
+            "pinyin": "shi1 zi5",
+            "rank": 27,
+            "batch": 1,
+            "vi": "sư tử",
+            "rejected": [
+                {
+                    "pinyin": "Shi1 zi3",
+                    "vi": "Leo"
+                }
+            ]
+        },
+        {
+            "zh": "香蕉",
+            "pinyin": "xiang1 jiao1",
+            "rank": 28,
+            "batch": 1,
+            "vi": "quả chuối"
+        },
+        {
+            "zh": "兔",
+            "pinyin": "tu4",
+            "rank": 29,
+            "batch": 1,
+            "vi": "thỏ"
+        },
+        {
+            "zh": "蔬菜",
+            "pinyin": "shu1 cai4",
+            "rank": 30,
+            "batch": 1,
+            "vi": "rau"
+        },
+        {
+            "zh": "草莓",
+            "pinyin": "cao3 mei2",
+            "rank": 31,
+            "batch": 1,
+            "vi": "dâu tây"
+        },
+        {
+            "zh": "葡萄",
+            "pinyin": "pu2 tao5",
+            "rank": 32,
+            "batch": 1,
+            "vi": "nho"
+        },
+        {
+            "zh": "鸭",
+            "pinyin": "ya1",
+            "rank": 33,
+            "batch": 1,
+            "vi": "vịt"
+        },
+        {
+            "zh": "种子",
+            "pinyin": "zhong3 zi5",
+            "rank": 34,
+            "batch": 1,
+            "vi": "hạt giống"
+        },
+        {
+            "zh": "熊猫",
+            "pinyin": "xiong2 mao1",
+            "rank": 35,
+            "batch": 1,
+            "vi": "gấu trúc"
+        },
+        {
+            "zh": "叶子",
+            "pinyin": "ye4 zi5",
+            "rank": 36,
+            "batch": 1,
+            "vi": "lá"
+        },
+        {
+            "zh": "西瓜",
+            "pinyin": "xi1 gua1",
+            "rank": 37,
+            "batch": 1,
+            "vi": "dưa hấu"
+        },
+        {
+            "zh": "大米",
+            "pinyin": "da4 mi3",
+            "rank": 38,
+            "batch": 1,
+            "vi": "gạo"
+        },
+        {
+            "zh": "竹子",
+            "pinyin": "zhu2 zi5",
+            "rank": 39,
+            "batch": 1,
+            "vi": "cây tre"
+        },
+        {
+            "zh": "麦子",
+            "pinyin": "mai4 zi5",
+            "rank": 40,
+            "batch": 1,
+            "vi": "lúa mì"
+        }
+    ]
+}

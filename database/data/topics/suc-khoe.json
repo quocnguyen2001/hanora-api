@@ -1,0 +1,287 @@
+{
+    "slug": "suc-khoe",
+    "prompt_version": 1,
+    "model": "gemini-3.1-flash-lite",
+    "generated_at": "2026-08-31T15:51:46+07:00",
+    "words": [
+        {
+            "zh": "医生",
+            "pinyin": "yi1 sheng1",
+            "rank": 1,
+            "batch": 1,
+            "vi": "bác sĩ"
+        },
+        {
+            "zh": "医院",
+            "pinyin": "yi1 yuan4",
+            "rank": 2,
+            "batch": 1,
+            "vi": "bệnh viện"
+        },
+        {
+            "zh": "检查",
+            "pinyin": "jian3 cha2",
+            "rank": 3,
+            "batch": 1,
+            "vi": "kiểm tra"
+        },
+        {
+            "zh": "身体",
+            "pinyin": "shen1 ti3",
+            "rank": 4,
+            "batch": 1,
+            "vi": "cơ thể"
+        },
+        {
+            "zh": "精神",
+            "pinyin": "jing1 shen2",
+            "rank": 5,
+            "batch": 1,
+            "vi": "tinh thần",
+            "rejected": [
+                {
+                    "pinyin": "jing1 shen5",
+                    "vi": "sinh lực; sức sống"
+                }
+            ]
+        },
+        {
+            "zh": "休息",
+            "pinyin": "xiu1 xi5",
+            "rank": 6,
+            "batch": 1,
+            "vi": "nghỉ"
+        },
+        {
+            "zh": "手术",
+            "pinyin": "shou3 shu4",
+            "rank": 7,
+            "batch": 1,
+            "vi": "ca phẫu thuật"
+        },
+        {
+            "zh": "病人",
+            "pinyin": "bing4 ren2",
+            "rank": 8,
+            "batch": 1,
+            "vi": "người bệnh"
+        },
+        {
+            "zh": "治疗",
+            "pinyin": "zhi4 liao2",
+            "rank": 9,
+            "batch": 1,
+            "vi": "điều trị"
+        },
+        {
+            "zh": "力量",
+            "pinyin": "li4 liang5",
+            "rank": 10,
+            "batch": 1,
+            "vi": "sức mạnh; lực lượng; sức lực"
+        },
+        {
+            "zh": "严重",
+            "pinyin": "yan2 zhong4",
+            "rank": 11,
+            "batch": 1,
+            "vi": "nghiêm trọng"
+        },
+        {
+            "zh": "受伤",
+            "pinyin": "shou4 shang1",
+            "rank": 12,
+            "batch": 1,
+            "vi": "bị thương"
+        },
+        {
+            "zh": "舒服",
+            "pinyin": "shu1 fu5",
+            "rank": 13,
+            "batch": 1,
+            "vi": "thoải mái"
+        },
+        {
+            "zh": "恢复",
+            "pinyin": "hui1 fu4",
+            "rank": 14,
+            "batch": 1,
+            "vi": "khôi phục"
+        },
+        {
+            "zh": "健康",
+            "pinyin": "jian4 kang1",
+            "rank": 15,
+            "batch": 1,
+            "vi": "sức khỏe"
+        },
+        {
+            "zh": "心理",
+            "pinyin": "xin1 li3",
+            "rank": 16,
+            "batch": 1,
+            "vi": "tâm lý"
+        },
+        {
+            "zh": "运动",
+            "pinyin": "yun4 dong4",
+            "rank": 17,
+            "batch": 1,
+            "vi": "di chuyển"
+        },
+        {
+            "zh": "护士",
+            "pinyin": "hu4 shi5",
+            "rank": 18,
+            "batch": 1,
+            "vi": "y tá"
+        },
+        {
+            "zh": "肚子",
+            "pinyin": "du4 zi5",
+            "rank": 19,
+            "batch": 1,
+            "vi": "bụng"
+        },
+        {
+            "zh": "牙齿",
+            "pinyin": "ya2 chi3",
+            "rank": 20,
+            "batch": 1,
+            "vi": "răng"
+        },
+        {
+            "zh": "生病",
+            "pinyin": "sheng1 bing4",
+            "rank": 21,
+            "batch": 1,
+            "vi": "bị ốm"
+        },
+        {
+            "zh": "过敏",
+            "pinyin": "guo4 min3",
+            "rank": 22,
+            "batch": 1,
+            "vi": "quá nhạy cảm"
+        },
+        {
+            "zh": "难受",
+            "pinyin": "nan2 shou4",
+            "rank": 23,
+            "batch": 1,
+            "vi": "cảm thấy không khỏe"
+        },
+        {
+            "zh": "疼痛",
+            "pinyin": "teng2 tong4",
+            "rank": 24,
+            "batch": 1,
+            "vi": "đau"
+        },
+        {
+            "zh": "锻炼",
+            "pinyin": "duan4 lian4",
+            "rank": 25,
+            "batch": 1,
+            "vi": "rèn luyện"
+        },
+        {
+            "zh": "感冒",
+            "pinyin": "gan3 mao4",
+            "rank": 26,
+            "batch": 1,
+            "vi": "bị cảm lạnh"
+        },
+        {
+            "zh": "头痛",
+            "pinyin": "tou2 tong4",
+            "rank": 27,
+            "batch": 1,
+            "vi": "bị đau đầu"
+        },
+        {
+            "zh": "血压",
+            "pinyin": "xue4 ya1",
+            "rank": 28,
+            "batch": 1,
+            "vi": "huyết áp"
+        },
+        {
+            "zh": "减肥",
+            "pinyin": "jian3 fei2",
+            "rank": 29,
+            "batch": 1,
+            "vi": "giảm cân"
+        },
+        {
+            "zh": "睡眠",
+            "pinyin": "shui4 mian2",
+            "rank": 30,
+            "batch": 1,
+            "vi": "giấc ngủ"
+        },
+        {
+            "zh": "发烧",
+            "pinyin": "fa1 shao1",
+            "rank": 31,
+            "batch": 1,
+            "vi": "bị sốt"
+        },
+        {
+            "zh": "处方",
+            "pinyin": "chu3 fang1",
+            "rank": 32,
+            "batch": 1,
+            "vi": "đơn thuốc"
+        },
+        {
+            "zh": "营养",
+            "pinyin": "ying2 yang3",
+            "rank": 33,
+            "batch": 1,
+            "vi": "dinh dưỡng"
+        },
+        {
+            "zh": "咳嗽",
+            "pinyin": "ke2 sou5",
+            "rank": 34,
+            "batch": 1,
+            "vi": "ho"
+        },
+        {
+            "zh": "预防",
+            "pinyin": "yu4 fang2",
+            "rank": 35,
+            "batch": 1,
+            "vi": "ngăn ngừa"
+        },
+        {
+            "zh": "疲劳",
+            "pinyin": "pi2 lao2",
+            "rank": 36,
+            "batch": 1,
+            "vi": "mệt mỏi"
+        },
+        {
+            "zh": "药店",
+            "pinyin": "yao4 dian4",
+            "rank": 37,
+            "batch": 1,
+            "vi": "nhà thuốc"
+        },
+        {
+            "zh": "吃药",
+            "pinyin": "chi1 yao4",
+            "rank": 38,
+            "batch": 1,
+            "vi": "uống thuốc"
+        },
+        {
+            "zh": "挂号",
+            "pinyin": "gua4 hao4",
+            "rank": 39,
+            "batch": 1,
+            "vi": "đăng ký"
+        }
+    ]
+}
