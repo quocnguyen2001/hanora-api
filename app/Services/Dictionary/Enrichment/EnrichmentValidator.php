@@ -131,7 +131,13 @@ final class EnrichmentValidator
     }
 
     /**
-     * @return list<array{char: string, radical: string, stroke_count: int, meaning_vi: string}>
+     * Nghĩa tiếng Việt của từng chữ — thứ DUY NHẤT corpus không có.
+     *
+     * `radical` và `stroke_count` đã bị gỡ ở prompt v2: chúng đến từ
+     * `dictionary_characters`, một nguồn tất định. Giữ bản của model song song
+     * là để hai con số khác nhau cho cùng một chữ nằm trong cùng một database.
+     *
+     * @return list<array{char: string, meaning_vi: string}>
      */
     private function characters(mixed $raw, DictionaryWord $word): array
     {
@@ -143,23 +149,15 @@ final class EnrichmentValidator
 
         foreach ($this->rows($raw) as $row) {
             $char = $this->text($row['char'] ?? null);
-            $radical = $this->text($row['radical'] ?? null);
             $meaning = $this->text($row['meaning_vi'] ?? null);
-            $strokes = $row['stroke_count'] ?? null;
 
-            if ($char === null || $radical === null || $meaning === null
-                || ! isset($allowed[$char]) || isset($seen[$char])
-                || ! is_numeric($strokes)) {
+            if ($char === null || $meaning === null
+                || ! isset($allowed[$char]) || isset($seen[$char])) {
                 continue;
             }
 
             $seen[$char] = true;
-            $out[] = [
-                'char' => $char,
-                'radical' => $radical,
-                'stroke_count' => (int) $strokes,
-                'meaning_vi' => $meaning,
-            ];
+            $out[] = ['char' => $char, 'meaning_vi' => $meaning];
         }
 
         return $out;

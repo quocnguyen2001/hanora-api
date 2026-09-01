@@ -22,8 +22,11 @@ final class EnrichmentPrompt
      * Tăng số này khi prompt hoặc schema đổi tới mức nội dung cũ không còn dùng
      * được. Nó được ghi vào `dictionary_word_enrichments.prompt_version` để
      * quét lại hàng loạt bằng `dictionary:enrich --stale`.
+     *
+     * v2: gỡ `radical` và `stroke_count` khỏi `characters`. Hai trường đó giờ
+     * đến từ `dictionary_characters` — nguồn tất định, không phải model.
      */
-    public const VERSION = 1;
+    public const VERSION = 2;
 
     /** Trần số phần tử, khớp với `EnrichmentValidator`. Đổi ở đây thì đổi cả kia. */
     private const MAX_SENSES = 8;
@@ -105,7 +108,14 @@ final class EnrichmentPrompt
      * `characters` KHÔNG xin `pinyin` của từng chữ, dù màn chi tiết có hiện nó:
      * `CharacterBreakdownService` đã trả pinyin và âm Hán-Việt từ dữ liệu đã xác
      * minh. Xin model sinh lại là tự tạo ra một nguồn thứ hai để hai bên lệch
-     * nhau. Ở đây chỉ xin thứ corpus KHÔNG có: bộ thủ, số nét, nghĩa của chữ.
+     * nhau.
+     *
+     * Từ v2, `radical` và `stroke_count` cũng rơi vào đúng luật đó và đã bị gỡ.
+     * Bảng `dictionary_characters` (Make Me a Hanzi, 9.574 chữ) là nguồn tất
+     * định cho chúng, và thứ tự nét cùng bộ thủ là đúng chỗ model bịa nhiều
+     * nhất — `EnrichmentValidator` không có cách nào tra ngược để bắt.
+     *
+     * Còn lại đúng MỘT thứ corpus không có: **nghĩa tiếng Việt của từng chữ**.
      *
      * @return array<string, mixed>
      */
@@ -144,11 +154,9 @@ final class EnrichmentPrompt
                         'type' => 'object',
                         'properties' => [
                             'char' => ['type' => 'string'],
-                            'radical' => ['type' => 'string'],
-                            'stroke_count' => ['type' => 'integer'],
                             'meaning_vi' => ['type' => 'string'],
                         ],
-                        'required' => ['char', 'radical', 'stroke_count', 'meaning_vi'],
+                        'required' => ['char', 'meaning_vi'],
                     ],
                 ],
                 'related_words' => [

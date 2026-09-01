@@ -44,7 +44,7 @@ function fakeGemini(): void
             ['type' => 'model_output', 'content' => [['type' => 'text', 'text' => json_encode([
                 'senses' => [['pos' => 'động từ', 'vi' => 'học, học tập']],
                 'examples' => [['zh' => '我喜欢学习。', 'pinyin' => 'wǒ xǐhuān xuéxí', 'vi' => 'Tôi thích học.']],
-                'characters' => [['char' => '学', 'radical' => '子', 'stroke_count' => 8, 'meaning_vi' => 'học']],
+                'characters' => [['char' => '学', 'meaning_vi' => 'học']],
                 'related_words' => [['simplified' => '学生', 'pinyin' => 'xuéshēng', 'vi' => 'học sinh']],
                 'idioms' => [],
                 'usage_note' => 'Ghi chú.',
@@ -98,7 +98,9 @@ describe('khi đã có nội dung', function (): void {
 
         expect($response->json('data.senses.0.vi'))->toBe('học, học tập')
             ->and($response->json('data.examples.0.zh'))->toBe('我喜欢学习。')
-            ->and($response->json('data.characters.0.radical'))->toBe('子')
+            // `meaning_vi`, KHÔNG phải `radical`: prompt v2 đã gỡ bộ thủ và số
+            // nét khỏi lớp AI — chúng đến từ `dictionary_characters`.
+            ->and($response->json('data.characters.0.meaning_vi'))->toBe('học')
             ->and($response->json('data.related_words.0.simplified'))->toBe('学生')
             // Người học phải biết dòng nào do máy sinh.
             ->and($response->json('data.source'))->toBe('ai')

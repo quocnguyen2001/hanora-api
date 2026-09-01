@@ -23,8 +23,8 @@ function validPayload(array $override = []): array
         'senses' => [['pos' => 'động từ', 'vi' => 'học, học tập', 'note' => null]],
         'examples' => [['zh' => '我喜欢学习。', 'pinyin' => 'wǒ xǐhuān xuéxí', 'vi' => 'Tôi thích học.']],
         'characters' => [
-            ['char' => '学', 'radical' => '子', 'stroke_count' => 8, 'meaning_vi' => 'học'],
-            ['char' => '习', 'radical' => '乙', 'stroke_count' => 3, 'meaning_vi' => 'luyện tập'],
+            ['char' => '学', 'meaning_vi' => 'học'],
+            ['char' => '习', 'meaning_vi' => 'luyện tập'],
         ],
         'related_words' => [['simplified' => '学生', 'pinyin' => 'xuéshēng', 'vi' => 'học sinh']],
         'idioms' => [],
@@ -68,8 +68,8 @@ describe('loại chữ Hán do AI bịa', function (): void {
 
     it('loại chữ không thuộc chính từ đang tra', function (): void {
         $result = check(validPayload(['characters' => [
-            ['char' => '学', 'radical' => '子', 'stroke_count' => 8, 'meaning_vi' => 'học'],
-            ['char' => '猫', 'radical' => '犭', 'stroke_count' => 11, 'meaning_vi' => 'mèo'],
+            ['char' => '学', 'meaning_vi' => 'học'],
+            ['char' => '猫', 'meaning_vi' => 'mèo'],
         ]]));
 
         expect($result['characters'])->toHaveCount(1)
@@ -125,9 +125,11 @@ describe('không ném với payload lệch hình dạng', function (): void {
             ->and($result['idioms'])->toBe([]);
     });
 
-    it('stroke_count không phải số', function (): void {
+    it('chữ thiếu nghĩa tiếng Việt', function (): void {
+        // `meaning_vi` là thứ DUY NHẤT còn xin model ở `characters` từ prompt v2
+        // — `radical` và `stroke_count` đã về `dictionary_characters`.
         $result = check(validPayload(['characters' => [
-            ['char' => '学', 'radical' => '子', 'stroke_count' => 'tám', 'meaning_vi' => 'học'],
+            ['char' => '学'],
         ]]));
 
         expect($result['characters'])->toBe([]);
