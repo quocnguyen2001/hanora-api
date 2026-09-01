@@ -40,7 +40,7 @@ describe('chi tiết từ', function (): void {
 
         expect(array_keys($data))->toBe([
             'id', 'simplified', 'traditional', 'pinyin', 'han_viet',
-            'definitions_en', 'definitions_vi', 'hsk_level', 'characters', 'examples',
+            'definitions_en', 'definitions_vi', 'measure_words', 'hsk_level', 'characters', 'examples',
         ]);
     });
 

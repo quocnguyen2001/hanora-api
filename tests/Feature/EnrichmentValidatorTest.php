@@ -152,6 +152,33 @@ it('khử trùng từ ghép lặp lại', function (): void {
     expect($result['related_words'])->toHaveCount(1);
 });
 
+it('gắn word_id cho từ tra được, để FE mở được trang chi tiết', function (): void {
+    // Truy vấn tra ngược VỐN ĐÃ chạy để loại từ model bịa ra. Giữ lại `id` mà nó
+    // đọc về là miễn phí, và đó là thứ biến danh sách từ ghép từ "để nhìn"
+    // thành bấm được.
+    $expected = DictionaryWord::query()->where('simplified', '学生')->value('id');
+
+    $result = check(validPayload(['related_words' => [
+        ['simplified' => '学生', 'pinyin' => 'xuéshēng', 'vi' => 'học sinh'],
+    ]]));
+
+    expect($result['related_words'][0]['word_id'])->toBe($expected);
+});
+
+it('không để lọt mục nào thiếu word_id', function (): void {
+    // Nhánh lọc `isset($existing[...])` đã bỏ mọi từ không tra được, nên tới
+    // bước dựng mảng thì id chắc chắn tồn tại. Test này khoá bất biến đó: ai nới
+    // lỏng bộ lọc thì mục thiếu id sẽ lọt xuống FE thành một link hỏng.
+    $result = check(validPayload(['related_words' => [
+        ['simplified' => '学生', 'pinyin' => 'xuéshēng', 'vi' => 'học sinh'],
+        ['simplified' => '这个词不存在', 'pinyin' => 'x', 'vi' => 'bịa'],
+    ]]));
+
+    foreach ([...$result['related_words'], ...$result['idioms']] as $item) {
+        expect($item['word_id'])->toBeInt();
+    }
+});
+
 it('tra ngược corpus bằng đúng MỘT truy vấn', function (): void {
     // N+1 ở đây nhân 123.646 từ × 12 đề xuất = 1,5 triệu truy vấn mỗi lần pre-warm.
     $related = array_map(

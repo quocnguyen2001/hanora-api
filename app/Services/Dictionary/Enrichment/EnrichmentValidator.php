@@ -166,9 +166,9 @@ final class EnrichmentValidator
     }
 
     /**
-     * @param  array<string, true>  $existing
+     * @param  array<string, int>  $existing  `simplified => id` của từ tra được
      * @param  DictionaryWord  $word  Mục từ đang tra — luôn bị loại khỏi kết quả
-     * @return list<array{simplified: string, pinyin: string, vi: string}>
+     * @return list<array{simplified: string, pinyin: string, vi: string, word_id: int}>
      */
     private function words(mixed $raw, array $existing, int $limit, DictionaryWord $word): array
     {
@@ -194,7 +194,20 @@ final class EnrichmentValidator
             }
 
             $seen[$simplified] = true;
-            $out[] = ['simplified' => $simplified, 'pinyin' => $pinyin, 'vi' => $vi];
+            $out[] = [
+                'simplified' => $simplified,
+                'pinyin' => $pinyin,
+                'vi' => $vi,
+                /*
+                 * Lối đi vào trang chi tiết. Luôn có mặt ở bản sinh MỚI — nhánh
+                 * `isset($existing[...])` ngay trên đã loại mọi từ không tra
+                 * được, nên tới đây id chắc chắn tồn tại.
+                 *
+                 * Bản ghi làm giàu CŨ không có trường này; FE coi trường vắng
+                 * như `null` và hiện mục đó tĩnh.
+                 */
+                'word_id' => $existing[$simplified],
+            ];
 
             if (count($out) >= $limit) {
                 break;
@@ -210,8 +223,12 @@ final class EnrichmentValidator
      * N+1 ở đây nhân với 123.646 từ, mỗi từ tới 12 đề xuất, là 1,5 triệu truy
      * vấn cho một lần pre-warm. Có test đếm truy vấn khóa lại.
      *
+     * Trả `simplified => id`, không phải `simplified => true`. Truy vấn này VỐN
+     * ĐÃ tra corpus để loại từ model bịa ra; giữ lại `id` mà nó đã đọc về là
+     * miễn phí, và đó là thứ biến danh sách từ ghép từ "để nhìn" thành bấm được.
+     *
      * @param  list<string>  $words
-     * @return array<string, true>
+     * @return array<string, int>
      */
     private function existingWords(array $words): array
     {
@@ -221,10 +238,29 @@ final class EnrichmentValidator
             return [];
         }
 
-        return array_fill_keys(
-            DictionaryWord::query()->whereIn('simplified', $words)->distinct()->pluck('simplified')->all(),
-            true,
-        );
+        /*
+         * Khóa tự nhiên của bảng là (simplified, pinyin_numbered), nên MỘT chữ
+         * có thể có nhiều dòng — mỗi âm một dòng. Phải chọn dòng nào để bấm vào.
+         *
+         * Ưu tiên: từ trong tập ưu tiên trước, rồi từ phổ biến hơn, rồi id nhỏ
+         * hơn. Bỏ `ORDER BY` đi thì Postgres trả thứ tự tùy ý và bấm vào `行` có
+         * thể ra âm hiếm — đúng loại lỗi mà `CharacterBreakdownService` đã phải
+         * sửa một lần (red team H11).
+         */
+        $rows = DictionaryWord::query()
+            ->whereIn('simplified', $words)
+            ->orderByRaw('is_priority DESC, frequency_rank ASC NULLS LAST, id ASC')
+            ->get(['id', 'simplified']);
+
+        $map = [];
+
+        foreach ($rows as $row) {
+            // `??=`: dòng ĐẦU theo thứ tự trên thắng. Gán thẳng sẽ để dòng cuối
+            // thắng, tức đảo ngược đúng thứ tự ưu tiên vừa đặt.
+            $map[$row->simplified] ??= $row->id;
+        }
+
+        return $map;
     }
 
     /**

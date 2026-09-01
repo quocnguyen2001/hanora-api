@@ -45,6 +45,15 @@ final class WordSearchResultResource extends JsonResource
              * dòng tiếng Anh là cơ chế đối chiếu duy nhất người học có.
              */
             'definitions_vi' => $this->resource->definitions_vi,
+            /*
+             * Cùng trường và cùng quy ước `[]`-chứ-không-`null` mà
+             * `DictionaryWordResource` giữ — xem ghi chú dài ở đó.
+             *
+             * Thẻ kết quả tìm kiếm hiện CHƯA hiển thị nó (thẻ đã chật), nhưng
+             * trường vẫn có mặt để hai response không lệch hình dạng: FE dùng
+             * một kiểu `WordSummary` duy nhất cho cả hai.
+             */
+            'measure_words' => $this->resource->measure_words ?? [],
             'hsk_level' => $this->resource->hsk_level,
         ];
     }

@@ -134,7 +134,7 @@ describe('response không chứa dữ liệu theo user — red team C2', functio
 
         expect(array_keys($first))->toBe([
             'id', 'simplified', 'traditional', 'pinyin', 'han_viet',
-            'definitions_en', 'definitions_vi', 'hsk_level',
+            'definitions_en', 'definitions_vi', 'measure_words', 'hsk_level',
         ]);
     });
 

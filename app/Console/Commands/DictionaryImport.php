@@ -127,10 +127,24 @@ final class DictionaryImport extends Command
             ...$incoming['definitions_en'],
         ]));
 
+        /*
+         * Lượng từ gộp theo cùng nguyên tắc với nghĩa: nối rồi khử trùng lặp.
+         *
+         * Khử theo dạng GIẢN THỂ chứ không theo cả bản ghi — hai mục cùng khóa
+         * có thể ghi cùng một lượng từ mà phồn thể viết khác nhau, và hiện `个`
+         * hai lần trên màn hình đọc ra như một lỗi.
+         */
+        $measureWords = array_values(array_column(
+            [...($existing['measure_words'] ?? []), ...($incoming['measure_words'] ?? [])],
+            null,
+            'simplified',
+        ));
+
         return [
             ...$existing,
             'definitions_en' => $definitions,
             'definitions_en_text' => implode('; ', $definitions),
+            'measure_words' => $measureWords === [] ? null : $measureWords,
         ];
     }
 
@@ -143,6 +157,15 @@ final class DictionaryImport extends Command
         return [
             ...$entry,
             'definitions_en' => json_encode($entry['definitions_en'], JSON_UNESCAPED_UNICODE),
+            /*
+             * `null` đi thẳng vào cột chứ KHÔNG thành chuỗi `"null"`:
+             * `json_encode(null)` trả về chuỗi bốn ký tự, và Postgres nhận nó là
+             * một giá trị jsonb hợp lệ. Cột khi đó không bao giờ `IS NULL` nữa,
+             * và mọi phép kiểm "từ này có lượng từ không" đều trả đúng.
+             */
+            'measure_words' => ($entry['measure_words'] ?? null) === null
+                ? null
+                : json_encode($entry['measure_words'], JSON_UNESCAPED_UNICODE),
             'created_at' => $now,
             'updated_at' => $now,
         ];
@@ -172,6 +195,7 @@ final class DictionaryImport extends Command
                     'pinyin_plain',
                     'definitions_en',
                     'definitions_en_text',
+                    'measure_words',
                     'char_count',
                     'is_single_char',
                     'updated_at',

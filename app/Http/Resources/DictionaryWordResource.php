@@ -45,6 +45,19 @@ final class DictionaryWordResource extends JsonResource
              * dòng tiếng Anh là cơ chế đối chiếu duy nhất người học có.
              */
             'definitions_vi' => $this->resource->definitions_vi,
+            /*
+             * Lượng từ, tách khỏi `definitions_en` lúc import.
+             *
+             * Trước đó CC-CEDICT để chúng NGAY TRONG phần nghĩa dưới dạng
+             * `CL:家[jia1],個|个[ge4]`, và chuỗi đó hiện nguyên dạng mã cho người
+             * dùng. Tách ra vừa cho FE một mục "Lượng từ" đọc được, vừa bịt chỗ rò.
+             *
+             * `[]` chứ không `null` ở tầng này có chủ đích: `null` trong cột nói
+             * "từ này không có lượng từ", nhưng FE không cần phân biệt nó với
+             * danh sách rỗng — cả hai đều render thành không có gì. Chuẩn hoá ở
+             * đây để app khỏi mang hai nhánh cho cùng một ý.
+             */
+            'measure_words' => $this->resource->measure_words ?? [],
             'hsk_level' => $this->resource->hsk_level,
             'characters' => $this->characters,
             /*

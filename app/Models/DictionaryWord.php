@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $definitions_en_text
  * @property list<string>|null $definitions_vi
  * @property string|null $definitions_vi_text
+ * @property list<array{simplified: string, traditional: string, pinyin: string}>|null $measure_words
  * @property string|null $han_viet
  * @property string|null $han_viet_plain
  * @property string $han_viet_status
@@ -90,6 +91,12 @@ final class DictionaryWord extends Model
              * Việt" với "có nhưng rỗng".
              */
             'definitions_vi' => 'array',
+            /*
+             * Cũng `null`-hợp-lệ như `definitions_vi`: phần lớn từ không có
+             * lượng từ. Cast `array` giữ nguyên `null`, và tầng resource mới là
+             * chỗ chuẩn hoá nó thành `[]` cho FE.
+             */
+            'measure_words' => 'array',
             'is_priority' => 'boolean',
             'is_single_char' => 'boolean',
             'hsk_level' => 'integer',
