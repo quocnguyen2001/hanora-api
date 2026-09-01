@@ -42,7 +42,13 @@ services:
     networks: [edge]
 
   app:
-    image: hanora-api:latest
+    # Ảnh kéo từ GHCR, KHÔNG dựng trên VPS: `scripts/docker-publish.sh` đẩy lên,
+    # ba service dưới đây dùng chung đúng một ảnh đó.
+    #
+    # `HANORA_VERSION` là cần gạt rollback. Bỏ trống thì lấy `latest`; đặt
+    # `HANORA_VERSION=0.1.0` là quay về đúng ảnh đã kiểm của bản 0.1.0 — mục
+    # Rollback trong README chỉ thực hiện được nhờ biến này.
+    image: ghcr.io/quocnguyen2001/hanora-api:${HANORA_VERSION:-latest}
     restart: unless-stopped
     env_file: [.env.production]
     volumes:
@@ -54,7 +60,7 @@ services:
     networks: [internal]
 
   worker:
-    image: hanora-api:latest
+    image: ghcr.io/quocnguyen2001/hanora-api:${HANORA_VERSION:-latest}
     restart: unless-stopped
     env_file: [.env.production]
     volumes:
@@ -74,7 +80,7 @@ services:
     networks: [internal]
 
   scheduler:
-    image: hanora-api:latest
+    image: ghcr.io/quocnguyen2001/hanora-api:${HANORA_VERSION:-latest}
     restart: unless-stopped
     env_file: [.env.production]
     volumes:

@@ -1,0 +1,57 @@
+# Ngữ cảnh build cho `docker/php/Dockerfile.prod`.
+#
+# HAI mục ở đây không phải dọn dẹp cho gọn, mà là điều kiện đúng/sai của ảnh:
+#
+# 1. `.env*` — Dockerfile dùng `COPY . .`, nên một file `.env` nằm ở thư mục gốc
+#    sẽ đi thẳng vào ảnh, và ảnh này được ĐẨY LÊN REGISTRY. Đó là APP_KEY, mật
+#    khẩu database và khoá Gemini của máy build, phát hành cho bất kỳ ai kéo
+#    được ảnh. Env của production đến từ `env_file:` lúc chạy, không từ ảnh.
+#
+# 2. Thư mục dependency của máy build — `COPY . .` chạy SAU `COPY --from=vendor`,
+#    nên bản cài ở máy build sẽ ĐÈ LÊN bản `--no-dev` mà stage composer vừa dựng.
+#    Không chặn ở đây thì Pint, Pest và Larastan có mặt trên production, và cờ
+#    `--no-dev` trong Dockerfile chỉ là trang trí.
+
+.env
+.env.*
+.git
+.github
+.gitattributes
+.gitignore
+.editorconfig
+.DS_Store
+.claude
+.prompts
+.phpunit.cache
+.phpunit.result.cache
+
+vendor
+node_modules
+
+# Công cụ dev: không có lý do gì tồn tại trên production.
+tests
+plans
+docs
+scripts
+phpunit.xml
+phpstan.neon
+pint.json
+docker-compose.yml
+docker-compose.prod.yml
+
+public/build
+public/hot
+public/storage
+
+# Nội dung `storage/` bị bỏ, nhưng KHUNG THƯ MỤC phải còn: Dockerfile chạy
+# `chown -R www-data:www-data storage`, và Laravel cần sẵn
+# `storage/framework/{cache,sessions,views}`. Mỗi thư mục đó có một `.gitignore`
+# được commit, nên giữ đúng các file đó là dựng lại được toàn bộ khung.
+storage/**
+!storage/**/.gitignore
+
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# `database/data/` KHÔNG nằm trong danh sách này: `cvdict.u8` và `topics/*.json`
+# là dữ liệu đi cùng ảnh (README §Dữ liệu từ điển).

@@ -751,16 +751,70 @@ Internet. Publish nhầm Redis nghĩa là ai đó **tiêm được job tùy ý**
 mà worker sẽ ngoan ngoãn chạy; publish nhầm Postgres nghĩa là lộ bảng `users` và
 `personal_access_tokens`.
 
+### Phát hành ảnh lên GHCR
+
+Ảnh **không dựng trên VPS**. Dựng ở máy maintainer rồi đẩy lên
+`ghcr.io/quocnguyen2001/hanora-api`; VPS chỉ kéo về.
+
+```bash
+gh auth refresh -h github.com -s write:packages   # lần đầu: token gh mặc định KHÔNG có scope này
+
+vim VERSION                                        # 0.1.0 -> 0.1.1
+git commit -am 'chore: phát hành 0.1.1'
+git tag -a v0.1.1 -m v0.1.1 && git push --follow-tags
+
+./scripts/docker-publish.sh            # dựng amd64 + arm64, đẩy 4 tag
+./scripts/docker-publish.sh --dry-run  # dựng thử cả hai kiến trúc, không đẩy
+```
+
+File `VERSION` là nguồn version duy nhất. Script đối chiếu nó với git trước khi
+dựng: working tree bẩn thì dừng (dùng `--allow-dirty` sẽ chỉ đẩy tag
+`sha-…-dirty`), thiếu tag `v<version>` thì cảnh báo, và tag `:<version>` đã có
+trên registry thì từ chối đẩy đè trừ khi `--force`.
+
+| Tag | Có bị dời? | Dùng để |
+|---|---|---|
+| `:0.1.1` | không | ghim bản trên VPS, và là thứ để rollback |
+| `:0.1` | có | bám bản vá mới nhất của dòng 0.1 |
+| `:sha-abc1234` | không | truy ảnh đang chạy về đúng commit |
+| `:latest` | có | mặc định của compose |
+
+**Ảnh đa kiến trúc (amd64 + arm64) không phải để cho sang.** Máy maintainer là
+Apple Silicon, VPS thường là amd64; dựng native trên Mac rồi đẩy lên sẽ ra một
+ảnh arm64 mà VPS **không chạy nổi**, và lỗi đó chỉ lộ ra lúc `up -d` trên máy
+thật.
+
+**Config không nướng vào ảnh.** `docker/php/entrypoint.sh` chạy `config:cache`
+lúc container khởi động, không phải lúc build. Config cache là mảng PHP đã chốt
+giá trị, và khi nó tồn tại thì Laravel không đọc env nữa — nướng sẵn vào ảnh
+nghĩa là `env_file: [.env.production]` bị bỏ qua **im lặng** và cả stack chạy
+bằng env của máy build. Cùng lý do đó, `.dockerignore` chặn `.env*`: ảnh này
+nằm trên registry, không phải nơi chứa `APP_KEY`.
+
 ### Các bước
 
 ```bash
 # 1. Chuẩn bị env (TRÊN VPS, không commit)
 cp .env.production.example .env.production
 cp .env.production.db.example .env.production.db
-docker run --rm hanora-api:latest php artisan key:generate --show   # dán vào APP_KEY
+docker run --rm ghcr.io/quocnguyen2001/hanora-api:latest \
+  php artisan key:generate --show                                  # dán vào APP_KEY
 
-# 2. Build và khởi động
-docker build -f docker/php/Dockerfile.prod -t hanora-api:latest .
+# 2. Kéo ảnh và khởi động
+# Package GHCR mặc định là private, nên VPS phải đăng nhập bằng một PAT có
+# scope `read:packages` trước:
+echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u quocnguyen2001 --password-stdin
+
+# Repo trên VPS phải ở ĐÚNG tag của ảnh sắp chạy. Mã ứng dụng đến từ ảnh, nhưng
+# nginx bind-mount `./public` và `docker/nginx/prod.conf` từ HOST — hai nguồn
+# lệch nhau là `public/index.php` của bản này gọi vào mã của bản khác.
+git fetch --tags && git checkout v0.1.0
+
+# Compose đọc `.env` của thư mục hiện tại để nội suy tag ảnh. Không có biến này
+# thì mặc định là `:latest` — chạy được, nhưng mất khả năng ghim và rollback.
+echo 'HANORA_VERSION=0.1.0' >> .env
+
+docker compose -f docker-compose.prod.yml pull
 docker compose -f docker-compose.prod.yml up -d
 
 # 3. Chứng chỉ TLS (lần đầu)
@@ -827,7 +881,19 @@ bàn về nơi lưu token.
 ### Rollback
 
 Mỗi lần deploy là một ảnh Docker mới (`validate_timestamps=0` nên opcache không
-tự nhận file đổi). Rollback = trỏ lại tag ảnh trước rồi `up -d`.
+tự nhận file đổi). Rollback = trỏ lại tag ảnh trước rồi `up -d`:
+
+```bash
+docker compose -f docker-compose.prod.yml config | grep hanora-api  # đang chạy tag nào
+HANORA_VERSION=0.1.0 docker compose -f docker-compose.prod.yml up -d
+```
+
+Chỉ dùng tag **không bị dời** (`:0.1.0` hoặc `:sha-abc1234`) để rollback. `:0.1`
+và `:latest` trỏ vào bản mới nhất, tức là trỏ đúng vào thứ vừa phải quay lui.
+
+Rollback ảnh **không** hoàn tác migration đã chạy. Ảnh cũ nói chuyện với schema
+mới, nên mọi migration phá vỡ tương thích ngược phải tách làm hai lần phát hành
+thì đường lui này mới còn tác dụng.
 
 ## Quy ước API
 

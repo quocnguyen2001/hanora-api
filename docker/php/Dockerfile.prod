@@ -37,10 +37,28 @@ WORKDIR /var/www/html
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
 
-# `validate_timestamps=0` nghĩa là opcache không kiểm tra file đổi — nên phải
-# nạp sẵn cache config/route/view lúc build, và mỗi lần deploy là một ảnh mới.
-RUN php artisan config:cache \
-    && php artisan route:cache \
+# `validate_timestamps=0` nghĩa là opcache không kiểm tra file đổi, nên mỗi lần
+# deploy là một ảnh mới.
+#
+# CHỈ route cache nướng vào ảnh. Route không phụ thuộc env, còn config thì có:
+# config cache chốt cứng giá trị env LÚC BUILD, và một ảnh phát hành trên
+# registry thì không được mang env của bất kỳ máy nào. `config:cache` chuyển
+# sang entrypoint — xem `docker/php/entrypoint.sh` để biết vì sao.
+RUN php artisan route:cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
+COPY docker/php/entrypoint.sh /usr/local/bin/hanora-entrypoint
+RUN chmod +x /usr/local/bin/hanora-entrypoint
+
+# Phiên bản ảnh, do `scripts/docker-publish.sh` truyền vào từ file `VERSION`.
+# Đặt ở cuối để đổi version không thổi bay cache của các layer nặng phía trên.
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 USER www-data
+
+# Khai lại CMD là BẮT BUỘC: khai ENTRYPOINT ở ảnh con sẽ xoá CMD kế thừa từ
+# `php:8.4-fpm-alpine`, và không có dòng này thì container `app` khởi động rồi
+# thoát ngay vì không có lệnh nào để chạy.
+ENTRYPOINT ["/usr/local/bin/hanora-entrypoint"]
+CMD ["php-fpm"]
