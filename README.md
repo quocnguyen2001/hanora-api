@@ -181,6 +181,125 @@ rơi vào 8.000–10.000. Đo trên nguồn thật:
 `DictionaryEnricher::FREQUENCY_THRESHOLD`; đổi nguồn dữ liệu thì phải đo lại —
 lệnh import tự cảnh báo nếu kết quả rơi ra ngoài dải.
 
+### Hán tự — `dictionary_characters`
+
+Bảng TẤT ĐỊNH cho bộ thủ, số nét, hình thái, lục thư và nét bút. Tồn tại vì lớp
+làm giàu AI từng được hỏi bộ thủ và số nét — đúng chỗ model bịa nhiều nhất, và
+`EnrichmentValidator` không tra ngược được.
+
+Nguồn: [Make Me a Hanzi](https://github.com/skishore/makemeahanzi) —
+`dictionary.txt` (metadata) + `graphics.txt` (hình học nét), **9.574 chữ**.
+Dữ liệu ký tự dẫn xuất từ font Arphic, theo **Arphic Public License**: mọi bản
+phân phối phải kèm thông báo license, và app hiện nó ở chân sheet tập viết.
+
+```bash
+node scripts/generate-stroke-names.mjs   # cần: npm i --no-save cnchar cnchar-order
+docker compose exec app php artisan characters:import
+```
+
+Import chạy **ba lượt** và mất ~5 giây; bảng nặng **44 MB**.
+
+| Lượt | Làm gì                                              |
+| ---- | ----------------------------------------------------- |
+| 1    | `graphics.txt` → TẠO dòng, `stroke_count`, `strokes`, `medians`, `stroke_names` |
+| 2    | `dictionary.txt` → CẬP NHẬT bộ thủ, hình thái, lục thư |
+| 3    | Âm Hán-Việt của bộ thủ, tra từ chính `dictionary_words` |
+
+Hai lượt chứ không ghép hai file trong bộ nhớ: `graphics.txt` nặng 30 MB, và giữ
+9.574 bản ghi hình học cùng lúc là vài trăm MB trong mảng PHP.
+
+Độ phủ đo được:
+
+| Trường          | Có dữ liệu    | Ghi chú                                          |
+| --------------- | ------------- | -------------------------------------------------- |
+| bộ thủ          | 9.574 (100%)  | giữ nguyên biến thể (`刂`, không quy về `刀`)     |
+| hình thái       | 9.508 (99%)   | 66 chữ có `？` là cả chuỗi → `null`               |
+| lục thư         | 9.033 (94%)   | chỉ BA loại, không phải sáu                       |
+| âm bộ thủ       | 7.844 (82%)   | 244/295 bộ tra ra âm                              |
+| nét bút         | 6.811 (71%)   | cnchar chỉ phủ chữ giản thể                       |
+
+#### Bốn điểm dễ làm sai
+
+**Lục thư chỉ có BA loại.** `pictophonetic` → hình thanh, `ideographic` → chỉ
+sự, `pictographic` → tượng hình. Hội ý, chuyển chú, giả tá **không có trong
+nguồn** và không được suy ra. Loại lạ rơi về `null` và FE ẩn dòng — tốt hơn là
+đẩy một chuỗi tiếng Anh lên màn hình vì bảng ánh xạ không có nó.
+
+**`？` cả chuỗi → `null`, `？` nhúng giữa thì GIỮ.** Đo được: 9.125 chữ sạch,
+383 có `？` nhúng (`习` → `⿹？冫`), 66 có `？` là toàn bộ giá trị. IDS nhúng vẫn
+nói được cấu trúc chữ; vứt 383 chữ đó đi để tránh một ký tự lạ là mất thông tin.
+
+**Bộ thủ giữ nguyên BIẾN THỂ.** `剑` có bộ `刂`, không quy về `刀`. Đó là hình
+dạng thật xuất hiện trong chữ, và corpus vẫn tra ra âm cho biến thể (`刂`→đao,
+`亻`→nhân, `氵`→thuỷ) nên không cần bảng ánh xạ.
+
+**Nét bút sinh bằng script Node, KHÔNG phải runtime.** `cnchar` (MIT) là thư
+viện JS còn API là PHP; bắt PHP shell ra Node là thêm phụ thuộc runtime cho một
+trường trang trí. `scripts/generate-stroke-names.mjs` sinh sẵn JSON, importer
+đọc file. Ba cái bẫy của cnchar nằm trong comment của script — cả ba cho ra dữ
+liệu sai mà không báo gì.
+
+#### Hai đường ra, không phải một
+
+| Dữ liệu               | Đường                                | Kích thước  | Khi nào             |
+| --------------------- | -------------------------------------- | ----------- | ------------------- |
+| Metadata 6 thuộc tính | trong `characters[]` của `/words/{id}` | ~200 B/chữ | Luôn, 0 request thêm |
+| `strokes` + `medians` | `GET /dictionary/characters/{char}/strokes` | ~4 KB/chữ | Chỉ khi bấm tập viết |
+
+Gộp chung là bắt một từ 4 chữ kéo về 16 KB hình học cho một tính năng thiểu số
+dùng, cộng 4 request trên trần 60/phút theo user.
+
+Endpoint nét **TẤT ĐỊNH**: không job, không quota, không `pending`. Có thì `200`
+kèm `immutable` một năm, không thì `404`. FE không cần vòng poll nào — khác hẳn
+ba lớp lười quanh nó. Route ràng buộc regex CJK nên `/characters/abc/strokes`
+trả 404 mà KHÔNG chạm database.
+
+#### `CharacterBreakdownService` giờ phân tích CẢ chữ đơn
+
+Trước đây nó thoát sớm với mảng rỗng cho từ một chữ ("chữ đơn thì chính nó là
+phân tích của nó"). Đúng khi khối Hán tự chỉ có pinyin và âm Hán-Việt — hai thứ
+đã hiện ở hero. Thôi đúng từ khi khối đó mang thêm bốn thuộc tính hero không có.
+
+Hệ quả: response `/words/{id}` của từ một chữ đổi từ `characters: []` sang một
+phần tử. Bản cache cũ (CDN 24 giờ, service worker 30 ngày) vẫn trả mảng rỗng cho
+tới khi hết hạn — không phải lỗi, nhưng phải biết trước để không truy nhầm.
+
+**Đổi shape thì phải xoá cache `dictionary.breakdown.*`** (TTL 30 ngày). Bỏ bước
+đó thì màn chi tiết đọc bản cache thiếu metadata suốt một tháng.
+
+### Lượng từ
+
+CC-CEDICT mã hoá lượng từ bằng `CL:` **ngay trong phần nghĩa**, ở hai dạng — cả
+hai đều có thật trong nguồn:
+
+```text
+銀行 银行 [yin2 hang2] /bank/CL:家[jia1],個|个[ge4]/    ← nghĩa ĐỘC LẬP
+貓  猫  [mao1]        /cat (CL:隻|只[zhi1])/          ← NHÚNG trong nghĩa
+```
+
+`CedictParser::extractMeasureWords()` rút chúng ra cột `measure_words` (jsonb,
+nullable) lúc import. Đo trên nguồn thật: **1.554 / 123.646 mục** có lượng từ,
+khớp 1.556 dòng chứa `CL:` trong file gốc (chênh 2 do gộp khoá trùng).
+
+Không rút ra thì chuỗi đó hiện **nguyên dạng mã** cho người dùng ở cả thẻ tìm
+kiếm lẫn màn chi tiết — đó là trạng thái trước thay đổi này. Nó cũng lọt vào
+vector tìm kiếm sinh từ `definitions_en_text`, tức gõ "cl" ra kết quả rác.
+
+Ba điểm dễ làm sai:
+
+- **Regex neo vào hình dạng `chữ[pinyin số]`, không chỉ vào hai chữ `CL:`.** Một
+  nghĩa chứa "CL:" ở ngữ cảnh khác không có ngoặc vuông theo sau nên không khớp;
+  có test âm tính khoá điều đó.
+- **`definitions_en_text` dựng TỪ danh sách đã dọn**, không phải từ chuỗi gốc.
+  Dựng từ chuỗi gốc thì màn hình sạch nhưng vector tìm kiếm vẫn bẩn.
+- **`cvdict:import` dọn `CL:` khỏi nghĩa Việt nhưng KHÔNG ghi cột.** Cột
+  `measure_words` thuộc sở hữu của `dictionary:import` — cùng ranh giới mà
+  pinyin và `char_count` đang giữ. CVDICT sinh ra từ chính CC-CEDICT nên nó mang
+  theo cả mã đó, và `definitions_vi` cũng được hiển thị.
+
+Tầng resource trả `[]` chứ không `null`: FE không cần phân biệt "không có lượng
+từ" với "danh sách rỗng", cả hai render thành không có gì.
+
 ## Lớp AI (Gemini)
 
 Từ điển vẫn là **CC-CEDICT + CVDICT + Unihan + HSK + SUBTLEX**. AI không thay
@@ -285,6 +404,20 @@ Gọi **async sau khi màn chi tiết đã render** phần dữ liệu cứng:
 | không dùng được | `200` | `data: null`, `meta.status: "unavailable"` — **không bao giờ 5xx** |
 
 Payload mang `source: "ai"` và tên model; FE phải hiện nhãn đó.
+
+**`related_words` và `idioms` mang `word_id`.** `EnrichmentValidator` vốn đã tra
+corpus bằng MỘT truy vấn để loại từ model bịa ra — nó chỉ đang vứt `id` đi sau
+khi kiểm. Giữ lại là miễn phí, và đó là thứ biến danh sách từ ghép từ "để nhìn"
+thành bấm được.
+
+Một chữ có thể có nhiều dòng (khoá tự nhiên là `simplified` + `pinyin_numbered`),
+nên truy vấn sắp theo `is_priority DESC, frequency_rank ASC NULLS LAST, id ASC`
+và lấy dòng ĐẦU. Bỏ `ORDER BY` đi thì Postgres trả thứ tự tùy ý và bấm vào `行`
+có thể ra âm hiếm — đúng loại lỗi mà `CharacterBreakdownService` đã sửa một lần.
+
+Bản ghi làm giàu sinh TRƯỚC thay đổi này không có trường đó; FE coi trường vắng
+như `null` và hiện mục tĩnh. Không bump `prompt_version` — đây là thay đổi ở tầng
+validate, model không được xin thêm gì.
 
 ```bash
 docker compose exec app php artisan dictionary:enrich --hsk        # nạp sẵn tập HSK
