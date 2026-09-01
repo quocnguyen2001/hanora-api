@@ -102,9 +102,19 @@ describe('phân tích Hán tự — red team H11', function (): void {
         expect(showWord('沙发')->json('data.characters'))->toBe([]);
     });
 
-    it('không phân tích chữ đơn', function (): void {
-        // Chữ đơn thì chính nó là phân tích của nó.
-        expect(showWord('学', 'xue2')->json('data.characters'))->toBe([]);
+    it('PHÂN TÍCH cả chữ đơn', function (): void {
+        /*
+         * Đảo hành vi cũ ("chữ đơn thì chính nó là phân tích của nó", trả `[]`).
+         *
+         * Lập luận cũ đúng khi khối Hán tự chỉ có pinyin và âm Hán-Việt — hai
+         * thứ đó đã hiện ở hero, nên lặp lại là thừa. Nó thôi đúng từ khi khối
+         * đó mang thêm bộ thủ, số nét, hình thái, lục thư và nét bút: hero
+         * KHÔNG có những thứ này, và người tra một chữ đơn cần chúng nhất.
+         */
+        $characters = showWord('学', 'xue2')->json('data.characters');
+
+        expect($characters)->toHaveCount(1);
+        expect($characters[0]['char'])->toBe('学');
     });
 });
 

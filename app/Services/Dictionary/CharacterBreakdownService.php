@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Dictionary;
 
+use App\Models\DictionaryCharacter;
 use App\Models\DictionaryWord;
 use Illuminate\Support\Facades\Cache;
 
@@ -26,7 +27,11 @@ final class CharacterBreakdownService
     public function __construct(private readonly QueryClassifier $classifier) {}
 
     /**
-     * @return list<array{char: string, pinyin: string, han_viet: string|null}>
+     * @return list<array{
+     *     char: string, pinyin: string, han_viet: string|null,
+     *     radical: string|null, radical_han_viet: string|null, stroke_count: int|null,
+     *     decomposition: string|null, etymology_type: string|null, stroke_names: list<string>|null
+     * }>
      */
     public function forWord(DictionaryWord $word): array
     {
@@ -38,19 +43,30 @@ final class CharacterBreakdownService
     }
 
     /**
-     * @return list<array{char: string, pinyin: string, han_viet: string|null}>
+     * @return list<array{
+     *     char: string, pinyin: string, han_viet: string|null,
+     *     radical: string|null, radical_han_viet: string|null, stroke_count: int|null,
+     *     decomposition: string|null, etymology_type: string|null, stroke_names: list<string>|null
+     * }>
      */
     private function build(DictionaryWord $word): array
     {
         $characters = mb_str_split($word->simplified);
         $syllables = $this->syllables($word->pinyin_numbered, count($characters));
 
-        // Chữ đơn thì chính nó là phân tích của nó — không cần tra lại.
-        if (count($characters) <= 1) {
-            return [];
-        }
-
+        /*
+         * TỪ MỘT CHỮ CŨNG CÓ phân tích.
+         *
+         * Trước đây chỗ này thoát sớm với mảng rỗng, lý do là "chữ đơn thì chính
+         * nó là phân tích của nó" — đúng khi khối Hán tự chỉ có pinyin và âm
+         * Hán-Việt, vì hai thứ đó đã hiện ở hero.
+         *
+         * Không còn đúng từ khi khối đó mang thêm bộ thủ, số nét, hình thái, lục
+         * thư và nét bút: đó là thông tin hero KHÔNG có. Và `剑` — chữ đơn —
+         * chính là ca trong ảnh demo của yêu cầu.
+         */
         $rows = $this->lookupCharacters($characters);
+        $metadata = $this->metadata($characters);
         $breakdown = [];
 
         foreach ($characters as $index => $character) {
@@ -65,6 +81,7 @@ final class CharacterBreakdownService
                 'char' => $character,
                 'pinyin' => $match->pinyin,
                 'han_viet' => $match->han_viet,
+                ...$this->attributes($metadata[$character] ?? null),
             ];
         }
 
@@ -100,6 +117,59 @@ final class CharacterBreakdownService
     private function sameSyllable(string $left, string $right): bool
     {
         return mb_strtolower(trim($left)) === mb_strtolower(trim($right));
+    }
+
+    /**
+     * Sáu thuộc tính Hán tự, hoặc toàn `null` khi chữ không có trong bảng.
+     *
+     * Trả ĐỦ khoá kể cả khi không có dữ liệu, thay vì bỏ khoá: hình dạng
+     * response phải giống nhau cho mọi chữ, nếu không FE phải kiểm sự tồn tại
+     * của từng trường thay vì chỉ kiểm `null`.
+     *
+     * @return array{
+     *     radical: string|null,
+     *     radical_han_viet: string|null,
+     *     stroke_count: int|null,
+     *     decomposition: string|null,
+     *     etymology_type: string|null,
+     *     stroke_names: list<string>|null
+     * }
+     */
+    private function attributes(?DictionaryCharacter $row): array
+    {
+        return [
+            'radical' => $row?->radical,
+            'radical_han_viet' => $row?->radical_han_viet,
+            'stroke_count' => $row?->stroke_count,
+            'decomposition' => $row?->decomposition,
+            'etymology_type' => $row?->etymology_type,
+            'stroke_names' => $row?->stroke_names,
+        ];
+    }
+
+    /**
+     * MỘT truy vấn cho cả từ, không phải một truy vấn mỗi chữ.
+     *
+     * Cùng lý do `EnrichmentValidator::existingWords()` đã ghi: N+1 ở tầng từ
+     * điển nhân với số lần người dùng mở một từ là con số không đọc nổi.
+     *
+     * KHÔNG lấy `strokes`/`medians` — chúng nặng ~4 KB mỗi chữ và đi endpoint
+     * riêng. Kéo về đây là bắt mọi người mở màn chi tiết trả phí cho một tính
+     * năng thiểu số dùng (xem plan, Validation Q1).
+     *
+     * @param  list<string>  $characters
+     * @return array<string, DictionaryCharacter>
+     */
+    private function metadata(array $characters): array
+    {
+        return DictionaryCharacter::query()
+            ->whereIn('char', array_values(array_unique($characters)))
+            ->get([
+                'char', 'radical', 'radical_han_viet',
+                'stroke_count', 'decomposition', 'etymology_type', 'stroke_names',
+            ])
+            ->keyBy('char')
+            ->all();
     }
 
     /**

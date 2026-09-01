@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DictionaryCharacterStrokesController;
 use App\Http\Controllers\Api\DictionaryEnrichmentController;
 use App\Http\Controllers\Api\DictionaryExampleTranslationController;
 use App\Http\Controllers\Api\DictionaryIllustrationController;
@@ -96,6 +97,20 @@ Route::middleware('auth:sanctum')->group(function (): void {
          */
         Route::get('/words/{word}/illustration', DictionaryIllustrationController::class)
             ->name('word.illustration');
+
+        /*
+         * Hình học nét cho bảng tập viết.
+         *
+         * Khác ba endpoint quanh nó: TẤT ĐỊNH. Không job, không quota, không
+         * `pending`. Có thì 200 kèm `immutable`, không thì 404.
+         *
+         * `where` chặn ở tầng route bằng dải CJK, nên `/characters/abc/strokes`
+         * trả 404 mà KHÔNG chạm database. Thiếu ràng buộc này thì endpoint thành
+         * một đường quét bảng miễn phí cho mọi chuỗi người lạ gửi tới.
+         */
+        Route::get('/characters/{char}/strokes', DictionaryCharacterStrokesController::class)
+            ->where('char', '[\x{3400}-\x{9FFF}\x{F900}-\x{FAFF}\x{2E80}-\x{2FDF}]')
+            ->name('character.strokes');
 
         /*
          * Nghĩa tiếng Việt của câu ví dụ, cũng gọi ASYNC sau khi màn chi tiết
